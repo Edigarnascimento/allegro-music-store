@@ -23,8 +23,9 @@ function ProductCard({ product }) {
         <h3>{normalizedProduct.nome}</h3>
         <p>{normalizedProduct.descricao}</p>
         <strong className="product-price">R$ {Number(normalizedProduct.preco).toLocaleString('pt-BR')}</strong>
+        <div className="installments">até 12x sem juros no cartão</div>
         <div className="product-actions">
-          <Link to={`/produto/${normalizedProduct.id}`} className="btn btn-secondary">Ver detalhes</Link>
+          <Link to={`/produto/${normalizedProduct.id}`} className="btn">Ver detalhes</Link>
           <a href={whatsappLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp">WhatsApp</a>
         </div>
       </div>

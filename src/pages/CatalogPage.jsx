@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import ProductCard from '../components/ProductCard';
 import { getProducts } from '../services/productsService';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 function CatalogPage() {
   const [products, setProducts] = useState([]);
@@ -33,6 +34,7 @@ function CatalogPage() {
 
   return (
     <section className="container section">
+      <Breadcrumbs items={[{ label: 'Início', to: '/' }, { label: 'Catálogo' }]} />
       <div className="section-heading">
         <h1>Catálogo de Produtos</h1>
         <p className="subtitle">Instrumentos selecionados para quem busca performance, timbre e confiabilidade.</p>

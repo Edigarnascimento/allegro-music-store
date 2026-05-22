@@ -1,8 +1,10 @@
 import { services } from '../data/services';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 function ServicesPage() {
   return (
     <section className="container section">
+      <Breadcrumbs items={[{ label: 'Início', to: '/' }, { label: 'Serviços' }]} />
       <div className="section-heading">
         <h1>Serviços especializados</h1>
         <p className="subtitle">Equipe técnica preparada para cuidar do seu instrumento antes e depois da compra.</p>

@@ -1,6 +1,8 @@
+import Breadcrumbs from '../components/Breadcrumbs';
 function ContactPage() {
   return (
     <section className="container section">
+      <Breadcrumbs items={[{ label: 'Início', to: '/' }, { label: 'Contato' }]} />
       <div className="section-heading">
         <h1>Contato</h1>
         <p className="subtitle">Atendimento consultivo para compras, serviços e pós-venda.</p>
