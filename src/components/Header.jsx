@@ -24,7 +24,8 @@ function Header() {
           ))}
         </div>
       </div>
-      <div className="container header-main">
+      <div className="header-main-wrap">
+        <div className="container header-main">
         <NavLink to="/" className="brand">
           <span className="brand-mark">♫</span>
           <span className="brand-text">
@@ -36,6 +37,7 @@ function Header() {
           <input type="search" placeholder="Busque instrumentos, acessórios e equipamentos" aria-label="Buscar produtos" />
           <button type="button" className="btn">Buscar</button>
         </form>
+        </div>
       </div>
       <div className="menu-bar">
         <div className="container menu-content">
