@@ -44,6 +44,14 @@ function isValidUuid(value) {
   return typeof value === 'string' && UUID_V4_REGEX.test(value);
 }
 
+
+function sanitizeCategoryPayload(payload = {}) {
+  return {
+    nome: payload?.nome ?? '',
+    ativo: payload?.ativo ?? true,
+  };
+}
+
 function sanitizeStoreSettingsPayload(payload = {}) {
   return {
     nome_loja: payload?.nome_loja ?? '',
@@ -175,24 +183,28 @@ export async function getAdminCategories() {
 }
 
 export async function createAdminCategory(payload) {
+  const sanitizedPayload = sanitizeCategoryPayload(payload);
+
   if (!isSupabaseConfigured || !supabase) {
-    const item = { ...payload, id: `mock-category-${Date.now()}` };
+    const item = { ...sanitizedPayload, id: `mock-category-${Date.now()}` };
     localCategories = [item, ...localCategories];
     return item;
   }
 
-  const { data, error } = await supabase.from(CATEGORIES_TABLE).insert(payload).select().single();
+  const { data, error } = await supabase.from(CATEGORIES_TABLE).insert(sanitizedPayload).select().single();
   if (error) throw new Error(error.message);
   return data;
 }
 
 export async function updateAdminCategory(id, payload) {
+  const sanitizedPayload = sanitizeCategoryPayload(payload);
+
   if (!isSupabaseConfigured || !supabase) {
-    localCategories = localCategories.map((item) => (String(item.id) === String(id) ? { ...item, ...payload } : item));
+    localCategories = localCategories.map((item) => (String(item.id) === String(id) ? { ...item, ...sanitizedPayload } : item));
     return true;
   }
 
-  const { error } = await supabase.from(CATEGORIES_TABLE).update(payload).eq('id', id);
+  const { error } = await supabase.from(CATEGORIES_TABLE).update(sanitizedPayload).eq('id', id);
   if (error) throw new Error(error.message);
   return true;
 }
