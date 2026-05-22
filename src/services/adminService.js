@@ -4,6 +4,7 @@ import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 const PRODUCTS_TABLE = 'music_produtos';
 const CATEGORIES_TABLE = 'music_categorias';
 const STORE_SETTINGS_TABLE = 'music_configuracoes_loja';
+const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const mockSettings = {
   id: 'mock-store-settings',
@@ -38,6 +39,22 @@ let localCategories = Array.from(new Set(localProducts.map((p) => p.categoria)))
   ativo: true,
 }));
 let localSettings = { ...mockSettings };
+
+function isValidUuid(value) {
+  return typeof value === 'string' && UUID_V4_REGEX.test(value);
+}
+
+function sanitizeStoreSettingsPayload(payload = {}) {
+  return {
+    nome_loja: payload?.nome_loja ?? '',
+    whatsapp: payload?.whatsapp ?? '',
+    instagram: payload?.instagram ?? '',
+    endereco: payload?.endereco ?? '',
+    horario_funcionamento: payload?.horario_funcionamento ?? '',
+    sobre: payload?.sobre ?? '',
+    logo_url: payload?.logo_url ?? '',
+  };
+}
 
 export async function signInAdmin({ email, password }) {
   if (!isSupabaseConfigured || !supabase) {
@@ -186,36 +203,50 @@ export async function getAdminStoreSettings() {
   const { data, error } = await supabase.from(STORE_SETTINGS_TABLE).select('*').limit(1).maybeSingle();
   if (error) {
     console.warn('[adminService] fallback configurações locais:', error.message);
-    return localSettings;
+    return sanitizeStoreSettingsPayload(localSettings);
   }
 
-  return data ?? localSettings;
+  if (!data) {
+    return sanitizeStoreSettingsPayload(localSettings);
+  }
+
+  return {
+    id: isValidUuid(data.id) ? data.id : undefined,
+    ...sanitizeStoreSettingsPayload(data),
+  };
 }
 
 export async function updateAdminStoreSettings(payload) {
-  const sanitizedPayload = {
-    nome_loja: payload?.nome_loja ?? '',
-    whatsapp: payload?.whatsapp ?? '',
-    instagram: payload?.instagram ?? '',
-    endereco: payload?.endereco ?? '',
-    horario_funcionamento: payload?.horario_funcionamento ?? '',
-    sobre: payload?.sobre ?? '',
-    logo_url: payload?.logo_url ?? '',
-  };
+  const sanitizedPayload = sanitizeStoreSettingsPayload(payload);
 
   if (!isSupabaseConfigured || !supabase) {
     localSettings = { ...localSettings, ...sanitizedPayload };
     return localSettings;
   }
 
-  const current = await getAdminStoreSettings();
-  if (!current?.id) {
+  const { data: existingSettings, error: readError } = await supabase
+    .from(STORE_SETTINGS_TABLE)
+    .select('id')
+    .limit(1)
+    .maybeSingle();
+
+  if (readError) {
+    throw new Error(`Não foi possível consultar as configurações atuais: ${readError.message}`);
+  }
+
+  const existingId = existingSettings?.id;
+  if (!isValidUuid(existingId)) {
     const { data, error } = await supabase.from(STORE_SETTINGS_TABLE).insert(sanitizedPayload).select().single();
     if (error) throw new Error(error.message);
     return data;
   }
 
-  const { data, error } = await supabase.from(STORE_SETTINGS_TABLE).update(sanitizedPayload).eq('id', current.id).select().single();
+  const { data, error } = await supabase
+    .from(STORE_SETTINGS_TABLE)
+    .update(sanitizedPayload)
+    .eq('id', existingId)
+    .select()
+    .single();
   if (error) throw new Error(error.message);
   return data;
 }

@@ -36,7 +36,10 @@ export default function AdminSettingsPage() {
       setForm((current) => ({ ...current, ...(saved || {}) }));
       setStatus({ type: 'success', message: 'Configurações salvas com sucesso.' });
     } catch (error) {
-      setStatus({ type: 'error', message: error.message || 'Erro ao salvar configurações.' });
+      setStatus({
+        type: 'error',
+        message: `Falha ao salvar configurações da loja. ${(error && error.message) || 'Tente novamente em instantes.'}` ,
+      });
     } finally {
       setIsSaving(false);
     }
