@@ -6,10 +6,14 @@ const CATEGORIES_TABLE = 'music_categorias';
 const STORE_SETTINGS_TABLE = 'music_configuracoes_loja';
 
 const mockSettings = {
-  storeName: 'Allegro Music Store',
-  whatsappNumber: '5511999999999',
-  supportEmail: 'contato@allegromusicstore.com.br',
-  adminPanelEnabled: true,
+  id: 'mock-store-settings',
+  nome_loja: 'Allegro Music Store',
+  whatsapp: '5511999999999',
+  instagram: '@allegromusicstore',
+  endereco: 'Rua das Cordas, 123 - São Paulo, SP',
+  horario_funcionamento: 'Segunda a Sexta, 09:00 às 18:00',
+  sobre: 'Loja especializada em instrumentos musicais e acessórios.',
+  logo_url: '',
 };
 
 function normalizeMockProduct(product) {
@@ -189,19 +193,29 @@ export async function getAdminStoreSettings() {
 }
 
 export async function updateAdminStoreSettings(payload) {
+  const sanitizedPayload = {
+    nome_loja: payload?.nome_loja ?? '',
+    whatsapp: payload?.whatsapp ?? '',
+    instagram: payload?.instagram ?? '',
+    endereco: payload?.endereco ?? '',
+    horario_funcionamento: payload?.horario_funcionamento ?? '',
+    sobre: payload?.sobre ?? '',
+    logo_url: payload?.logo_url ?? '',
+  };
+
   if (!isSupabaseConfigured || !supabase) {
-    localSettings = { ...localSettings, ...payload };
+    localSettings = { ...localSettings, ...sanitizedPayload };
     return localSettings;
   }
 
   const current = await getAdminStoreSettings();
   if (!current?.id) {
-    const { data, error } = await supabase.from(STORE_SETTINGS_TABLE).insert(payload).select().single();
+    const { data, error } = await supabase.from(STORE_SETTINGS_TABLE).insert(sanitizedPayload).select().single();
     if (error) throw new Error(error.message);
     return data;
   }
 
-  const { data, error } = await supabase.from(STORE_SETTINGS_TABLE).update(payload).eq('id', current.id).select().single();
+  const { data, error } = await supabase.from(STORE_SETTINGS_TABLE).update(sanitizedPayload).eq('id', current.id).select().single();
   if (error) throw new Error(error.message);
   return data;
 }
