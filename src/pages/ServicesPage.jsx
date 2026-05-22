@@ -3,8 +3,10 @@ import { services } from '../data/services';
 function ServicesPage() {
   return (
     <section className="container section">
-      <h1>Serviços</h1>
-      <p className="subtitle">Soluções especializadas para manter sua música sempre em alta performance.</p>
+      <div className="section-heading">
+        <h1>Serviços especializados</h1>
+        <p className="subtitle">Equipe técnica preparada para cuidar do seu instrumento antes e depois da compra.</p>
+      </div>
       <div className="services-grid">
         {services.map((service) => (
           <article key={service.title} className="service-card">
@@ -12,6 +14,10 @@ function ServicesPage() {
             <p>{service.description}</p>
           </article>
         ))}
+      </div>
+      <div className="catalog-highlight">
+        <p>Agende avaliação técnica e receba uma proposta sob medida para seu setup.</p>
+        <a className="btn" href="/contato">Solicitar orçamento</a>
       </div>
     </section>
   );
