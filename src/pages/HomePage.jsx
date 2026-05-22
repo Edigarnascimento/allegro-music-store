@@ -4,6 +4,7 @@ import ProductCard from '../components/ProductCard';
 import CategoryIcon from '../components/CategoryIcon';
 import { services } from '../data/services';
 import { getProducts } from '../services/productsService';
+import { ArrowIcon, WhatsAppIcon } from '../components/PublicButtonIcons';
 
 const featuredCategories = [
   { icon: 'strings', title: 'Guitarras e baixos', description: 'Modelos para palco, estúdio e estudo.' },
@@ -51,8 +52,8 @@ function HomePage() {
             <h1>Compre instrumentos e áudio profissional com confiança.</h1>
             <p>Catálogo com produtos selecionados, atendimento especializado e suporte completo para músicos, igrejas e estúdios.</p>
             <div className="hero-actions">
-              <Link className="btn" to="/catalogo">Ver catálogo completo</Link>
-              <a className="btn btn-whatsapp" href="https://wa.me/5511999999999?text=Olá!%20Quero%20consultoria%20para%20comprar%20equipamentos." target="_blank" rel="noreferrer">Atendimento via WhatsApp</a>
+              <Link className="btn btn-main" to="/catalogo"><span>Ver catálogo completo</span><ArrowIcon /></Link>
+              <a className="btn btn-whatsapp" href="https://wa.me/5511999999999?text=Olá!%20Quero%20consultoria%20para%20comprar%20equipamentos." target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Atendimento via WhatsApp</span></a>
             </div>
           </div>
           <aside className="hero-panel">

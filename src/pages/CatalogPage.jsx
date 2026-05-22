@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import ProductCard from '../components/ProductCard';
 import { getProducts } from '../services/productsService';
 import Breadcrumbs from '../components/Breadcrumbs';
+import { WhatsAppIcon } from '../components/PublicButtonIcons';
 
 function CatalogPage() {
   const [products, setProducts] = useState([]);
@@ -41,7 +42,7 @@ function CatalogPage() {
       </div>
       <div className="catalog-highlight">
         <p>Precisa de ajuda para escolher? Nossa equipe recomenda o melhor setup para seu estilo.</p>
-        <a className="btn btn-whatsapp" href="https://wa.me/5511999999999?text=Olá!%20Preciso%20de%20ajuda%20para%20escolher%20um%20instrumento." target="_blank" rel="noreferrer">Atendimento no WhatsApp</a>
+        <a className="btn btn-whatsapp" href="https://wa.me/5511999999999?text=Olá!%20Preciso%20de%20ajuda%20para%20escolher%20um%20instrumento." target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Atendimento no WhatsApp</span></a>
       </div>
       {loading ? (
         <p>Carregando produtos...</p>
