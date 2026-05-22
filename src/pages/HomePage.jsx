@@ -1,11 +1,39 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data/products';
 import { services } from '../data/services';
-
-const featuredProducts = products.slice(0, 3);
+import { getProducts } from '../services/productsService';
 
 function HomePage() {
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadFeaturedProducts() {
+      try {
+        const data = await getProducts();
+
+        if (!isMounted) return;
+
+        const activeProducts = data.filter((product) => product.ativo === true || typeof product.ativo === 'undefined');
+        const featured = activeProducts.filter((product) => product.destaque === true);
+        setFeaturedProducts(featured.length ? featured.slice(0, 3) : activeProducts.slice(0, 3));
+      } finally {
+        if (isMounted) {
+          setLoadingFeatured(false);
+        }
+      }
+    }
+
+    loadFeaturedProducts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <section>
       <div className="hero">
@@ -39,7 +67,7 @@ function HomePage() {
           <p className="subtitle">Mais que uma loja, um parceiro técnico para sua evolução musical.</p>
         </div>
         <div className="features-grid">
-          {['Curadoria com marcas reconhecidas no mercado','Luthiers e técnicos especializados na equipe','Suporte rápido em pré e pós-venda','Entrega segura e acompanhamento em tempo real'].map((item) => (
+          {['Curadoria com marcas reconhecidas no mercado', 'Luthiers e técnicos especializados na equipe', 'Suporte rápido em pré e pós-venda', 'Entrega segura e acompanhamento em tempo real'].map((item) => (
             <article key={item} className="feature-card"><p>{item}</p></article>
           ))}
         </div>
@@ -53,9 +81,13 @@ function HomePage() {
           </div>
           <Link to="/catalogo" className="btn btn-secondary">Ver todos</Link>
         </div>
-        <div className="products-grid">
-          {featuredProducts.map((product) => <ProductCard key={product.id} product={product} />)}
-        </div>
+        {loadingFeatured ? (
+          <p>Carregando produtos em destaque...</p>
+        ) : (
+          <div className="products-grid">
+            {featuredProducts.map((product) => <ProductCard key={product.id} product={product} />)}
+          </div>
+        )}
       </div>
 
       <div className="container section">
