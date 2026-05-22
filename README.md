@@ -111,3 +111,48 @@ npm run dev
 ```bash
 npm run build
 ```
+
+### Storage para imagens de produtos (`product-images`)
+
+Para o upload funcionar no painel (`/admin/produtos/novo` e `/admin/produtos/editar/:id`), crie um bucket no Supabase Storage:
+
+1. No Supabase Dashboard, acesse **Storage > Buckets**.
+2. Clique em **Create bucket**.
+3. Nome: `product-images`.
+4. Marque como **Public bucket** (necessário para `getPublicUrl`).
+
+#### Políticas recomendadas (Storage)
+
+No SQL Editor, ajuste as políticas para o bucket `product-images`:
+
+```sql
+-- Leitura pública dos arquivos do bucket
+create policy "Public can view product images"
+on storage.objects
+for select
+using (bucket_id = 'product-images');
+
+-- Upload apenas para usuários autenticados (admin)
+create policy "Authenticated users can upload product images"
+on storage.objects
+for insert
+to authenticated
+with check (bucket_id = 'product-images');
+
+-- Atualização apenas para usuários autenticados
+create policy "Authenticated users can update product images"
+on storage.objects
+for update
+to authenticated
+using (bucket_id = 'product-images')
+with check (bucket_id = 'product-images');
+
+-- Remoção apenas para usuários autenticados
+create policy "Authenticated users can delete product images"
+on storage.objects
+for delete
+to authenticated
+using (bucket_id = 'product-images');
+```
+
+> Observação: se o bucket não existir, o cadastro/edição de produto continua disponível em modo mock/local, porém sem persistência remota de arquivos.

@@ -6,6 +6,41 @@ const CATEGORIES_TABLE = 'music_categorias';
 const STORE_SETTINGS_TABLE = 'music_configuracoes_loja';
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+
+const PRODUCT_IMAGES_BUCKET = 'product-images';
+
+function getProductImagePath(file) {
+  const safeName = (file?.name || 'image').toLowerCase().replace(/[^a-z0-9.\-_]/g, '-');
+  return `products/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
+}
+
+export async function uploadProductImage(file) {
+  if (!file) throw new Error('Selecione uma imagem antes de enviar.');
+  if (!file.type?.startsWith('image/')) throw new Error('Apenas arquivos de imagem são permitidos.');
+
+  if (!isSupabaseConfigured || !supabase) {
+    return URL.createObjectURL(file);
+  }
+
+  const path = getProductImagePath(file);
+
+  const { error: uploadError } = await supabase.storage
+    .from(PRODUCT_IMAGES_BUCKET)
+    .upload(path, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: file.type,
+    });
+
+  if (uploadError) throw new Error(`Falha no upload da imagem: ${uploadError.message}`);
+
+  const { data } = supabase.storage.from(PRODUCT_IMAGES_BUCKET).getPublicUrl(path);
+  if (!data?.publicUrl) throw new Error('Não foi possível gerar URL pública para a imagem enviada.');
+
+  return data.publicUrl;
+}
+
+
 const mockSettings = {
   id: 'mock-store-settings',
   nome_loja: 'Allegro Music Store',
