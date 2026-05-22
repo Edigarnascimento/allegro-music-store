@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
+import { WhatsAppIcon } from '../components/PublicButtonIcons';
 import { getProductById } from '../services/productsService';
 
 const WHATSAPP_NUMBER = '5511999999999';
@@ -59,7 +60,7 @@ function ProductDetailsPage() {
             <li>Opções de upgrade com acessórios</li>
           </ul>
           <div className="product-actions">
-            <a className="btn btn-whatsapp" href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`} target="_blank" rel="noreferrer">Falar no WhatsApp</a>
+            <a className="btn btn-whatsapp" href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`} target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Falar no WhatsApp</span></a>
             <Link to="/catalogo" className="btn btn-secondary">Voltar ao catálogo</Link>
           </div>
         </div>

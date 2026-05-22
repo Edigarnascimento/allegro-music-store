@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ArrowIcon, WhatsAppIcon } from './PublicButtonIcons';
 
 const WHATSAPP_NUMBER = '5511999999999';
 
@@ -25,8 +26,8 @@ function ProductCard({ product }) {
         <strong className="product-price">R$ {Number(normalizedProduct.preco).toLocaleString('pt-BR')}</strong>
         <div className="installments">até 12x sem juros no cartão</div>
         <div className="product-actions">
-          <Link to={`/produto/${normalizedProduct.id}`} className="btn">Ver detalhes</Link>
-          <a href={whatsappLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp">WhatsApp</a>
+          <Link to={`/produto/${normalizedProduct.id}`} className="btn btn-main btn-compact"><span>Ver detalhes</span><ArrowIcon /></Link>
+          <a href={whatsappLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp btn-compact"><WhatsAppIcon /><span>WhatsApp</span></a>
         </div>
       </div>
     </article>

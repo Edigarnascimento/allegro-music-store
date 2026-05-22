@@ -36,7 +36,7 @@ function Header() {
         </NavLink>
         <form className="search-bar" role="search">
           <input type="search" placeholder="Busque instrumentos, acessórios e equipamentos" aria-label="Buscar produtos" />
-          <button type="button" className="btn">Buscar</button>
+          <button type="button" className="btn btn-main btn-search">Buscar</button>
         </form>
         </div>
       </div>
