@@ -8,7 +8,7 @@ export async function getProducts() {
     return mockProducts;
   }
 
-  const { data, error } = await supabase.from(PRODUCTS_TABLE).select('*').order('name');
+  const { data, error } = await supabase.from(PRODUCTS_TABLE).select('*').order('nome');
 
   if (error) {
     console.warn('[productsService] fallback para dados mockados:', error.message);
