@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { getProductById } from '../services/productsService';
 
 const WHATSAPP_NUMBER = '5511999999999';
@@ -28,51 +29,34 @@ function ProductDetailsPage() {
           });
         }
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     }
 
     loadProduct();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [productId]);
 
-  if (loading) {
-    return (
-      <section className="container section">
-        <h1>Carregando produto...</h1>
-      </section>
-    );
-  }
-
-  if (!product) {
-    return (
-      <section className="container section">
-        <h1>Produto não encontrado</h1>
-        <Link to="/catalogo" className="btn">Voltar ao catálogo</Link>
-      </section>
-    );
-  }
+  if (loading) return <section className="container section"><h1>Carregando produto...</h1></section>;
+  if (!product) return <section className="container section"><h1>Produto não encontrado</h1><Link to="/catalogo" className="btn">Voltar ao catálogo</Link></section>;
 
   const whatsappMessage = encodeURIComponent(`Olá! Gostaria de mais detalhes sobre ${product.nome}.`);
 
   return (
     <section className="container section">
+      <Breadcrumbs items={[{ label: 'Início', to: '/' }, { label: 'Catálogo', to: '/catalogo' }, { label: product.nome }]} />
       <div className="product-details">
         <img src={product.imagem_url} alt={product.nome} className="details-image" />
         <div className="details-content">
           <span className="badge">{product.categoria}</span>
           <h1>{product.nome}</h1>
-          <p>{product.descricao}</p>
           <strong className="price">R$ {Number(product.preco).toLocaleString('pt-BR')}</strong>
+          <p>{product.descricao}</p>
+          <h3>Informações adicionais</h3>
           <ul className="details-benefits">
-            <li>Garantia de fábrica</li>
+            <li>Garantia de fábrica e nota fiscal</li>
             <li>Suporte técnico especializado</li>
-            <li>Possibilidade de upgrade com acessórios</li>
+            <li>Opções de upgrade com acessórios</li>
           </ul>
           <div className="product-actions">
             <a className="btn btn-whatsapp" href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`} target="_blank" rel="noreferrer">Falar no WhatsApp</a>
