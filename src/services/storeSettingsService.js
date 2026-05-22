@@ -1,6 +1,6 @@
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 
-const STORE_SETTINGS_TABLE = 'store_settings';
+const STORE_SETTINGS_TABLE = 'music_configuracoes_loja';
 
 const mockStoreSettings = {
   storeName: 'Allegro Music Store',

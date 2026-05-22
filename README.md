@@ -60,9 +60,11 @@ VITE_SUPABASE_ANON_KEY=SUA_ANON_KEY
 
 ### Tabelas esperadas (fase inicial)
 
-- `products`
-- `categories`
-- `store_settings`
+> Como o banco será compartilhado com outros projetos, as tabelas do Allegro usam o prefixo `music_` para evitar conflitos de nomes.
+
+- `music_produtos`
+- `music_categorias`
+- `music_configuracoes_loja`
 
 > Nesta etapa, o painel administrativo ainda **não foi implementado**. Foi criada apenas a base de serviços para suportar essa evolução.
 

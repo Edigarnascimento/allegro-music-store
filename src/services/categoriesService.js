@@ -1,7 +1,7 @@
 import { products as mockProducts } from '../data/products';
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 
-const CATEGORIES_TABLE = 'categories';
+const CATEGORIES_TABLE = 'music_categorias';
 
 const mockCategories = Array.from(new Set(mockProducts.map((product) => product.category))).map((category) => ({
   slug: category.toLowerCase(),

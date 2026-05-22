@@ -1,7 +1,7 @@
 import { products as mockProducts } from '../data/products';
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 
-const PRODUCTS_TABLE = 'products';
+const PRODUCTS_TABLE = 'music_produtos';
 
 export async function getProducts() {
   if (!isSupabaseConfigured || !supabase) {
