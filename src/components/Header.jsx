@@ -12,7 +12,8 @@ function Header() {
     <header className="header">
       <div className="container nav-wrapper">
         <NavLink to="/" className="brand">
-          Allegro Music Store
+          <span className="brand-mark">♫</span>
+          <span>Allegro Music Store</span>
         </NavLink>
         <nav className="nav">
           {links.map((link) => (
@@ -20,6 +21,7 @@ function Header() {
               {link.label}
             </NavLink>
           ))}
+          <a className="btn btn-whatsapp header-cta" href="https://wa.me/5511999999999?text=Olá!%20Quero%20atendimento%20da%20Allegro." target="_blank" rel="noreferrer">WhatsApp</a>
         </nav>
       </div>
     </header>
