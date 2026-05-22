@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import CategoryIcon from './CategoryIcon';
 
 const quickLinks = [
   { label: 'Central de atendimento', to: '/contato' },
@@ -7,11 +8,11 @@ const quickLinks = [
 ];
 
 const categoryLinks = [
-  { icon: '🎸', label: 'Cordas', to: '/catalogo' },
-  { icon: '🎹', label: 'Teclas', to: '/catalogo' },
-  { icon: '🥁', label: 'Bateria', to: '/catalogo' },
-  { icon: '🎤', label: 'Áudio', to: '/catalogo' },
-  { icon: '🎼', label: 'Acessórios', to: '/catalogo' },
+  { icon: 'strings', label: 'Cordas', to: '/catalogo' },
+  { icon: 'keys', label: 'Teclas', to: '/catalogo' },
+  { icon: 'drums', label: 'Bateria', to: '/catalogo' },
+  { icon: 'audio', label: 'Áudio', to: '/catalogo' },
+  { icon: 'accessories', label: 'Acessórios', to: '/catalogo' },
 ];
 
 function Header() {
@@ -43,7 +44,7 @@ function Header() {
         <div className="container menu-content">
           {categoryLinks.map((category) => (
             <NavLink key={category.label} to={category.to} className="menu-link">
-              <span>{category.icon}</span>{category.label}
+              <CategoryIcon type={category.icon} /><span className="menu-link-label">{category.label}</span>
             </NavLink>
           ))}
         </div>

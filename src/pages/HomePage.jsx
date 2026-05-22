@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
+import CategoryIcon from '../components/CategoryIcon';
 import { services } from '../data/services';
 import { getProducts } from '../services/productsService';
 
 const featuredCategories = [
-  { icon: '🎸', title: 'Guitarras e baixos', description: 'Modelos para palco, estúdio e estudo.' },
-  { icon: '🎹', title: 'Teclados e pianos', description: 'Sons expressivos e recursos modernos.' },
-  { icon: '🥁', title: 'Baterias e percussão', description: 'Kits completos e peças de reposição.' },
-  { icon: '🎤', title: 'Áudio e gravação', description: 'Microfones, interfaces e monitoramento.' },
+  { icon: 'strings', title: 'Guitarras e baixos', description: 'Modelos para palco, estúdio e estudo.' },
+  { icon: 'keys', title: 'Teclados e pianos', description: 'Sons expressivos e recursos modernos.' },
+  { icon: 'drums', title: 'Baterias e percussão', description: 'Kits completos e peças de reposição.' },
+  { icon: 'audio', title: 'Áudio e gravação', description: 'Microfones, interfaces e monitoramento.' },
 ];
 
 function HomePage() {
@@ -73,7 +74,7 @@ function HomePage() {
         <div className="features-grid">
           {featuredCategories.map((item) => (
             <article key={item.title} className="feature-card">
-              <h3>{item.icon} {item.title}</h3>
+              <h3><CategoryIcon type={item.icon} /><span>{item.title}</span></h3>
               <p>{item.description}</p>
             </article>
           ))}
