@@ -11,17 +11,19 @@ Primeira versão de um site profissional para loja de música, desenvolvido com 
 - Página de contato
 - Botões de WhatsApp em catálogo e detalhes
 - Layout responsivo para celular
-- Estrutura inicial para integração com Supabase
+- Painel administrativo com autenticação Supabase
 
 ## Estrutura de pastas
 
 ```bash
 src/
   components/
+    admin/
   data/
   lib/
     supabaseClient.js
   pages/
+    admin/
   services/
     productsService.js
     categoriesService.js
@@ -56,17 +58,47 @@ VITE_SUPABASE_URL=https://SEU-PROJETO.supabase.co
 VITE_SUPABASE_ANON_KEY=SUA_ANON_KEY
 ```
 
-3. Sem essas variáveis, o projeto continua funcionando com dados mockados (`src/data`).
+3. Sem essas variáveis, o projeto continua funcionando com dados mockados (`src/data`) e o painel administrativo funciona em modo mock local (sem persistência remota).
 
-### Tabelas esperadas (fase inicial)
-
-> Como o banco será compartilhado com outros projetos, as tabelas do Allegro usam o prefixo `music_` para evitar conflitos de nomes.
+### Tabelas esperadas
 
 - `music_produtos`
 - `music_categorias`
 - `music_configuracoes_loja`
 
-> Nesta etapa, o painel administrativo ainda **não foi implementado**. Foi criada apenas a base de serviços para suportar essa evolução.
+## Painel administrativo
+
+### Rotas
+
+- `/admin/login`: login com Supabase Auth (`signInWithPassword`)
+- `/admin`: dashboard simples
+- `/admin/produtos`: listagem e inativação de produtos
+- `/admin/produtos/novo`: cadastro de produto
+- `/admin/produtos/editar/:id`: edição de produto
+- `/admin/categorias`: gerenciamento de categorias
+- `/admin/configuracoes`: edição de configurações da loja
+
+### Campos de produto suportados
+
+- `nome`
+- `descricao`
+- `preco`
+- `categoria`
+- `imagem_url`
+- `destaque`
+- `ativo`
+- `estoque`
+
+### Proteção de rotas administrativas
+
+- Rotas `/admin/*` (exceto `/admin/login`) passam por validação de sessão.
+- Sem sessão válida, o usuário é redirecionado para `/admin/login`.
+
+### Importante
+
+- O site público continua funcionando normalmente.
+- Os dados mockados não foram removidos.
+- Pagamento online ainda não está implementado.
 
 ## Executar em desenvolvimento
 
@@ -79,22 +111,3 @@ npm run dev
 ```bash
 npm run build
 ```
-
-## Publicar o projeto
-
-Você pode publicar facilmente em plataformas como Vercel, Netlify ou Cloudflare Pages.
-
-### Exemplo (Vercel)
-
-1. Suba o repositório para o GitHub.
-2. Importe o projeto na Vercel.
-3. Configure:
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-4. Clique em **Deploy**.
-
-## Próximos passos
-
-- Conectar páginas aos serviços de dados Supabase
-- Adicionar busca, filtros e paginação
-- Evoluir painel administrativo (autenticação, CRUD e uploads)
