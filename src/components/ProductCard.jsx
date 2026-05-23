@@ -3,6 +3,8 @@ import { ArrowIcon, WhatsAppIcon } from './PublicButtonIcons';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink, formatPriceBRL } from '../lib/whatsapp';
 
+const PRODUCT_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80';
+
 function ProductCard({ product }) {
   const whatsappNumber = useStoreWhatsappNumber();
 
@@ -31,7 +33,15 @@ function ProductCard({ product }) {
 
   return (
     <article className="product-card">
-      <img src={normalizedProduct.imagem_url} alt={normalizedProduct.nome} />
+      <img
+        src={normalizedProduct.imagem_url || PRODUCT_IMAGE_FALLBACK}
+        alt={normalizedProduct.nome}
+        loading="lazy"
+        onError={(event) => {
+          event.currentTarget.onerror = null;
+          event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
+        }}
+      />
       <div className="product-content">
         <span className="badge">{normalizedProduct.categoria}</span>
         <h3>{normalizedProduct.nome}</h3>

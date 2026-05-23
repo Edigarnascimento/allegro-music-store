@@ -6,6 +6,8 @@ import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink, formatPriceBRL } from '../lib/whatsapp';
 import { getProductById } from '../services/productsService';
 
+const PRODUCT_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80';
+
 function ProductDetailsPage() {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
@@ -55,7 +57,15 @@ function ProductDetailsPage() {
     <section className="container section">
       <Breadcrumbs items={[{ label: 'Início', to: '/' }, { label: 'Catálogo', to: '/catalogo' }, { label: product.nome }]} />
       <div className="product-details">
-        <img src={product.imagem_url} alt={product.nome} className="details-image" />
+        <img
+          src={product.imagem_url || PRODUCT_IMAGE_FALLBACK}
+          alt={product.nome}
+          className="details-image"
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
+          }}
+        />
         <div className="details-content">
           <span className="badge">{product.categoria}</span>
           <h1>{product.nome}</h1>

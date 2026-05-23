@@ -4,12 +4,15 @@ import ProductCard from '../components/ProductCard';
 import { getProducts } from '../services/productsService';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { WhatsAppIcon } from '../components/PublicButtonIcons';
+import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
+import { buildWhatsAppLink } from '../lib/whatsapp';
 
 function CatalogPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const whatsappNumber = useStoreWhatsappNumber();
 
   const query = searchParams.get('q')?.trim() ?? '';
   const category = searchParams.get('categoria')?.trim() ?? '';
@@ -76,7 +79,12 @@ function CatalogPage() {
       </div>
       <div className="catalog-highlight">
         <p>Precisa de ajuda para escolher? Nossa equipe recomenda o melhor setup para seu estilo.</p>
-        <a className="btn btn-whatsapp" href="https://wa.me/5511999999999?text=Olá!%20Preciso%20de%20ajuda%20para%20escolher%20um%20instrumento." target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Atendimento no WhatsApp</span></a>
+        <a
+          className="btn btn-whatsapp"
+          href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda para escolher um instrumento.')}
+          target="_blank"
+          rel="noreferrer"
+        ><WhatsAppIcon /><span>Atendimento no WhatsApp</span></a>
       </div>
       {loading ? (
         <p>Carregando produtos...</p>
