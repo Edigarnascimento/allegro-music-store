@@ -1,10 +1,26 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getAdminDashboardStats } from '../../services/adminService';
+import { formatOrderStatus } from '../../lib/orderFormatters';
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
 function formatCurrency(value) {
   return currency.format(Number(value) || 0);
+}
+
+function formatDate(value) {
+  if (!value) return 'Data não informada';
+  return new Date(value).toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+}
+
+function getShortOrderId(orderId) {
+  if (!orderId) return '--------';
+  return String(orderId).slice(0, 8);
 }
 
 function EmptyState({ message }) {
@@ -48,6 +64,15 @@ export default function AdminDashboardPage() {
         ))}
       </section>
 
+      <section className="admin-page admin-dashboard-quick-actions" aria-label="Ações rápidas">
+        <h2>Ações rápidas</h2>
+        <div className="admin-dashboard-quick-actions-grid">
+          <Link className="admin-dashboard-quick-link" to="/admin/pedidos">Ver pedidos</Link>
+          <Link className="admin-dashboard-quick-link" to="/admin/produtos">Ver produtos</Link>
+          <Link className="admin-dashboard-quick-link" to="/admin/interesses">Ver interesses</Link>
+        </div>
+      </section>
+
       <section className="admin-kpi-grid">
         <article className="admin-page">
           <h2>Indicadores comerciais</h2>
@@ -63,11 +88,17 @@ export default function AdminDashboardPage() {
         <article className="admin-page">
           <h2>Últimos pedidos</h2>
           {stats.listas.ultimosPedidos.length ? (
-            <ul className="admin-list">
+            <ul className="admin-list admin-orders-preview-list">
               {stats.listas.ultimosPedidos.map((pedido) => (
-                <li key={pedido.id}>
-                  <span>#{pedido.id} · {pedido.cliente_nome || 'Cliente'}</span>
-                  <strong>{formatCurrency(pedido.total)}</strong>
+                <li key={pedido.id} className="admin-orders-preview-item">
+                  <div>
+                    <p className="admin-orders-preview-title">#{getShortOrderId(pedido.id)} · {pedido.cliente_nome || 'Cliente não informado'}</p>
+                    <p className="admin-orders-preview-meta">{formatOrderStatus(pedido.status)} · {formatDate(pedido.created_at)}</p>
+                  </div>
+                  <div className="admin-orders-preview-side">
+                    <strong>{formatCurrency(pedido.total)}</strong>
+                    <Link className="admin-action-btn" to="/admin/pedidos">Ver pedido</Link>
+                  </div>
                 </li>
               ))}
             </ul>

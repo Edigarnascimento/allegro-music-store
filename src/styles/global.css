@@ -251,5 +251,15 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 .admin-list { list-style: none; margin: .5rem 0 0; padding: 0; display: grid; gap: .4rem; }
 .admin-list li { display: flex; justify-content: space-between; gap: .5rem; border: 1px solid #e6e9ef; padding: .55rem .65rem; border-radius: 10px; background: #fff; }
 .admin-empty-state { margin: .7rem 0 0; color: #616b78; font-style: italic; }
+.admin-dashboard-quick-actions { margin-bottom: .8rem; }
+.admin-dashboard-quick-actions-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .6rem; margin-top: .8rem; }
+.admin-dashboard-quick-link { display: inline-flex; justify-content: center; align-items: center; border-radius: 10px; border: 1px solid #4b151c; background: linear-gradient(135deg, #7f121d 0%, #b71c2b 100%); color: #fff; font-weight: 700; padding: .65rem .8rem; box-shadow: 0 10px 18px rgba(136, 20, 31, .25); }
+.admin-dashboard-quick-link:hover { filter: brightness(1.05); }
+.admin-orders-preview-list { gap: .55rem; }
+.admin-orders-preview-item { align-items: center; }
+.admin-orders-preview-title { margin: 0; font-weight: 700; color: #1f2633; }
+.admin-orders-preview-meta { margin: .25rem 0 0; color: #616b78; font-size: .88rem; }
+.admin-orders-preview-side { display: grid; justify-items: end; gap: .4rem; }
 
-@media (max-width: 900px){ .admin-kpi-grid{ grid-template-columns:1fr; } }
+@media (max-width: 900px){ .admin-kpi-grid{ grid-template-columns:1fr; } .admin-dashboard-quick-actions-grid { grid-template-columns: 1fr; } }
+@media (max-width: 680px){ .admin-orders-preview-item { flex-direction: column; align-items: flex-start; } .admin-orders-preview-side { justify-items: start; } }
