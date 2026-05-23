@@ -19,6 +19,7 @@ import AdminInteressesPage from './pages/admin/AdminInteressesPage';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import ProtectedAdminRoute from './components/admin/ProtectedAdminRoute';
 import AdminLayout from './components/admin/AdminLayout';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   const location = useLocation();
@@ -26,6 +27,7 @@ function App() {
 
   return (
     <div className="app-shell">
+      <ScrollToTop />
       {!isAdminRoute ? <Header /> : null}
       <main className="main-content">
         <Routes>
