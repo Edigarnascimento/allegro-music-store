@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
-import { formatPriceBRL } from '../../lib/whatsapp';
+import {
+  formatCurrencyBRL,
+  formatDeliveryMethod,
+  formatOrderStatus,
+  formatPaymentMethod,
+  getFormattedValueOrFallback,
+} from '../../lib/orderFormatters';
 import {
   getAdminOrders,
   getOrderItems,
@@ -15,12 +21,6 @@ const statuses = [
   'concluido',
   'cancelado',
 ];
-
-const getValueOrFallback = (value) => {
-  if (value === null || value === undefined) return 'Não informado';
-  if (typeof value === 'string' && value.trim() === '') return 'Não informado';
-  return value;
-};
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -67,23 +67,26 @@ export default function AdminOrdersPage() {
             {orders.map((o) => (
               <tr key={o.id}>
                 <td>{new Date(o.created_at).toLocaleString('pt-BR')}</td>
-                <td>{o.cliente_nome}</td>
-                <td>{o.cliente_whatsapp}</td>
-                <td>{formatPriceBRL(o.total || 0)}</td>
+                <td>{getFormattedValueOrFallback(o.cliente_nome)}</td>
+                <td>{getFormattedValueOrFallback(o.cliente_whatsapp)}</td>
+                <td>{formatCurrencyBRL(o.total || 0)}</td>
                 <td>
+                  <div className={`admin-order-status-badge status-${o.status || 'novo'}`}>
+                    {formatOrderStatus(o.status)}
+                  </div>
                   <select
                     value={o.status || 'novo'}
                     onChange={(e) => changeStatus(o.id, e.target.value)}
                   >
                     {statuses.map((s) => (
                       <option key={s} value={s}>
-                        {s}
+                        {formatOrderStatus(s)}
                       </option>
                     ))}
                   </select>
                 </td>
-                <td>{o.forma_pagamento}</td>
-                <td>{o.forma_entrega}</td>
+                <td>{formatPaymentMethod(o.forma_pagamento)}</td>
+                <td>{formatDeliveryMethod(o.forma_entrega)}</td>
                 <td>
                   <button className="btn-link" onClick={() => open(o)}>
                     Detalhes
@@ -96,34 +99,38 @@ export default function AdminOrdersPage() {
       </div>
 
       {selected ? (
-        <div className="admin-page" style={{ marginTop: '1rem' }}>
+        <div className="admin-page admin-order-details" style={{ marginTop: '1rem' }}>
           <h2>Pedido {selected.id.slice(0, 8)}</h2>
+
+          <div className={`admin-order-status-badge status-${selected.status || 'novo'}`}>
+            {formatOrderStatus(selected.status)}
+          </div>
 
           <p>
             <strong>Nome do cliente:</strong>{' '}
-            {getValueOrFallback(selected.cliente_nome)}
+            {getFormattedValueOrFallback(selected.cliente_nome)}
           </p>
           <p>
             <strong>WhatsApp:</strong>{' '}
-            {getValueOrFallback(selected.cliente_whatsapp)}
+            {getFormattedValueOrFallback(selected.cliente_whatsapp)}
           </p>
           <p>
-            <strong>E-mail:</strong> {getValueOrFallback(selected.cliente_email)}
+            <strong>E-mail:</strong> {getFormattedValueOrFallback(selected.cliente_email)}
           </p>
           <p>
             <strong>Endereço de entrega:</strong>{' '}
-            {getValueOrFallback(selected.endereco_entrega)}
+            {getFormattedValueOrFallback(selected.endereco_entrega)}
           </p>
           <p>
             <strong>Forma de entrega:</strong>{' '}
-            {getValueOrFallback(selected.forma_entrega)}
+            {formatDeliveryMethod(selected.forma_entrega)}
           </p>
           <p>
             <strong>Forma de pagamento:</strong>{' '}
-            {getValueOrFallback(selected.forma_pagamento)}
+            {formatPaymentMethod(selected.forma_pagamento)}
           </p>
           <p>
-            <strong>Observações:</strong> {getValueOrFallback(selected.observacoes)}
+            <strong>Observações:</strong> {getFormattedValueOrFallback(selected.observacoes)}
           </p>
 
           <p>
@@ -133,9 +140,9 @@ export default function AdminOrdersPage() {
             <ul>
               {items.map((it) => (
                 <li key={it.id}>
-                  {getValueOrFallback(it.produto_nome)} · {it.quantidade} x{' '}
-                  {formatPriceBRL(it.preco_unitario)} ={' '}
-                  {formatPriceBRL(it.subtotal)}
+                  {getFormattedValueOrFallback(it.produto_nome)} · {it.quantidade} x{' '}
+                  {formatCurrencyBRL(it.preco_unitario)} ={' '}
+                  {formatCurrencyBRL(it.subtotal)}
                 </li>
               ))}
             </ul>
