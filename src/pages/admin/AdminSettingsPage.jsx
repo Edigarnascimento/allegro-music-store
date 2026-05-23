@@ -46,10 +46,11 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div>
+    <div className="admin-page">
       <h1>Configurações da loja</h1>
+      <p className="admin-page-subtitle">Atualize informações institucionais exibidas no site e no atendimento.</p>
       {status.message ? (
-        <p role="alert" style={{ color: status.type === 'error' ? '#dc2626' : '#16a34a', marginBottom: '1rem' }}>
+        <p role="alert" className={`admin-alert ${status.type === 'error' ? 'error' : 'success'}`}>
           {status.message}
         </p>
       ) : null}

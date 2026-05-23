@@ -25,14 +25,17 @@ export default function AdminLoginPage() {
 
   return (
     <section className="section container admin-login">
-      <h1>Login administrativo</h1>
-      <p className="subtitle">Use sua conta Supabase Auth para acessar o painel.</p>
-      <form className="admin-form" onSubmit={handleSubmit}>
-        <label>E-mail<input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></label>
-        <label>Senha<input type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></label>
+      <div className="admin-login-card">
+        <p className="admin-sidebar-kicker">Acesso seguro</p>
+        <h1>Login administrativo</h1>
+        <p className="subtitle">Use sua conta Supabase Auth para acessar o painel.</p>
+        <form className="admin-form" onSubmit={handleSubmit}>
+          <label>E-mail<input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></label>
+          <label>Senha<input type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></label>
         {error ? <p className="error-text">{error}</p> : null}
         <button type="submit" className="btn" disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
-      </form>
+        </form>
+      </div>
     </section>
   );
 }
