@@ -121,6 +121,9 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 .product-price { display: block; margin-top: .65rem; font-size: 1.22rem; color: #111; }
 .installments { font-size: .85rem; color: var(--muted-text); margin-top: .25rem; }
 .catalog-highlight { margin: 1rem 0 1.4rem; padding: 1rem; background: #fff; border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: .9rem; flex-wrap: wrap; }
+.catalog-search-info { margin-top: .75rem; display: flex; align-items: center; gap: .65rem; flex-wrap: wrap; }
+.catalog-search-info .subtitle { margin: 0; }
+.catalog-empty-state { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 1rem; color: #4a515c; font-weight: 600; }
 
 .breadcrumbs { color: #656b73; font-size: .86rem; margin-bottom: 1rem; display:flex; flex-wrap:wrap; }
 .breadcrumb-item { display:flex; align-items:center; }

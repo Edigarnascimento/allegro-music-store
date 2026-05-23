@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import CategoryIcon from './CategoryIcon';
 
 const quickLinks = [
@@ -16,6 +17,15 @@ const categoryLinks = [
 ];
 
 function Header() {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  function handleSearchSubmit(event) {
+    event.preventDefault();
+    const query = searchTerm.trim();
+    navigate(query ? `/catalogo?q=${encodeURIComponent(query)}` : '/catalogo');
+  }
+
   return (
     <header className="header">
       <div className="topbar">
@@ -34,9 +44,15 @@ function Header() {
             <small>Instrumentos e Áudio Profissional</small>
           </span>
         </NavLink>
-        <form className="search-bar" role="search">
-          <input type="search" placeholder="Busque instrumentos, acessórios e equipamentos" aria-label="Buscar produtos" />
-          <button type="button" className="btn btn-main btn-search">Buscar</button>
+        <form className="search-bar" role="search" onSubmit={handleSearchSubmit}>
+          <input
+            type="search"
+            placeholder="Busque instrumentos, acessórios e equipamentos"
+            aria-label="Buscar produtos"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+          />
+          <button type="submit" className="btn btn-main btn-search">Buscar</button>
         </form>
         </div>
       </div>
