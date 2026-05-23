@@ -33,6 +33,7 @@ function Header() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [categories, setCategories] = useState([]);
+  const [cartPulse, setCartPulse] = useState(false);
   const { totalItems } = useCart();
   const whatsappNumber = useStoreWhatsappNumber();
 
@@ -64,6 +65,23 @@ function Header() {
       };
     });
   }, [categories]);
+
+
+  useEffect(() => {
+    let timeoutId;
+
+    function handleCartHighlight() {
+      setCartPulse(true);
+      window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => setCartPulse(false), 2200);
+    }
+
+    window.addEventListener('cart:item-added', handleCartHighlight);
+    return () => {
+      window.removeEventListener('cart:item-added', handleCartHighlight);
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   function handleSearchSubmit(event) {
     event.preventDefault();
@@ -100,7 +118,7 @@ function Header() {
           />
           <button type="submit" className="btn btn-main btn-search">Buscar</button>
         </form>
-        <NavLink to="/carrinho" className="btn btn-secondary cart-shortcut">Carrinho ({totalItems})</NavLink>
+        <NavLink to="/carrinho" className={`btn btn-secondary cart-shortcut ${cartPulse ? 'is-highlighted' : ''}`} aria-live="polite">Carrinho <span className="cart-counter">{totalItems}</span></NavLink>
         </div>
       </div>
       <div className="menu-bar">

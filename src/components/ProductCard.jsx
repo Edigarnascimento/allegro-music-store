@@ -12,6 +12,7 @@ function ProductCard({ product }) {
   const whatsappNumber = useStoreWhatsappNumber();
   const { addToCart } = useCart();
   const [cartFeedback, setCartFeedback] = useState('');
+  const [addedToCart, setAddedToCart] = useState(false);
 
   const normalizedProduct = {
     id: product.id,
@@ -42,7 +43,6 @@ function ProductCard({ product }) {
   const estoqueBaixo = estoqueInformado && estoque > 0 && estoque <= 3;
   const estoqueStatus = indisponivel ? 'Indisponível' : estoqueBaixo ? `Últimas unidades (${estoque})` : 'Em estoque';
 
-
   async function handleWhatsappClick(event) {
     event.preventDefault();
 
@@ -59,6 +59,19 @@ function ProductCard({ product }) {
     } finally {
       window.open(whatsappLink, '_blank', 'noopener,noreferrer');
     }
+  }
+
+  function handleAddToCart() {
+    const result = addToCart(normalizedProduct);
+    if (!result?.ok) {
+      setCartFeedback(result.message);
+      return;
+    }
+
+    setCartFeedback('');
+    setAddedToCart(true);
+    window.dispatchEvent(new CustomEvent('cart:item-added'));
+    window.setTimeout(() => setAddedToCart(false), 2600);
   }
 
   return (
@@ -80,8 +93,17 @@ function ProductCard({ product }) {
         <div className="installments">até 12x sem juros no cartão</div>
         <div className={`stock-status ${indisponivel ? 'out' : estoqueBaixo ? 'low' : 'ok'}`}>{estoqueStatus}</div>
         {cartFeedback ? <p className="error-text">{cartFeedback}</p> : null}
+        {addedToCart ? (
+          <div className="cart-added-banner" role="status" aria-live="polite">
+            <strong>Produto adicionado ao carrinho.</strong>
+            <div className="cart-added-actions">
+              <Link to="/carrinho" className="btn btn-secondary btn-compact">Ver carrinho</Link>
+              <button type="button" className="btn btn-secondary btn-compact" onClick={() => setAddedToCart(false)}>Continuar comprando</button>
+            </div>
+          </div>
+        ) : null}
         <div className="product-actions">
-          <button type="button" className="btn btn-cart btn-compact" disabled={indisponivel} onClick={() => { const result = addToCart(normalizedProduct); if (!result?.ok) setCartFeedback(result.message); else setCartFeedback(''); }}><CartIcon /><span>{indisponivel ? 'Indisponível' : 'Adicionar'}</span></button>
+          <button type="button" className={`btn btn-cart btn-compact ${addedToCart ? 'is-added' : ''}`} disabled={indisponivel} onClick={handleAddToCart}><CartIcon /><span>{indisponivel ? 'Indisponível' : addedToCart ? 'Adicionado!' : 'Adicionar'}</span></button>
           <Link to={`/produto/${normalizedProduct.id}`} className="btn btn-main btn-compact"><span>Ver detalhes</span><ArrowIcon /></Link>
           <a href={whatsappLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp btn-compact" onClick={handleWhatsappClick}><WhatsAppIcon /><span>WhatsApp</span></a>
         </div>
