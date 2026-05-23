@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowIcon, WhatsAppIcon } from './PublicButtonIcons';
+import { ArrowIcon, CartIcon, WhatsAppIcon } from './PublicButtonIcons';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink, formatPriceBRL, resolveWhatsappNumber } from '../lib/whatsapp';
 import { createInterest } from '../services/interessesService';
@@ -70,6 +70,7 @@ function ProductCard({ product }) {
         <strong className="product-price">{formatPriceBRL(normalizedProduct.preco)}</strong>
         <div className="installments">até 12x sem juros no cartão</div>
         <div className="product-actions">
+          <button type="button" className="btn btn-cart btn-compact" onClick={() => addToCart(normalizedProduct)}><CartIcon /><span>Adicionar</span></button>
           <Link to={`/produto/${normalizedProduct.id}`} className="btn btn-main btn-compact"><span>Ver detalhes</span><ArrowIcon /></Link>
           <a href={whatsappLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp btn-compact" onClick={handleWhatsappClick}><WhatsAppIcon /><span>WhatsApp</span></a>
         </div>

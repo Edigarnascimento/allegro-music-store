@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
-import { WhatsAppIcon } from '../components/PublicButtonIcons';
+import { CartIcon, WhatsAppIcon } from '../components/PublicButtonIcons';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink, formatPriceBRL, resolveWhatsappNumber } from '../lib/whatsapp';
 import { getProductById } from '../services/productsService';
@@ -101,7 +101,7 @@ function ProductDetailsPage() {
           </ul>
           <div className="product-actions">
             <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer" onClick={handleWhatsappClick}><WhatsAppIcon /><span>Falar no WhatsApp</span></a>
-            <button className="btn btn-secondary" type="button" onClick={() => addToCart(product)}>Adicionar ao carrinho</button>
+            <button className="btn btn-cart" type="button" onClick={() => addToCart(product)}><CartIcon /><span>Adicionar ao carrinho</span></button>
             <Link to="/catalogo" className="btn btn-secondary">Voltar ao catálogo</Link>
           </div>
         </div>

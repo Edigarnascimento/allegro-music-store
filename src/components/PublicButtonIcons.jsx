@@ -15,3 +15,15 @@ export function ArrowIcon() {
     </span>
   );
 }
+
+export function CartIcon() {
+  return (
+    <span className="btn-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" role="presentation">
+        <path d="M3 5h2l1.3 8.2a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.75L19 8H7" />
+        <circle cx="10" cy="18" r="1.5" />
+        <circle cx="17" cy="18" r="1.5" />
+      </svg>
+    </span>
+  );
+}
