@@ -3,8 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { WhatsAppIcon } from '../components/PublicButtonIcons';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
-import { buildWhatsAppLink, formatPriceBRL } from '../lib/whatsapp';
+import { buildWhatsAppLink, formatPriceBRL, resolveWhatsappNumber } from '../lib/whatsapp';
 import { getProductById } from '../services/productsService';
+import { createInterest } from '../services/interessesService';
 
 const PRODUCT_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80';
 
@@ -52,6 +53,25 @@ function ProductDetailsPage() {
     `Link: ${currentPageLink}`,
     'Gostaria de mais informações.',
   ].join('\n');
+  const whatsappLink = buildWhatsAppLink(whatsappNumber, whatsappMessage);
+
+  async function handleWhatsappClick(event) {
+    event.preventDefault();
+
+    try {
+      await createInterest({
+        produto_id: product.id ?? null,
+        produto_nome: product.nome,
+        categoria: product.categoria ?? '',
+        preco: product.preco ?? 0,
+        origem: 'detalhes',
+        whatsapp_destino: resolveWhatsappNumber(whatsappNumber),
+        mensagem: whatsappMessage,
+      });
+    } finally {
+      window.open(whatsappLink, '_blank', 'noopener,noreferrer');
+    }
+  }
 
   return (
     <section className="container section">
@@ -78,7 +98,7 @@ function ProductDetailsPage() {
             <li>Opções de upgrade com acessórios</li>
           </ul>
           <div className="product-actions">
-            <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, whatsappMessage)} target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Falar no WhatsApp</span></a>
+            <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer" onClick={handleWhatsappClick}><WhatsAppIcon /><span>Falar no WhatsApp</span></a>
             <Link to="/catalogo" className="btn btn-secondary">Voltar ao catálogo</Link>
           </div>
         </div>

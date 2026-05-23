@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ArrowIcon, WhatsAppIcon } from './PublicButtonIcons';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
-import { buildWhatsAppLink, formatPriceBRL } from '../lib/whatsapp';
+import { buildWhatsAppLink, formatPriceBRL, resolveWhatsappNumber } from '../lib/whatsapp';
+import { createInterest } from '../services/interessesService';
 
 const PRODUCT_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80';
 
@@ -31,6 +32,24 @@ function ProductCard({ product }) {
 
   const whatsappLink = buildWhatsAppLink(whatsappNumber, whatsappMessage);
 
+  async function handleWhatsappClick(event) {
+    event.preventDefault();
+
+    try {
+      await createInterest({
+        produto_id: normalizedProduct.id ?? null,
+        produto_nome: normalizedProduct.nome,
+        categoria: normalizedProduct.categoria ?? '',
+        preco: normalizedProduct.preco ?? 0,
+        origem: 'catalogo',
+        whatsapp_destino: resolveWhatsappNumber(whatsappNumber),
+        mensagem: whatsappMessage,
+      });
+    } finally {
+      window.open(whatsappLink, '_blank', 'noopener,noreferrer');
+    }
+  }
+
   return (
     <article className="product-card">
       <img
@@ -50,7 +69,7 @@ function ProductCard({ product }) {
         <div className="installments">até 12x sem juros no cartão</div>
         <div className="product-actions">
           <Link to={`/produto/${normalizedProduct.id}`} className="btn btn-main btn-compact"><span>Ver detalhes</span><ArrowIcon /></Link>
-          <a href={whatsappLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp btn-compact"><WhatsAppIcon /><span>WhatsApp</span></a>
+          <a href={whatsappLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp btn-compact" onClick={handleWhatsappClick}><WhatsAppIcon /><span>WhatsApp</span></a>
         </div>
       </div>
     </article>

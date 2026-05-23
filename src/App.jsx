@@ -12,6 +12,7 @@ import AdminProductsPage from './pages/admin/AdminProductsPage';
 import AdminProductFormPage from './pages/admin/AdminProductFormPage';
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+import AdminInteressesPage from './pages/admin/AdminInteressesPage';
 import ProtectedAdminRoute from './components/admin/ProtectedAdminRoute';
 import AdminLayout from './components/admin/AdminLayout';
 
@@ -39,6 +40,7 @@ function App() {
               <Route path="/admin/produtos/editar/:id" element={<AdminProductFormPage />} />
               <Route path="/admin/categorias" element={<AdminCategoriesPage />} />
               <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
+              <Route path="/admin/interesses" element={<AdminInteressesPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

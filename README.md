@@ -156,3 +156,47 @@ using (bucket_id = 'product-images');
 ```
 
 > Observação: se o bucket não existir, o cadastro/edição de produto continua disponível em modo mock/local, porém sem persistência remota de arquivos.
+
+## Módulo de Interesses / Orçamentos (WhatsApp)
+
+Para registrar o interesse do cliente ao clicar no botão de WhatsApp (sem exigir login), crie a tabela abaixo no Supabase:
+
+```sql
+create table if not exists public.music_interesses (
+  id uuid primary key default gen_random_uuid(),
+  produto_id uuid null,
+  produto_nome text,
+  categoria text,
+  preco numeric(10,2),
+  origem text,
+  whatsapp_destino text,
+  mensagem text,
+  created_at timestamp with time zone default now()
+);
+```
+
+### Políticas RLS recomendadas
+
+```sql
+alter table public.music_interesses enable row level security;
+
+-- Permite registrar interesse de forma pública/anônima
+create policy "Public can insert interests"
+on public.music_interesses
+for insert
+to anon, authenticated
+with check (true);
+
+-- Permite leitura apenas para usuários autenticados (admin)
+create policy "Authenticated can read interests"
+on public.music_interesses
+for select
+to authenticated
+using (true);
+```
+
+### Observação importante
+
+O clique no WhatsApp **não deve ser bloqueado** se o registro no banco falhar.
+A aplicação faz fallback seguro: registra quando possível e, em caso de erro/ausência de configuração do Supabase, apenas emite `console.warn` e abre o WhatsApp normalmente.
+Sem dados pessoais do cliente: apenas metadados do produto e origem do clique.
