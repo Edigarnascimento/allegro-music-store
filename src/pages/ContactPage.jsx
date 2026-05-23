@@ -1,6 +1,11 @@
 import Breadcrumbs from '../components/Breadcrumbs';
 import { WhatsAppIcon } from '../components/PublicButtonIcons';
+import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
+import { buildWhatsAppLink } from '../lib/whatsapp';
+
 function ContactPage() {
+  const whatsappNumber = useStoreWhatsappNumber();
+
   return (
     <section className="container section">
       <Breadcrumbs items={[{ label: 'Início', to: '/' }, { label: 'Contato' }]} />
@@ -11,17 +16,17 @@ function ContactPage() {
       <div className="contact-layout">
         <div className="contact-card">
           <h2>Fale com um especialista</h2>
-          <p><strong>Telefone:</strong> (11) 99999-9999</p>
+          <p><strong>WhatsApp:</strong> Atendimento oficial pelo botão abaixo</p>
           <p><strong>E-mail:</strong> contato@allegromusicstore.com</p>
-          <p><strong>Endereço:</strong> Av. da Música, 1000 - São Paulo, SP</p>
-          <a className="btn btn-whatsapp" href="https://wa.me/5511999999999?text=Olá!%20Gostaria%20de%20informações%20sobre%20a%20Allegro%20Music%20Store." target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Chamar no WhatsApp</span></a>
+          <p><strong>Endereço:</strong> Atendimento sob agendamento em São Paulo - SP</p>
+          <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, 'Olá! Gostaria de informações sobre a Allegro Music Store.')} target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Chamar no WhatsApp</span></a>
         </div>
         <div className="contact-card">
-          <h2>Por que nosso atendimento é diferente?</h2>
+          <h2>Atendimento confiável</h2>
           <ul className="details-benefits">
             <li>Orientação por perfil musical e orçamento</li>
-            <li>Suporte técnico com linguagem simples</li>
-            <li>Acompanhamento até a entrega do produto</li>
+            <li>Atualizações do pedido também pelo WhatsApp</li>
+            <li>Confirmação de estoque e disponibilidade pela equipe</li>
           </ul>
         </div>
       </div>

@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
+import { buildWhatsAppLink } from '../lib/whatsapp';
 import { useCart } from '../context/CartContext';
 import CategoryIcon from './CategoryIcon';
 import { getCategories } from '../services/categoriesService';
 
 const quickLinks = [
   { label: 'Central de atendimento', to: '/contato' },
-  { label: 'WhatsApp', href: 'https://wa.me/5511999999999?text=Olá!%20Preciso%20de%20ajuda%20na%20loja.' },
-  { label: 'Login (em breve)', to: '/' },
+  { label: 'Sobre a loja', to: '/institucional/sobre' },
 ];
 
 const fallbackCategoryLinks = [
@@ -33,6 +34,7 @@ function Header() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categories, setCategories] = useState([]);
   const { totalItems } = useCart();
+  const whatsappNumber = useStoreWhatsappNumber();
 
   useEffect(() => {
     let isMounted = true;
@@ -76,6 +78,7 @@ function Header() {
           {quickLinks.map((link) => (
             link.href ? <a key={link.label} href={link.href} target="_blank" rel="noreferrer">{link.label}</a> : <NavLink key={link.label} to={link.to}>{link.label}</NavLink>
           ))}
+          <a href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda na loja.')} target="_blank" rel="noreferrer">WhatsApp</a>
         </div>
       </div>
       <div className="header-main-wrap">

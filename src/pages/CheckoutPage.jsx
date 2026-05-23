@@ -167,7 +167,7 @@ export default function CheckoutPage() {
     return (
       <section className="container section">
         <h1>Pedido realizado com sucesso!</h1>
-        <p>Seu pedido foi registrado. Em breve nossa equipe vai entrar em contato.</p>
+        <p>Seu pedido foi registrado. Nossa equipe acompanha a próxima etapa e também entrará em contato pelo WhatsApp informado.</p>
         <p>
           <strong>Número do pedido:</strong> #{success.shortId}
         </p>
@@ -219,6 +219,7 @@ export default function CheckoutPage() {
   return (
     <section className="container section">
       <h1>Checkout</h1>
+      <p className='subtitle'>Pedidos por PIX são confirmados apenas após validação manual do comprovante. A disponibilidade final de estoque pode ser confirmada pela equipe.</p>
       {error ? <p className="admin-alert error">{error}</p> : null}
       <form className="admin-form" onSubmit={onSubmit}>
         <input required name="nome" placeholder="Nome" value={form.nome} onChange={onChange} />
