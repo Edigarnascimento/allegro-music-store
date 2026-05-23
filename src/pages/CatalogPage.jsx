@@ -12,6 +12,7 @@ function CatalogPage() {
   const [loading, setLoading] = useState(true);
 
   const query = searchParams.get('q')?.trim() ?? '';
+  const category = searchParams.get('categoria')?.trim() ?? '';
 
   useEffect(() => {
     let isMounted = true;
@@ -39,9 +40,8 @@ function CatalogPage() {
   }, []);
 
   const filteredProducts = useMemo(() => {
-    if (!query) return products;
-
     const normalizedQuery = query.toLowerCase();
+    const normalizedCategory = category.toLowerCase();
 
     return products.filter((product) => {
       const searchableFields = [product.nome, product.descricao, product.categoria]
@@ -49,11 +49,14 @@ function CatalogPage() {
         .join(' ')
         .toLowerCase();
 
-      return searchableFields.includes(normalizedQuery);
-    });
-  }, [products, query]);
+      const matchesQuery = !query || searchableFields.includes(normalizedQuery);
+      const matchesCategory = !category || (product.categoria ?? '').toLowerCase() === normalizedCategory;
 
-  function handleClearSearch() {
+      return matchesQuery && matchesCategory;
+    });
+  }, [products, query, category]);
+
+  function handleClearFilters() {
     navigate('/catalogo');
   }
 
@@ -63,10 +66,11 @@ function CatalogPage() {
       <div className="section-heading">
         <h1>Catálogo de Produtos</h1>
         <p className="subtitle">Instrumentos selecionados para quem busca performance, timbre e confiabilidade.</p>
-        {query ? (
+        {query || category ? (
           <div className="catalog-search-info">
-            <p className="subtitle">Resultados para “{query}”</p>
-            <button type="button" className="btn btn-secondary btn-compact" onClick={handleClearSearch}>Limpar busca</button>
+            {query ? <p className="subtitle">Resultados para “{query}”</p> : null}
+            {category ? <p className="subtitle">Categoria: “{category}”</p> : null}
+            <button type="button" className="btn btn-secondary btn-compact" onClick={handleClearFilters}>Limpar filtros</button>
           </div>
         ) : null}
       </div>
@@ -83,7 +87,7 @@ function CatalogPage() {
           ))}
         </div>
       ) : (
-        <p className="catalog-empty-state">Nenhum produto encontrado para sua busca.</p>
+        <p className="catalog-empty-state">Nenhum produto encontrado para os filtros selecionados.</p>
       )}
     </section>
   );

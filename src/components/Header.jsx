@@ -9,11 +9,11 @@ const quickLinks = [
 ];
 
 const categoryLinks = [
-  { icon: 'strings', label: 'Cordas', to: '/catalogo' },
-  { icon: 'keys', label: 'Teclas', to: '/catalogo' },
-  { icon: 'drums', label: 'Bateria', to: '/catalogo' },
-  { icon: 'audio', label: 'Áudio', to: '/catalogo' },
-  { icon: 'accessories', label: 'Acessórios', to: '/catalogo' },
+  { icon: 'strings', label: 'Cordas' },
+  { icon: 'keys', label: 'Teclas' },
+  { icon: 'drums', label: 'Bateria' },
+  { icon: 'audio', label: 'Áudio' },
+  { icon: 'accessories', label: 'Acessórios' },
 ];
 
 function Header() {
@@ -59,7 +59,7 @@ function Header() {
       <div className="menu-bar">
         <div className="container menu-content">
           {categoryLinks.map((category) => (
-            <NavLink key={category.label} to={category.to} className="menu-link">
+            <NavLink key={category.label} to={`/catalogo?categoria=${encodeURIComponent(category.label)}`} className="menu-link">
               <CategoryIcon type={category.icon} /><span className="menu-link-label">{category.label}</span>
             </NavLink>
           ))}
