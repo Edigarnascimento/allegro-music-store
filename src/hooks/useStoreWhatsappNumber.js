@@ -15,7 +15,6 @@ export function useStoreWhatsappNumber() {
 
         setWhatsappNumber(
           resolveWhatsappNumber(
-            settings?.whatsappNumber,
             settings?.whatsapp,
           ),
         );

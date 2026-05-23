@@ -3,10 +3,13 @@ import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 const STORE_SETTINGS_TABLE = 'music_configuracoes_loja';
 
 const mockStoreSettings = {
-  storeName: 'Allegro Music Store',
-  whatsappNumber: '5511999999999',
-  supportEmail: 'contato@allegromusicstore.com.br',
-  adminPanelEnabled: false,
+  nome_loja: 'Allegro Music Store',
+  whatsapp: '5511999999999',
+  instagram: '',
+  endereco: '',
+  horario_funcionamento: '',
+  sobre: '',
+  logo_url: '',
 };
 
 export async function getStoreSettings() {
@@ -17,7 +20,7 @@ export async function getStoreSettings() {
   const { data, error } = await supabase
     .from(STORE_SETTINGS_TABLE)
     .select('*')
-    .eq('is_active', true)
+    .limit(1)
     .maybeSingle();
 
   if (error) {
