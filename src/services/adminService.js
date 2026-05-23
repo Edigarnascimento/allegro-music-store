@@ -4,8 +4,13 @@ import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 const PRODUCTS_TABLE = 'music_produtos';
 const CATEGORIES_TABLE = 'music_categorias';
 const STORE_SETTINGS_TABLE = 'music_configuracoes_loja';
+const ORDERS_TABLE = 'music_pedidos';
+const ORDER_ITEMS_TABLE = 'music_pedido_itens';
+const INTERESTS_TABLE = 'music_interesses';
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+const LOW_STOCK_THRESHOLD = 5;
+const PAID_STATUSES = new Set(['pago', 'concluido']);
 
 const PRODUCT_IMAGES_BUCKET = 'product-images';
 
@@ -39,7 +44,6 @@ export async function uploadProductImage(file) {
 
   return data.publicUrl;
 }
-
 
 const mockSettings = {
   id: 'mock-store-settings',
@@ -79,7 +83,6 @@ function isValidUuid(value) {
   return typeof value === 'string' && UUID_V4_REGEX.test(value);
 }
 
-
 function sanitizeCategoryPayload(payload = {}) {
   return {
     nome: payload?.nome ?? '',
@@ -97,6 +100,32 @@ function sanitizeStoreSettingsPayload(payload = {}) {
     sobre: payload?.sobre ?? '',
     logo_url: payload?.logo_url ?? '',
   };
+}
+
+function toNumber(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function getStartOfTodayIso() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return start.toISOString();
+}
+
+function aggregateByProduct(rows = []) {
+  const acc = new Map();
+
+  rows.forEach((row) => {
+    const name = row?.produto_nome || 'Produto não identificado';
+    const current = acc.get(name) || { produto: name, quantidade: 0, total: 0, interesses: 0 };
+    current.quantidade += toNumber(row?.quantidade || row?.qtde || 1);
+    current.total += toNumber(row?.subtotal || row?.total || 0);
+    current.interesses += 1;
+    acc.set(name, current);
+  });
+
+  return Array.from(acc.values());
 }
 
 export async function signInAdmin({ email, password }) {
@@ -136,13 +165,89 @@ export async function getAdminSession() {
 }
 
 export async function getAdminDashboardStats() {
-  const [produtos, categorias] = await Promise.all([getAdminProducts(), getAdminCategories()]);
-  return {
-    totalProdutos: produtos.length,
-    produtosAtivos: produtos.filter((p) => p.ativo).length,
-    produtosDestaque: produtos.filter((p) => p.destaque).length,
-    totalCategorias: categorias.length,
+  const [produtos, pedidos, pedidoItens, interesses] = await Promise.all([
+    getAdminProducts(),
+    getAdminOrdersRaw(),
+    getOrderItemsRaw(),
+    getInterestsRaw(),
+  ]);
+
+  const pedidosPagosOuConcluidos = pedidos.filter((pedido) => PAID_STATUSES.has(String(pedido?.status || '').toLowerCase()));
+  const produtosAtivos = produtos.filter((produto) => produto?.ativo !== false);
+  const lowStockProducts = produtosAtivos.filter((produto) => toNumber(produto?.estoque) > 0 && toNumber(produto?.estoque) <= LOW_STOCK_THRESHOLD);
+  const outOfStockProducts = produtosAtivos.filter((produto) => toNumber(produto?.estoque) <= 0);
+
+  const totalPedidos = pedidos.reduce((acc, pedido) => acc + toNumber(pedido?.total), 0);
+  const ticketMedio = pedidos.length ? totalPedidos / pedidos.length : 0;
+
+  const startOfToday = getStartOfTodayIso();
+  const pedidosHoje = pedidos.filter((pedido) => (pedido?.created_at || '') >= startOfToday);
+  const faturamentoHoje = pedidosHoje
+    .filter((pedido) => PAID_STATUSES.has(String(pedido?.status || '').toLowerCase()))
+    .reduce((acc, pedido) => acc + toNumber(pedido?.total), 0);
+
+  const pedidosPorStatus = {
+    novos: pedidos.filter((pedido) => String(pedido?.status || '').toLowerCase() === 'novo').length,
+    pagos: pedidos.filter((pedido) => String(pedido?.status || '').toLowerCase() === 'pago').length,
+    concluidos: pedidos.filter((pedido) => String(pedido?.status || '').toLowerCase() === 'concluido').length,
   };
+
+  const vendidos = aggregateByProduct(pedidoItens)
+    .sort((a, b) => b.quantidade - a.quantidade)
+    .map((item) => ({ produto: item.produto, quantidade: item.quantidade, total: item.total }));
+
+  const interessesPorProduto = aggregateByProduct(interesses)
+    .sort((a, b) => b.interesses - a.interesses)
+    .map((item) => ({ produto: item.produto, interesses: item.interesses }));
+
+  return {
+    cards: {
+      totalEmPedidos: totalPedidos,
+      pedidosNovos: pedidosPorStatus.novos,
+      pedidosPagos: pedidosPorStatus.pagos,
+      pedidosConcluidos: pedidosPorStatus.concluidos,
+      ticketMedio,
+      totalProdutosAtivos: produtosAtivos.length,
+      produtosEstoqueBaixo: lowStockProducts.length,
+      produtosIndisponiveis: outOfStockProducts.length,
+    },
+    comerciais: {
+      produtoMaisVendido: vendidos[0]?.produto || 'Sem vendas registradas',
+      produtoMaisProcurado: interessesPorProduto[0]?.produto || 'Sem interesses registrados',
+      totalInteressesWhatsapp: interesses.length,
+      pedidosDoDia: pedidosHoje.length,
+      faturamentoDoDia: faturamentoHoje,
+      totalPedidosPagosOuConcluidos: pedidosPagosOuConcluidos.length,
+    },
+    listas: {
+      ultimosPedidos: pedidos.slice(0, 5),
+      produtosEstoqueBaixo: lowStockProducts.slice(0, 5),
+      produtosIndisponiveis: outOfStockProducts.slice(0, 5),
+      produtosMaisVendidos: vendidos.slice(0, 5),
+      produtosMaisInteressados: interessesPorProduto.slice(0, 5),
+    },
+  };
+}
+
+async function getAdminOrdersRaw() {
+  if (!isSupabaseConfigured || !supabase) return [];
+  const { data, error } = await supabase.from(ORDERS_TABLE).select('*').order('created_at', { ascending: false });
+  if (error) return [];
+  return data ?? [];
+}
+
+async function getOrderItemsRaw() {
+  if (!isSupabaseConfigured || !supabase) return [];
+  const { data, error } = await supabase.from(ORDER_ITEMS_TABLE).select('*');
+  if (error) return [];
+  return data ?? [];
+}
+
+async function getInterestsRaw() {
+  if (!isSupabaseConfigured || !supabase) return [];
+  const { data, error } = await supabase.from(INTERESTS_TABLE).select('*').order('created_at', { ascending: false });
+  if (error) return [];
+  return data ?? [];
 }
 
 export async function getAdminProducts() {
@@ -244,26 +349,30 @@ export async function updateAdminCategory(id, payload) {
   return true;
 }
 
-export async function getAdminStoreSettings() {
+export async function deleteAdminCategory(id) {
+  if (!isSupabaseConfigured || !supabase) {
+    localCategories = localCategories.filter((item) => String(item.id) !== String(id));
+    return true;
+  }
+
+  const { error } = await supabase.from(CATEGORIES_TABLE).delete().eq('id', id);
+  if (error) throw new Error(error.message);
+  return true;
+}
+
+export async function getStoreSettings() {
   if (!isSupabaseConfigured || !supabase) return localSettings;
 
   const { data, error } = await supabase.from(STORE_SETTINGS_TABLE).select('*').limit(1).maybeSingle();
   if (error) {
-    console.warn('[adminService] fallback configurações locais:', error.message);
-    return sanitizeStoreSettingsPayload(localSettings);
+    console.warn('[adminService] fallback configurações mockadas:', error.message);
+    return localSettings;
   }
 
-  if (!data) {
-    return sanitizeStoreSettingsPayload(localSettings);
-  }
-
-  return {
-    id: isValidUuid(data.id) ? data.id : undefined,
-    ...sanitizeStoreSettingsPayload(data),
-  };
+  return data ?? localSettings;
 }
 
-export async function updateAdminStoreSettings(payload) {
+export async function upsertStoreSettings(payload) {
   const sanitizedPayload = sanitizeStoreSettingsPayload(payload);
 
   if (!isSupabaseConfigured || !supabase) {
@@ -271,29 +380,29 @@ export async function updateAdminStoreSettings(payload) {
     return localSettings;
   }
 
-  const { data: existingSettings, error: readError } = await supabase
-    .from(STORE_SETTINGS_TABLE)
-    .select('id')
-    .limit(1)
-    .maybeSingle();
+  const existing = await getStoreSettings();
 
-  if (readError) {
-    throw new Error(`Não foi possível consultar as configurações atuais: ${readError.message}`);
-  }
-
-  const existingId = existingSettings?.id;
-  if (!isValidUuid(existingId)) {
-    const { data, error } = await supabase.from(STORE_SETTINGS_TABLE).insert(sanitizedPayload).select().single();
+  if (existing?.id && isValidUuid(existing.id)) {
+    const { data, error } = await supabase
+      .from(STORE_SETTINGS_TABLE)
+      .update(sanitizedPayload)
+      .eq('id', existing.id)
+      .select()
+      .single();
     if (error) throw new Error(error.message);
     return data;
   }
 
-  const { data, error } = await supabase
-    .from(STORE_SETTINGS_TABLE)
-    .update(sanitizedPayload)
-    .eq('id', existingId)
-    .select()
-    .single();
+  const { data, error } = await supabase.from(STORE_SETTINGS_TABLE).insert(sanitizedPayload).select().single();
   if (error) throw new Error(error.message);
   return data;
+}
+
+
+export async function getAdminStoreSettings() {
+  return getStoreSettings();
+}
+
+export async function updateAdminStoreSettings(payload) {
+  return upsertStoreSettings(payload);
 }
