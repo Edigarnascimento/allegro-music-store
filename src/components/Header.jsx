@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 import CategoryIcon from './CategoryIcon';
 import { getCategories } from '../services/categoriesService';
 
@@ -31,6 +32,7 @@ function Header() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [categories, setCategories] = useState([]);
+  const { totalItems } = useCart();
 
   useEffect(() => {
     let isMounted = true;
@@ -95,6 +97,7 @@ function Header() {
           />
           <button type="submit" className="btn btn-main btn-search">Buscar</button>
         </form>
+        <NavLink to="/carrinho" className="btn btn-secondary cart-shortcut">Carrinho ({totalItems})</NavLink>
         </div>
       </div>
       <div className="menu-bar">
