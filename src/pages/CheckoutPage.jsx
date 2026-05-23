@@ -59,7 +59,7 @@ function buildOrderWhatsappSummary(summary) {
     '',
     `Total do pedido: ${formatPriceBRL(summary.total)}`,
     ...pixLinhas,
-    'Aguardo confirmação do pedido.',
+    'Após o envio do comprovante, aguardo a confirmação do pedido e do pagamento.',
   ].join('\n');
 }
 
