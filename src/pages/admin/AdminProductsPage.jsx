@@ -127,7 +127,7 @@ export default function AdminProductsPage() {
                   </td>
                   <td>{item.categoria || 'Sem categoria'}</td>
                   <td>{toCurrency(item.preco)}</td>
-                  <td>{item.estoque ?? 0}</td>
+                  <td><span className={`admin-stock ${Number(item.estoque ?? 0) === 0 ? 'is-out' : Number(item.estoque ?? 0) <= 3 ? 'is-low' : 'is-ok'}`}>{item.estoque ?? 0}</span></td>
                   <td><span className={`admin-pill ${item.ativo ? 'is-success' : 'is-muted'}`}>{item.ativo ? 'Ativo' : 'Inativo'}</span></td>
                   <td><span className={`admin-pill ${item.destaque ? 'is-danger' : 'is-muted'}`}>{item.destaque ? 'Destaque' : 'Normal'}</span></td>
                   <td className="admin-table-actions">
