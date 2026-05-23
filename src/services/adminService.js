@@ -99,6 +99,10 @@ function sanitizeStoreSettingsPayload(payload = {}) {
     horario_funcionamento: payload?.horario_funcionamento ?? '',
     sobre: payload?.sobre ?? '',
     logo_url: payload?.logo_url ?? '',
+    chave_pix: payload?.chave_pix ?? '',
+    nome_recebedor_pix: payload?.nome_recebedor_pix ?? '',
+    banco_pix: payload?.banco_pix ?? '',
+    instrucoes_pix: payload?.instrucoes_pix ?? '',
   };
 }
 

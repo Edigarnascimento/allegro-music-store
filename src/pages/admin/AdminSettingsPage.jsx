@@ -10,6 +10,10 @@ export default function AdminSettingsPage() {
     horario_funcionamento: '',
     sobre: '',
     logo_url: '',
+    chave_pix: '',
+    nome_recebedor_pix: '',
+    banco_pix: '',
+    instrucoes_pix: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [status, setStatus] = useState({ type: '', message: '' });
@@ -62,6 +66,10 @@ export default function AdminSettingsPage() {
         <label>Horário de funcionamento<input value={form.horario_funcionamento || ''} onChange={(e) => setForm({ ...form, horario_funcionamento: e.target.value })} /></label>
         <label>Sobre<textarea value={form.sobre || ''} onChange={(e) => setForm({ ...form, sobre: e.target.value })} /></label>
         <label>URL da logo<input value={form.logo_url || ''} onChange={(e) => setForm({ ...form, logo_url: e.target.value })} /></label>
+        <label>Chave PIX<input value={form.chave_pix || ''} onChange={(e) => setForm({ ...form, chave_pix: e.target.value })} /></label>
+        <label>Nome do recebedor PIX<input value={form.nome_recebedor_pix || ''} onChange={(e) => setForm({ ...form, nome_recebedor_pix: e.target.value })} /></label>
+        <label>Banco PIX (opcional)<input value={form.banco_pix || ''} onChange={(e) => setForm({ ...form, banco_pix: e.target.value })} /></label>
+        <label>Instruções PIX<textarea value={form.instrucoes_pix || ''} onChange={(e) => setForm({ ...form, instrucoes_pix: e.target.value })} /></label>
         <button className="btn" type="submit" disabled={isSaving}>{isSaving ? 'Salvando...' : 'Salvar'}</button>
       </form>
     </div>

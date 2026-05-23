@@ -66,6 +66,15 @@ VITE_SUPABASE_ANON_KEY=SUA_ANON_KEY
 - `music_categorias`
 - `music_configuracoes_loja`
 
+### SQL sugerido para campos PIX em `music_configuracoes_loja`
+
+```sql
+alter table music_configuracoes_loja add column if not exists chave_pix text;
+alter table music_configuracoes_loja add column if not exists nome_recebedor_pix text;
+alter table music_configuracoes_loja add column if not exists banco_pix text;
+alter table music_configuracoes_loja add column if not exists instrucoes_pix text;
+```
+
 ## Painel administrativo
 
 ### Rotas
