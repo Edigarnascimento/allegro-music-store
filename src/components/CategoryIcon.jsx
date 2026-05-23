@@ -39,6 +39,12 @@ const iconMap = {
       <path d="M7 15l-2 4M17 15l2 4" />
     </svg>
   ),
+  generic: (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="4" y="4" width="16" height="16" rx="3" />
+      <path d="M8 9h8M8 12h8M8 15h5" />
+    </svg>
+  ),
 };
 
 function CategoryIcon({ type }) {
