@@ -24,8 +24,9 @@ function ProductCard({ product }) {
     estoque: Number.isFinite(Number(product.estoque)) ? Number(product.estoque) : null,
   };
 
+  const detailsPath = `/produto/${normalizedProduct.id}`;
   const productLink = normalizedProduct.id
-    ? `${window.location.origin}/produto/${normalizedProduct.id}`
+    ? `${window.location.origin}${detailsPath}`
     : window.location.href;
 
   const whatsappMessage = [
@@ -76,18 +77,22 @@ function ProductCard({ product }) {
 
   return (
     <article className="product-card">
-      <img
-        src={normalizedProduct.imagem_url || PRODUCT_IMAGE_FALLBACK}
-        alt={normalizedProduct.nome}
-        loading="lazy"
-        onError={(event) => {
-          event.currentTarget.onerror = null;
-          event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
-        }}
-      />
+      <Link to={detailsPath} className="product-image-link" aria-label={`Ver detalhes de ${normalizedProduct.nome}`}>
+        <img
+          src={normalizedProduct.imagem_url || PRODUCT_IMAGE_FALLBACK}
+          alt={normalizedProduct.nome}
+          loading="lazy"
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
+          }}
+        />
+      </Link>
       <div className="product-content">
         <span className="badge">{normalizedProduct.categoria}</span>
-        <h3>{normalizedProduct.nome}</h3>
+        <h3>
+          <Link to={detailsPath} className="product-name-link">{normalizedProduct.nome}</Link>
+        </h3>
         <p>{normalizedProduct.descricao}</p>
         <strong className="product-price">{formatPriceBRL(normalizedProduct.preco)}</strong>
         <div className="installments">até 12x sem juros no cartão</div>
@@ -95,16 +100,16 @@ function ProductCard({ product }) {
         {cartFeedback ? <p className="error-text">{cartFeedback}</p> : null}
         {addedToCart ? (
           <div className="cart-added-banner" role="status" aria-live="polite">
-            <strong>Produto adicionado ao carrinho.</strong>
+            <strong>Adicionado!</strong>
             <div className="cart-added-actions">
               <Link to="/carrinho" className="btn btn-secondary btn-compact">Ver carrinho</Link>
-              <button type="button" className="btn btn-secondary btn-compact" onClick={() => setAddedToCart(false)}>Continuar comprando</button>
+              <button type="button" className="btn btn-secondary btn-compact" onClick={() => setAddedToCart(false)}>Continuar</button>
             </div>
           </div>
         ) : null}
         <div className="product-actions">
           <button type="button" className={`btn btn-cart btn-compact ${addedToCart ? 'is-added' : ''}`} disabled={indisponivel} onClick={handleAddToCart}><CartIcon /><span>{indisponivel ? 'Indisponível' : addedToCart ? 'Adicionado!' : 'Adicionar'}</span></button>
-          <Link to={`/produto/${normalizedProduct.id}`} className="btn btn-main btn-compact"><span>Ver detalhes</span><ArrowIcon /></Link>
+          <Link to={detailsPath} className="btn btn-main btn-compact"><span>Detalhes</span><ArrowIcon /></Link>
           <a href={whatsappLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp btn-compact" onClick={handleWhatsappClick}><WhatsAppIcon /><span>WhatsApp</span></a>
         </div>
       </div>
