@@ -293,25 +293,44 @@ export async function updateAdminProduct(id, payload) {
   return data;
 }
 
-export async function deleteOrDeactivateProduct(id, hardDelete = false) {
+export async function deleteAdminProduct(productId) {
+  if (!productId) throw new Error('Produto inválido para exclusão.');
+
   if (!isSupabaseConfigured || !supabase) {
-    if (hardDelete) {
-      localProducts = localProducts.filter((item) => String(item.id) !== String(id));
-      return true;
-    }
-    localProducts = localProducts.map((item) => (String(item.id) === String(id) ? { ...item, ativo: false } : item));
+    localProducts = localProducts.filter((item) => String(item.id) !== String(productId));
     return true;
   }
 
-  if (hardDelete) {
-    const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq('id', id);
+  const [{ count: pedidosCount, error: pedidoError }, { count: interessesCount, error: interesseError }] = await Promise.all([
+    supabase.from(ORDER_ITEMS_TABLE).select('id', { count: 'exact', head: true }).eq('produto_id', productId),
+    supabase.from(INTERESTS_TABLE).select('id', { count: 'exact', head: true }).eq('produto_id', productId),
+  ]);
+
+  if (pedidoError) throw new Error(`Não foi possível validar pedidos vinculados: ${pedidoError.message}`);
+  if (interesseError) throw new Error(`Não foi possível validar interesses vinculados: ${interesseError.message}`);
+
+  if ((pedidosCount || 0) > 0 || (interessesCount || 0) > 0) {
+    throw new Error('Este produto já possui histórico de pedidos ou interesses. Para preservar o histórico, use a opção Inativar.');
+  }
+
+  const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq('id', productId);
+  if (error) throw new Error(error.message);
+  return true;
+}
+
+export async function deleteOrDeactivateProduct(id, hardDelete = false) {
+  if (!hardDelete) {
+    if (!isSupabaseConfigured || !supabase) {
+      localProducts = localProducts.map((item) => (String(item.id) === String(id) ? { ...item, ativo: false } : item));
+      return true;
+    }
+
+    const { error } = await supabase.from(PRODUCTS_TABLE).update({ ativo: false }).eq('id', id);
     if (error) throw new Error(error.message);
     return true;
   }
 
-  const { error } = await supabase.from(PRODUCTS_TABLE).update({ ativo: false }).eq('id', id);
-  if (error) throw new Error(error.message);
-  return true;
+  return deleteAdminProduct(id);
 }
 
 export async function getAdminCategories() {
