@@ -243,12 +243,6 @@ create table if not exists public.music_pedido_itens (
 alter table public.music_pedidos enable row level security;
 alter table public.music_pedido_itens enable row level security;
 
-create policy "public_insert_music_pedidos" on public.music_pedidos
-for insert to anon, authenticated with check (true);
-
-create policy "public_insert_music_pedido_itens" on public.music_pedido_itens
-for insert to anon, authenticated with check (true);
-
 create policy "admin_select_music_pedidos" on public.music_pedidos
 for select to authenticated using (true);
 
@@ -257,4 +251,126 @@ for update to authenticated using (true) with check (true);
 
 create policy "admin_select_music_pedido_itens" on public.music_pedido_itens
 for select to authenticated using (true);
+
+-- Função RPC segura para checkout público/anônimo
+create or replace function public.create_music_order(payload jsonb)
+returns table (
+  id uuid,
+  created_at timestamptz,
+  total numeric,
+  status text
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_customer jsonb := coalesce(payload->'customer', '{}'::jsonb);
+  v_items jsonb := coalesce(payload->'items', '[]'::jsonb);
+  v_subtotal numeric := coalesce((payload->>'subtotal')::numeric, 0);
+  v_total numeric := coalesce((payload->>'total')::numeric, 0);
+  v_order_id uuid;
+  v_created_at timestamptz;
+  v_status text := 'novo';
+  item jsonb;
+  v_product_id uuid;
+  v_qty integer;
+  v_price numeric;
+  v_stock integer;
+begin
+  if jsonb_typeof(v_items) <> 'array' or jsonb_array_length(v_items) = 0 then
+    raise exception 'Pedido inválido: itens obrigatórios.';
+  end if;
+
+  -- trava e valida estoque de todos os itens
+  for item in select * from jsonb_array_elements(v_items)
+  loop
+    v_product_id := (item->>'id')::uuid;
+    v_qty := greatest(coalesce((item->>'quantidade')::integer, 0), 0);
+
+    if v_product_id is null or v_qty <= 0 then
+      raise exception 'Item inválido no pedido.';
+    end if;
+
+    select p.estoque
+      into v_stock
+      from public.music_produtos p
+     where p.id = v_product_id
+     for update;
+
+    if not found then
+      raise exception 'Produto não encontrado: %', coalesce(item->>'nome', v_product_id::text);
+    end if;
+
+    if v_stock is null or v_stock < v_qty then
+      raise exception 'Estoque insuficiente para %.', coalesce(item->>'nome', v_product_id::text);
+    end if;
+  end loop;
+
+  insert into public.music_pedidos (
+    cliente_nome,
+    cliente_whatsapp,
+    cliente_email,
+    endereco_entrega,
+    observacoes,
+    status,
+    subtotal,
+    total,
+    forma_entrega,
+    forma_pagamento
+  ) values (
+    nullif(v_customer->>'nome', ''),
+    nullif(v_customer->>'whatsapp', ''),
+    nullif(v_customer->>'email', ''),
+    nullif(v_customer->>'endereco', ''),
+    nullif(v_customer->>'observacoes', ''),
+    v_status,
+    v_subtotal,
+    v_total,
+    nullif(v_customer->>'formaEntrega', ''),
+    nullif(v_customer->>'formaPagamento', '')
+  )
+  returning music_pedidos.id, music_pedidos.created_at
+  into v_order_id, v_created_at;
+
+  for item in select * from jsonb_array_elements(v_items)
+  loop
+    v_product_id := (item->>'id')::uuid;
+    v_qty := (item->>'quantidade')::integer;
+    v_price := coalesce((item->>'preco')::numeric, 0);
+
+    insert into public.music_pedido_itens (
+      pedido_id,
+      produto_id,
+      produto_nome,
+      categoria,
+      quantidade,
+      preco_unitario,
+      subtotal
+    ) values (
+      v_order_id,
+      v_product_id,
+      item->>'nome',
+      item->>'categoria',
+      v_qty,
+      v_price,
+      v_price * v_qty
+    );
+
+    update public.music_produtos
+       set estoque = greatest(estoque - v_qty, 0)
+     where id = v_product_id;
+  end loop;
+
+  return query
+  select v_order_id, v_created_at, v_total, v_status;
+end;
+$$;
+
+grant execute on function public.create_music_order(jsonb) to anon, authenticated;
+
+-- Recomendado: não dar update público direto em estoque e não abrir select público de pedidos
+revoke all on public.music_pedidos from anon;
+revoke all on public.music_pedido_itens from anon;
+revoke update on public.music_produtos from anon;
 ```
