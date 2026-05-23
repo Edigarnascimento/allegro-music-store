@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
-import { deleteOrDeactivateProduct, getAdminProducts } from '../../services/adminService';
+import { deleteAdminProduct, deleteOrDeactivateProduct, getAdminProducts } from '../../services/adminService';
 
 function toCurrency(value) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value || 0));
@@ -12,6 +12,7 @@ export default function AdminProductsPage() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [featuredFilter, setFeaturedFilter] = useState('all');
+  const [feedback, setFeedback] = useState({ type: '', message: '' });
 
   async function load() {
     const data = await getAdminProducts();
@@ -23,8 +24,24 @@ export default function AdminProductsPage() {
   }, []);
 
   async function onDeactivate(id) {
+    setFeedback({ type: '', message: '' });
     await deleteOrDeactivateProduct(id, false);
     load();
+  }
+
+  async function onDelete(product) {
+    const confirmed = window.confirm('Tem certeza que deseja excluir este produto? Essa ação não poderá ser desfeita.');
+    if (!confirmed) return;
+
+    setFeedback({ type: '', message: '' });
+
+    try {
+      await deleteAdminProduct(product.id);
+      await load();
+      setFeedback({ type: 'success', message: 'Produto excluído com sucesso.' });
+    } catch (error) {
+      setFeedback({ type: 'error', message: error.message || 'Não foi possível excluir o produto.' });
+    }
   }
 
   const categories = useMemo(() => {
@@ -50,6 +67,12 @@ export default function AdminProductsPage() {
         <Link className="btn admin-btn-primary" to="/admin/produtos/novo">+ Novo produto</Link>
       </div>
       <p className="admin-page-subtitle">Gerencie catálogo, disponibilidade e visibilidade dos produtos.</p>
+
+      {feedback.message ? (
+        <div className={`admin-alert ${feedback.type === 'success' ? 'success' : 'error'}`} role="status">
+          {feedback.message}
+        </div>
+      ) : null}
 
       <div className="admin-products-filters">
         <label>
@@ -133,6 +156,7 @@ export default function AdminProductsPage() {
                   <td className="admin-table-actions">
                     <Link className="admin-action-btn" to={`/admin/produtos/editar/${item.id}`}>Editar</Link>
                     <button type="button" className="admin-action-btn is-danger" onClick={() => onDeactivate(item.id)}>Inativar</button>
+                    <button type="button" className="admin-action-btn is-danger-strong" onClick={() => onDelete(item)}>Excluir</button>
                   </td>
                 </tr>
               ))
