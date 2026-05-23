@@ -6,6 +6,8 @@ import { services } from '../data/services';
 import { getProducts } from '../services/productsService';
 import { ArrowIcon, WhatsAppIcon } from '../components/PublicButtonIcons';
 import { getCategories } from '../services/categoriesService';
+import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
+import { buildWhatsAppLink } from '../lib/whatsapp';
 
 const fallbackFeaturedCategories = [
   { icon: 'strings', title: 'Guitarras e baixos', category: 'Cordas', description: 'Modelos para palco, estúdio e estudo.' },
@@ -28,6 +30,7 @@ function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [featuredCategories, setFeaturedCategories] = useState(fallbackFeaturedCategories);
+  const whatsappNumber = useStoreWhatsappNumber();
 
   useEffect(() => {
     let isMounted = true;
@@ -94,7 +97,7 @@ function HomePage() {
             <p>Catálogo com produtos selecionados, atendimento especializado e suporte completo para músicos, igrejas e estúdios.</p>
             <div className="hero-actions">
               <Link className="btn btn-main" to="/catalogo"><span>Ver catálogo completo</span><ArrowIcon /></Link>
-              <a className="btn btn-whatsapp" href="https://wa.me/5511999999999?text=Olá!%20Quero%20consultoria%20para%20comprar%20equipamentos." target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Atendimento via WhatsApp</span></a>
+              <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, 'Olá! Quero consultoria para comprar equipamentos.')} target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Atendimento via WhatsApp</span></a>
             </div>
           </div>
           <aside className="hero-panel">
