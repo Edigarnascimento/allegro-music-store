@@ -36,8 +36,9 @@ export default function AdminCategoriesPage() {
   }
 
   return (
-    <div>
+    <div className="admin-page">
       <h1>Categorias</h1>
+      <p className="admin-page-subtitle">Crie e controle categorias para facilitar a navegação do cliente.</p>
       <form className="admin-inline-form" onSubmit={addCategory}>
         <input
           value={newCategory}
@@ -49,12 +50,12 @@ export default function AdminCategoriesPage() {
         </button>
       </form>
 
-      {successMessage ? <p>{successMessage}</p> : null}
-      {errorMessage ? <p role="alert">{errorMessage}</p> : null}
+      {successMessage ? <p className="admin-alert success">{successMessage}</p> : null}
+      {errorMessage ? <p className="admin-alert error" role="alert">{errorMessage}</p> : null}
 
-      {categories.map((cat) => (
+      {categories.map((cat, index) => (
         <div key={cat.id || cat.slug} className="admin-row">
-          <span>{cat.nome || cat.name}</span>
+          <span>{index + 1}. {cat.nome || cat.name}</span>
           <button
             className="btn-link"
             onClick={() => updateAdminCategory(cat.id, { ativo: !(cat.ativo ?? true) }).then(load)}

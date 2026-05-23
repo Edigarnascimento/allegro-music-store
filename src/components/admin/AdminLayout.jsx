@@ -12,8 +12,11 @@ export default function AdminLayout() {
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
-        <h2>Painel Allegro</h2>
-        <nav>
+        <div>
+          <p className="admin-sidebar-kicker">Allegro Music Store</p>
+          <h2>Painel Admin</h2>
+        </div>
+        <nav className="admin-nav">
           <NavLink to="/admin" end className="admin-link">Dashboard</NavLink>
           <NavLink to="/admin/produtos" className="admin-link">Produtos</NavLink>
           <NavLink to="/admin/categorias" className="admin-link">Categorias</NavLink>
@@ -22,6 +25,10 @@ export default function AdminLayout() {
         <button className="btn btn-secondary" type="button" onClick={handleLogout}>Sair</button>
       </aside>
       <section className="admin-content">
+        <header className="admin-header-panel">
+          <strong>Gestão da loja</strong>
+          <span>Visual moderno, operações seguras.</span>
+        </header>
         <Outlet />
       </section>
     </div>

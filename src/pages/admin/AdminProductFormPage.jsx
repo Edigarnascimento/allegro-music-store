@@ -89,8 +89,9 @@ export default function AdminProductFormPage() {
   const disableSave = isUploadingImage || isSavingProduct;
 
   return (
-    <div>
+    <div className="admin-page">
       <h1>{editing ? 'Editar produto' : 'Novo produto'}</h1>
+      <p className="admin-page-subtitle">Preencha os dados com atenção para manter o catálogo organizado.</p>
       <form className="admin-form" onSubmit={handleSubmit}>
         <label>Nome<input required value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} /></label>
         <label>Descrição<textarea value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} /></label>
