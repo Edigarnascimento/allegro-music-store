@@ -17,7 +17,12 @@ export default function AdminLoginPage() {
       await signInAdmin(form);
       navigate(location.state?.from?.pathname || '/admin', { replace: true });
     } catch (err) {
-      setError(err.message);
+      const fallbackMessage = 'Não foi possível entrar. Verifique e-mail e senha e tente novamente.';
+      const readableMessage = err?.message?.includes('Invalid login credentials')
+        ? 'Credenciais inválidas. Confira seu e-mail e senha.'
+        : err?.message || fallbackMessage;
+
+      setError(readableMessage);
     } finally {
       setLoading(false);
     }
