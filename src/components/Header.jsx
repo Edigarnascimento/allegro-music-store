@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import CategoryIcon from './CategoryIcon';
+import { getCategories } from '../services/categoriesService';
 
 const quickLinks = [
   { label: 'Central de atendimento', to: '/contato' },
@@ -8,7 +9,7 @@ const quickLinks = [
   { label: 'Login (em breve)', to: '/' },
 ];
 
-const categoryLinks = [
+const fallbackCategoryLinks = [
   { icon: 'strings', label: 'Cordas' },
   { icon: 'keys', label: 'Teclas' },
   { icon: 'drums', label: 'Bateria' },
@@ -16,9 +17,49 @@ const categoryLinks = [
   { icon: 'accessories', label: 'Acessórios' },
 ];
 
+const iconByCategoryName = {
+  cordas: 'strings',
+  teclas: 'keys',
+  bateria: 'drums',
+  áudio: 'audio',
+  audio: 'audio',
+  acessórios: 'accessories',
+  acessorios: 'accessories',
+};
+
 function Header() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCategories() {
+      const data = await getCategories();
+      if (isMounted) setCategories(data);
+    }
+
+    loadCategories();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const categoryLinks = useMemo(() => {
+    const source = categories.length
+      ? categories.map((category) => ({ label: category.nome ?? category.name ?? '' })).filter((category) => category.label)
+      : fallbackCategoryLinks;
+
+    return source.map((category) => {
+      const normalizedName = category.label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      return {
+        ...category,
+        icon: category.icon ?? iconByCategoryName[normalizedName] ?? 'generic',
+      };
+    });
+  }, [categories]);
 
   function handleSearchSubmit(event) {
     event.preventDefault();

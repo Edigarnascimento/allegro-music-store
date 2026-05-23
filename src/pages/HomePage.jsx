@@ -5,17 +5,29 @@ import CategoryIcon from '../components/CategoryIcon';
 import { services } from '../data/services';
 import { getProducts } from '../services/productsService';
 import { ArrowIcon, WhatsAppIcon } from '../components/PublicButtonIcons';
+import { getCategories } from '../services/categoriesService';
 
-const featuredCategories = [
+const fallbackFeaturedCategories = [
   { icon: 'strings', title: 'Guitarras e baixos', category: 'Cordas', description: 'Modelos para palco, estúdio e estudo.' },
   { icon: 'keys', title: 'Teclados e pianos', category: 'Teclas', description: 'Sons expressivos e recursos modernos.' },
   { icon: 'drums', title: 'Baterias e percussão', category: 'Bateria', description: 'Kits completos e peças de reposição.' },
   { icon: 'audio', title: 'Áudio e gravação', category: 'Áudio', description: 'Microfones, interfaces e monitoramento.' },
 ];
 
+const iconByCategoryName = {
+  cordas: 'strings',
+  teclas: 'keys',
+  bateria: 'drums',
+  áudio: 'audio',
+  audio: 'audio',
+  acessórios: 'accessories',
+  acessorios: 'accessories',
+};
+
 function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
+  const [featuredCategories, setFeaturedCategories] = useState(fallbackFeaturedCategories);
 
   useEffect(() => {
     let isMounted = true;
@@ -37,6 +49,35 @@ function HomePage() {
     }
 
     loadFeaturedProducts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCategories() {
+      const data = await getCategories();
+      if (!isMounted || !data.length) return;
+
+      const mapped = data.slice(0, 4).map((category) => {
+        const name = category.nome ?? category.name;
+        const normalizedName = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+        return {
+          icon: iconByCategoryName[normalizedName] ?? 'generic',
+          title: name,
+          category: name,
+          description: category.descricao || 'Explore os melhores produtos desta categoria.',
+        };
+      });
+
+      setFeaturedCategories(mapped.length ? mapped : fallbackFeaturedCategories);
+    }
+
+    loadCategories();
 
     return () => {
       isMounted = false;
