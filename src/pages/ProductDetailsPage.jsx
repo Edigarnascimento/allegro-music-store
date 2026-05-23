@@ -16,6 +16,7 @@ function ProductDetailsPage() {
   const [loading, setLoading] = useState(true);
   const whatsappNumber = useStoreWhatsappNumber();
   const { addToCart } = useCart();
+  const [cartFeedback, setCartFeedback] = useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -33,6 +34,7 @@ function ProductDetailsPage() {
             preco: data.preco ?? data.price ?? 0,
             categoria: data.categoria ?? data.category,
             imagem_url: data.imagem_url ?? data.image,
+            estoque: Number.isFinite(Number(data.estoque)) ? Number(data.estoque) : null,
           });
         }
       } finally {
@@ -56,6 +58,10 @@ function ProductDetailsPage() {
     'Gostaria de mais informações.',
   ].join('\n');
   const whatsappLink = buildWhatsAppLink(whatsappNumber, whatsappMessage);
+  const estoqueInformado = Number.isFinite(Number(product.estoque));
+  const indisponivel = estoqueInformado && Number(product.estoque) <= 0;
+  const estoqueBaixo = estoqueInformado && Number(product.estoque) > 0 && Number(product.estoque) <= 3;
+  const estoqueStatus = indisponivel ? 'Indisponível' : estoqueBaixo ? `Últimas unidades (${product.estoque})` : 'Em estoque';
 
   async function handleWhatsappClick(event) {
     event.preventDefault();
@@ -92,6 +98,8 @@ function ProductDetailsPage() {
           <span className="badge">{product.categoria}</span>
           <h1>{product.nome}</h1>
           <strong className="price">{formatPriceBRL(product.preco)}</strong>
+          <div className={`stock-status ${indisponivel ? 'out' : estoqueBaixo ? 'low' : 'ok'}`}>{estoqueStatus}</div>
+          {cartFeedback ? <p className="error-text">{cartFeedback}</p> : null}
           <p>{product.descricao}</p>
           <h3>Informações adicionais</h3>
           <ul className="details-benefits">
@@ -101,7 +109,7 @@ function ProductDetailsPage() {
           </ul>
           <div className="product-actions">
             <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer" onClick={handleWhatsappClick}><WhatsAppIcon /><span>Falar no WhatsApp</span></a>
-            <button className="btn btn-cart" type="button" onClick={() => addToCart(product)}><CartIcon /><span>Adicionar ao carrinho</span></button>
+            <button className="btn btn-cart" type="button" disabled={indisponivel} onClick={() => { const result = addToCart(product); if (!result?.ok) setCartFeedback(result.message); else setCartFeedback(''); }}><CartIcon /><span>{indisponivel ? 'Indisponível' : 'Adicionar ao carrinho'}</span></button>
             <Link to="/catalogo" className="btn btn-secondary">Voltar ao catálogo</Link>
           </div>
         </div>

@@ -238,3 +238,6 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 .admin-order-details { display:grid; gap:.5rem; }
 .admin-order-details p { margin:.1rem 0; }
 .admin-order-details ul { margin:.2rem 0 0; padding-left:1.2rem; }
+
+.stock-status{margin-top:.45rem;font-size:.84rem;font-weight:700}.stock-status.ok{color:#148a41}.stock-status.low{color:#9b6408}.stock-status.out{color:#9f1e27}.btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.admin-stock{display:inline-flex;padding:.22rem .56rem;border-radius:999px;font-size:.78rem;font-weight:700;border:1px solid}.admin-stock.is-ok{color:#138a40;background:#e9f9ef;border-color:#b6ebca}.admin-stock.is-low{color:#9b6408;background:#fff5e6;border-color:#ffd9a6}.admin-stock.is-out{color:#b11a25;background:#ffeaed;border-color:#ffc1c8}
