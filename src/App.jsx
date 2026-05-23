@@ -6,6 +6,8 @@ import CatalogPage from './pages/CatalogPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 import ServicesPage from './pages/ServicesPage';
 import ContactPage from './pages/ContactPage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminProductsPage from './pages/admin/AdminProductsPage';
@@ -13,6 +15,7 @@ import AdminProductFormPage from './pages/admin/AdminProductFormPage';
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminInteressesPage from './pages/admin/AdminInteressesPage';
+import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import ProtectedAdminRoute from './components/admin/ProtectedAdminRoute';
 import AdminLayout from './components/admin/AdminLayout';
 
@@ -30,6 +33,8 @@ function App() {
           <Route path="/produto/:productId" element={<ProductDetailsPage />} />
           <Route path="/servicos" element={<ServicesPage />} />
           <Route path="/contato" element={<ContactPage />} />
+          <Route path="/carrinho" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
 
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route element={<ProtectedAdminRoute />}>
@@ -41,6 +46,7 @@ function App() {
               <Route path="/admin/categorias" element={<AdminCategoriesPage />} />
               <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
               <Route path="/admin/interesses" element={<AdminInteressesPage />} />
+              <Route path="/admin/pedidos" element={<AdminOrdersPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

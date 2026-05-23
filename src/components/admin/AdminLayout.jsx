@@ -22,6 +22,7 @@ export default function AdminLayout() {
           <NavLink to="/admin/categorias" className="admin-link">Categorias</NavLink>
           <NavLink to="/admin/configuracoes" className="admin-link">Configurações</NavLink>
           <NavLink to="/admin/interesses" className="admin-link">Interesses</NavLink>
+          <NavLink to="/admin/pedidos" className="admin-link">Pedidos</NavLink>
         </nav>
         <button className="btn btn-secondary" type="button" onClick={handleLogout}>Sair</button>
       </aside>

@@ -3,11 +3,13 @@ import { ArrowIcon, WhatsAppIcon } from './PublicButtonIcons';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink, formatPriceBRL, resolveWhatsappNumber } from '../lib/whatsapp';
 import { createInterest } from '../services/interessesService';
+import { useCart } from '../context/CartContext';
 
 const PRODUCT_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80';
 
 function ProductCard({ product }) {
   const whatsappNumber = useStoreWhatsappNumber();
+  const { addToCart } = useCart();
 
   const normalizedProduct = {
     id: product.id,

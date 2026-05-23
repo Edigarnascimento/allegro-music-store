@@ -200,3 +200,52 @@ using (true);
 O clique no WhatsApp **não deve ser bloqueado** se o registro no banco falhar.
 A aplicação faz fallback seguro: registra quando possível e, em caso de erro/ausência de configuração do Supabase, apenas emite `console.warn` e abre o WhatsApp normalmente.
 Sem dados pessoais do cliente: apenas metadados do produto e origem do clique.
+
+## SQL sugerido: carrinho e pedidos
+
+```sql
+create table if not exists public.music_pedidos (
+  id uuid primary key default gen_random_uuid(),
+  cliente_nome text not null,
+  cliente_whatsapp text not null,
+  cliente_email text,
+  endereco_entrega text,
+  observacoes text,
+  status text default 'novo',
+  subtotal numeric(10,2),
+  total numeric(10,2),
+  forma_entrega text,
+  forma_pagamento text,
+  created_at timestamp with time zone default now()
+);
+
+create table if not exists public.music_pedido_itens (
+  id uuid primary key default gen_random_uuid(),
+  pedido_id uuid references public.music_pedidos(id) on delete cascade,
+  produto_id uuid,
+  produto_nome text,
+  categoria text,
+  quantidade integer,
+  preco_unitario numeric(10,2),
+  subtotal numeric(10,2),
+  created_at timestamp with time zone default now()
+);
+
+alter table public.music_pedidos enable row level security;
+alter table public.music_pedido_itens enable row level security;
+
+create policy "public_insert_music_pedidos" on public.music_pedidos
+for insert to anon, authenticated with check (true);
+
+create policy "public_insert_music_pedido_itens" on public.music_pedido_itens
+for insert to anon, authenticated with check (true);
+
+create policy "admin_select_music_pedidos" on public.music_pedidos
+for select to authenticated using (true);
+
+create policy "admin_update_music_pedidos" on public.music_pedidos
+for update to authenticated using (true) with check (true);
+
+create policy "admin_select_music_pedido_itens" on public.music_pedido_itens
+for select to authenticated using (true);
+```
