@@ -215,11 +215,26 @@ export default function CheckoutPage() {
             <h2 style={{ marginTop: 0 }}>Pagamento PIX automático</h2>
             <p>Status: <strong>{success.pixAutomatico.status}</strong></p>
             {success.pixAutomatico.qrCode ? <p><img src={success.pixAutomatico.qrCode} alt="QR Code PIX automático" style={{ maxWidth: 220 }} /></p> : null}
-            {success.pixAutomatico.copiaColaPix ? <p><strong>PIX copia e cola:</strong> {success.pixAutomatico.copiaColaPix}</p> : <p>Código PIX indisponível no momento.</p>}
+            {success.pixAutomatico.copiaColaPix ? (
+              <p><strong>PIX copia e cola:</strong> {success.pixAutomatico.copiaColaPix}</p>
+            ) : (
+              <p>Cobrança PIX criada, mas o código copia e cola não foi retornado. Use o PIX manual ou fale com a loja.</p>
+            )}
             {success.pixAutomatico.expiresAt ? <p><strong>Validade:</strong> {new Date(success.pixAutomatico.expiresAt).toLocaleString('pt-BR')}</p> : null}
             <p>Após o pagamento, o status do pedido será atualizado automaticamente. Em caso de dúvida, fale conosco no WhatsApp.</p>
             {success.pixAutomatico.copiaColaPix ? <button type="button" className="btn btn-secondary" onClick={handleCopyAutoPixCode}>Copiar código PIX</button> : null}
             {copyAutoPixFeedback ? <p style={{ marginTop: '.5rem' }}>{copyAutoPixFeedback}</p> : null}
+            {!success.pixAutomatico.copiaColaPix && !pixSemCadastro ? (
+              <>
+                <hr style={{ margin: '1rem 0' }} />
+                <p><strong>PIX manual (fallback):</strong></p>
+                <p><strong>Chave PIX:</strong> {success.pix.chave}</p>
+                <p><strong>Recebedor:</strong> {success.pix.recebedor || 'Não informado'}</p>
+                {success.pix.banco ? <p><strong>Banco:</strong> {success.pix.banco}</p> : null}
+                <p><strong>Total:</strong> {formatPriceBRL(success.total)}</p>
+                {success.pix.instrucoes ? <p><strong>Instruções:</strong> {success.pix.instrucoes}</p> : null}
+              </>
+            ) : null}
           </div>
         ) : null}
         {success.pix?.isPix && !success.pixAutomatico ? (
