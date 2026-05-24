@@ -9,8 +9,13 @@ export async function createOrder({ customer, items, subtotal, total }) {
     throw new Error('Supabase não está configurado para receber pedidos.');
   }
 
+  const normalizedCustomer = {
+    ...customer,
+    documento: customer?.documento || customer?.cpf_cnpj || '',
+  };
+
   const payload = {
-    customer,
+    customer: normalizedCustomer,
     items,
     subtotal,
     total,

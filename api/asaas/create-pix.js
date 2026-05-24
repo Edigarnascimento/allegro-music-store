@@ -30,6 +30,17 @@ function maskPhone(phone) {
   return `${digits.slice(0, 2)}***${digits.slice(-2)}`;
 }
 
+function onlyDigits(value) {
+  return String(value || '').replace(/\D/g, '');
+}
+
+function maskDocument(document) {
+  const digits = onlyDigits(document);
+  if (!digits) return null;
+  if (digits.length <= 4) return `***${digits.slice(-2)}`;
+  return `${digits.slice(0, 3)}***${digits.slice(-2)}`;
+}
+
 function buildPaymentLogPayload(paymentPayload) {
   return {
     billingType: paymentPayload?.billingType || null,
@@ -77,7 +88,17 @@ export default async function handler(req, res) {
       email: pedido.cliente_email || undefined,
       mobilePhone: pedido.cliente_whatsapp || undefined,
       phone: pedido.cliente_whatsapp || undefined,
+      cpfCnpj: onlyDigits(pedido.cliente_documento) || undefined,
     };
+
+    if (!customerPayload.cpfCnpj) {
+      console.warn('[asaas/create-pix] fallback manual', {
+        etapa: 'validate_customer_document',
+        pedido_id: pedido.id,
+        reason: 'missing_cpf_cnpj',
+      });
+      return json(res, 200, { ok: false, reason: 'fallback_manual', message: 'Falha ao gerar PIX automático. Use o PIX manual.' });
+    }
 
     const customerResp = await fetch(`${ASAAS_API_URL}/customers`, { method: 'POST', headers: { 'Content-Type': 'application/json', access_token: ASAAS_API_KEY }, body: JSON.stringify(customerPayload) });
     const customerData = await customerResp.json();
@@ -101,6 +122,7 @@ export default async function handler(req, res) {
       customer_contact: {
         email_masked: maskEmail(pedido.cliente_email),
         phone_masked: maskPhone(pedido.cliente_whatsapp),
+        document_masked: maskDocument(pedido.cliente_documento),
       },
     });
 
