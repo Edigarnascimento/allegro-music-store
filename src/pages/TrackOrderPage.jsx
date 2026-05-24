@@ -33,14 +33,14 @@ export default function TrackOrderPage() {
     setResult(null);
 
     try {
-      const data = await getPublicOrderStatus(orderCode.trim(), customerWhatsapp.trim());
+      const data = await getPublicOrderStatus(orderCode, customerWhatsapp);
       if (!data) {
         setError('Pedido não encontrado. Confira o número do pedido e o WhatsApp informado.');
       } else {
         setResult(data);
       }
     } catch (err) {
-      setError(`Não foi possível consultar: ${err.message}`);
+      setError('Pedido não encontrado. Confira o número do pedido e o WhatsApp informado.');
     } finally {
       setLoading(false);
     }
