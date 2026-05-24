@@ -81,14 +81,18 @@ export async function updateOrderStatus(orderId, status) {
 }
 
 
+function normalizeOrderCode(orderCode) {
+  return String(orderCode || '').trim().replace(/^#/, '');
+}
+
 export async function getPublicOrderStatus(orderCode, customerWhatsapp) {
   if (!isSupabaseConfigured || !supabase) {
     throw new Error('Supabase não está configurado para consulta pública de pedidos.');
   }
 
   const { data, error } = await supabase.rpc('get_public_order_status', {
-    order_code: orderCode,
-    customer_whatsapp: customerWhatsapp,
+    order_code: normalizeOrderCode(orderCode),
+    customer_whatsapp: String(customerWhatsapp || '').trim(),
   });
 
   if (error) {

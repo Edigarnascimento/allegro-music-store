@@ -288,7 +288,7 @@ begin
   -- trava e valida estoque de todos os itens
   for item in select * from jsonb_array_elements(v_items)
   loop
-    v_product_id := (item->>'id')::uuid;
+    v_product_id := nullif(coalesce(item->>'id', item->>'produto_id'), '')::uuid;
     v_qty := greatest(coalesce((item->>'quantidade')::integer, 0), 0);
 
     if v_product_id is null or v_qty <= 0 then
@@ -340,7 +340,7 @@ begin
 
   for item in select * from jsonb_array_elements(v_items)
   loop
-    v_product_id := (item->>'id')::uuid;
+    v_product_id := nullif(coalesce(item->>'id', item->>'produto_id'), '')::uuid;
     v_qty := (item->>'quantidade')::integer;
     v_price := coalesce((item->>'preco')::numeric, 0);
 
@@ -363,8 +363,8 @@ begin
     );
 
     update public.music_produtos
-       set estoque = greatest(estoque - v_qty, 0)
-     where id = v_product_id;
+       set estoque = greatest(coalesce(public.music_produtos.estoque, 0) - v_qty, 0)
+     where public.music_produtos.id = v_product_id;
   end loop;
 
   return query
@@ -505,8 +505,8 @@ as $$
     select p.*
     from public.music_pedidos p
     where (
-      p.id::text = trim(order_code)
-      or left(p.id::text, 8) = left(trim(order_code), 8)
+      p.id::text = btrim(replace(coalesce(order_code, ''), '#', ''))
+      or left(p.id::text, 8) = left(btrim(replace(coalesce(order_code, ''), '#', '')), 8)
     )
     and regexp_replace(coalesce(p.cliente_whatsapp, ''), '\D', '', 'g') = regexp_replace(coalesce(customer_whatsapp, ''), '\D', '', 'g')
     limit 1
