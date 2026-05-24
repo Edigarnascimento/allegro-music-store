@@ -65,3 +65,25 @@ export async function updateOrderStatus(orderId, status) {
 
   return data;
 }
+
+
+export async function getPublicOrderStatus(orderCode, customerWhatsapp) {
+  if (!isSupabaseConfigured || !supabase) {
+    throw new Error('Supabase não está configurado para consulta pública de pedidos.');
+  }
+
+  const { data, error } = await supabase.rpc('get_public_order_status', {
+    order_code: orderCode,
+    customer_whatsapp: customerWhatsapp,
+  });
+
+  if (error) {
+    throw new Error(error.message || 'Não foi possível consultar o pedido.');
+  }
+
+  if (!data || data.length === 0) {
+    return null;
+  }
+
+  return data[0];
+}

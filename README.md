@@ -474,3 +474,61 @@ values (
   'checkout_rpc'
 );
 ```
+
+
+## SQL sugerido: RPC pública segura para acompanhamento de pedido
+
+```sql
+create or replace function public.get_public_order_status(order_code text, customer_whatsapp text)
+returns table (
+  id uuid,
+  short_id text,
+  created_at timestamptz,
+  status text,
+  cliente_nome text,
+  forma_pagamento text,
+  forma_entrega text,
+  total numeric,
+  observacoes text,
+  items jsonb
+)
+language sql
+security definer
+set search_path = public
+as $$
+  with pedido as (
+    select p.*
+    from public.music_pedidos p
+    where (
+      p.id::text = trim(order_code)
+      or left(p.id::text, 8) = left(trim(order_code), 8)
+    )
+    and regexp_replace(coalesce(p.cliente_whatsapp, ''), '\D', '', 'g') = regexp_replace(coalesce(customer_whatsapp, ''), '\D', '', 'g')
+    limit 1
+  )
+  select
+    p.id,
+    left(p.id::text, 8) as short_id,
+    p.created_at,
+    p.status,
+    p.cliente_nome,
+    p.forma_pagamento,
+    p.forma_entrega,
+    p.total,
+    p.observacoes,
+    coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'produto_id', i.produto_id,
+        'produto_nome', i.produto_nome,
+        'quantidade', i.quantidade,
+        'preco_unitario', i.preco_unitario,
+        'subtotal', i.subtotal
+      ) order by i.created_at asc)
+      from public.music_pedido_itens i
+      where i.pedido_id = p.id
+    ), '[]'::jsonb) as items
+  from pedido p;
+$$;
+
+grant execute on function public.get_public_order_status(text, text) to anon, authenticated;
+```

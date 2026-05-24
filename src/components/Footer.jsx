@@ -8,6 +8,7 @@ const institutionalLinks = [
   { label: 'Formas de Pagamento', to: '/institucional/pagamento' },
   { label: 'Entrega e Retirada', to: '/institucional/entrega' },
   { label: 'Sobre a Loja', to: '/institucional/sobre' },
+  { label: 'Acompanhar pedido', to: '/acompanhar-pedido' },
 ];
 
 function Footer() {
