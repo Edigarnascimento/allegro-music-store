@@ -2,7 +2,23 @@ import { createClient } from '@supabase/supabase-js';
 
 function json(res, status, payload) { res.status(status).json(payload); }
 
-const STATUS_MAP = { RECEIVED: 'pago', CONFIRMED: 'pago', OVERDUE: 'expirado', DELETED: 'cancelado', CANCELED: 'cancelado' };
+const STATUS_MAP = {
+  PAYMENT_CREATED: 'pendente',
+  PAYMENT_UPDATED: 'pendente',
+  PAYMENT_CONFIRMED: 'pago',
+  PAYMENT_RECEIVED: 'pago',
+  PAYMENT_OVERDUE: 'expirado',
+  PAYMENT_DELETED: 'cancelado',
+  PAYMENT_REFUNDED: 'estornado',
+  PAYMENT_REFUND_IN_PROGRESS: 'estorno_em_processamento',
+  PAYMENT_REFUND_DENIED: 'estorno_negado',
+  // Compatibilidade com nomes antigos
+  RECEIVED: 'pago',
+  CONFIRMED: 'pago',
+  OVERDUE: 'expirado',
+  DELETED: 'cancelado',
+  CANCELED: 'cancelado',
+};
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return json(res, 405, { ok: false });
@@ -19,6 +35,13 @@ export default async function handler(req, res) {
   const gatewayPaymentId = req.body?.payment?.id || null;
   const mappedStatus = STATUS_MAP[eventType] || 'pendente';
 
+  console.info('[webhook/asaas] evento recebido', {
+    eventType,
+    gatewayPaymentId,
+    mappedStatus,
+    pagamentoEncontrado: Boolean(gatewayPaymentId),
+  });
+
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
 
   const { data: pagamento } = gatewayPaymentId
@@ -33,7 +56,22 @@ export default async function handler(req, res) {
     payload: req.body,
   });
 
-  if (!pagamento) return json(res, 200, { ok: true });
+  if (!pagamento) {
+    console.info('[webhook/asaas] pagamento não encontrado', {
+      eventType,
+      gatewayPaymentId,
+      mappedStatus,
+      pagamentoEncontrado: false,
+    });
+    return json(res, 200, { ok: true });
+  }
+
+  console.info('[webhook/asaas] pagamento localizado', {
+    eventType,
+    gatewayPaymentId,
+    mappedStatus,
+    pagamentoEncontrado: true,
+  });
 
   const updatePayload = { status: mappedStatus, updated_at: new Date().toISOString() };
   if (mappedStatus === 'pago') updatePayload.paid_at = new Date().toISOString();
