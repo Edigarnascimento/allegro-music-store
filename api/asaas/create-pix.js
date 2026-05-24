@@ -22,6 +22,14 @@ export default async function handler(req, res) {
   if (String(pedido.status || '').toLowerCase() === 'pago') return json(res, 409, { ok: false, reason: 'already_paid', message: 'Pedido já pago.' });
 
   try {
+    const logAsaasWarning = ({ stage, status, body }) => {
+      console.warn('[asaas/create-pix] asaas warning', {
+        etapa: stage,
+        status_http: status || null,
+        response_body: body || null,
+      });
+    };
+
     const customerPayload = {
       name: pedido.cliente_nome || `Cliente ${String(pedido.id).slice(0, 8)}`,
       email: pedido.cliente_email || undefined,
@@ -32,7 +40,10 @@ export default async function handler(req, res) {
     const customerResp = await fetch(`${ASAAS_API_URL}/customers`, { method: 'POST', headers: { 'Content-Type': 'application/json', access_token: ASAAS_API_KEY }, body: JSON.stringify(customerPayload) });
     const customerData = await customerResp.json();
     const customerId = customerData?.id;
-    if (!customerResp.ok || !customerId) throw new Error('Falha ao criar cliente Asaas');
+    if (!customerResp.ok || !customerId) {
+      logAsaasWarning({ stage: 'create_customer', status: customerResp.status, body: customerData });
+      throw new Error('Falha ao criar cliente Asaas');
+    }
 
     const chargeResp = await fetch(`${ASAAS_API_URL}/payments`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', access_token: ASAAS_API_KEY }, body: JSON.stringify({
@@ -45,12 +56,20 @@ export default async function handler(req, res) {
       })
     });
     const chargeData = await chargeResp.json();
-    if (!chargeResp.ok || !chargeData?.id) throw new Error('Falha ao criar cobrança PIX Asaas');
+    if (!chargeResp.ok || !chargeData?.id) {
+      logAsaasWarning({ stage: 'create_payment', status: chargeResp.status, body: chargeData });
+      throw new Error('Falha ao criar cobrança PIX Asaas');
+    }
 
     let qrData = {};
     // TODO: confirmar endpoint e campos oficiais na documentação atual da Asaas para QR Code Pix.
     const qrResp = await fetch(`${ASAAS_API_URL}/payments/${chargeData.id}/pixQrCode`, { headers: { access_token: ASAAS_API_KEY } });
-    if (qrResp.ok) qrData = await qrResp.json();
+    if (qrResp.ok) {
+      qrData = await qrResp.json();
+    } else {
+      const qrErrorBody = await qrResp.json().catch(() => null);
+      logAsaasWarning({ stage: 'get_qr_code', status: qrResp.status, body: qrErrorBody });
+    }
 
     const paymentRow = {
       pedido_id: pedido.id,
@@ -65,13 +84,23 @@ export default async function handler(req, res) {
       raw_response: { charge: chargeData, qr: qrData },
     };
 
-    const { data: saved } = await supabase.from('music_pagamentos').insert(paymentRow).select('*').single();
+    const { data: saved, error: saveError } = await supabase.from('music_pagamentos').insert(paymentRow).select('*').single();
+    if (saveError || !saved) {
+      console.warn('[asaas/create-pix] supabase insert warning', {
+        etapa: 'insert_payment',
+        message: saveError?.message || null,
+        details: saveError?.details || null,
+        hint: saveError?.hint || null,
+        code: saveError?.code || null,
+      });
+      throw new Error('Falha ao salvar pagamento no Supabase');
+    }
 
     await safeAudit(supabase, { tipo: 'pagamento', acao: 'pix_criado', tabela: 'music_pagamentos', registro_id: saved?.id || null, descricao: `Pagamento PIX criado para pedido ${pedido.id}.`, depois: saved || paymentRow, origem: 'serverless' });
 
     return json(res, 200, { ok: true, payment_id: saved?.id, status: saved?.status || 'pendente', qr_code: saved?.qr_code_pix || null, qr_code_text: saved?.copia_cola_pix || null, expires_at: saved?.expires_at || null });
   } catch (error) {
-    console.warn('[asaas/create-pix] fallback manual:', error?.message || error);
+    console.warn('[asaas/create-pix] fallback manual', { etapa: 'fallback_manual', error: error?.message || error });
     return json(res, 200, { ok: false, reason: 'fallback_manual', message: 'Falha ao gerar PIX automático. Use o PIX manual.' });
   }
 }
