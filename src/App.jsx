@@ -19,6 +19,7 @@ import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminInteressesPage from './pages/admin/AdminInteressesPage';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import AdminAuditPage from './pages/admin/AdminAuditPage';
+import AdminPaymentsPage from './pages/admin/AdminPaymentsPage';
 import ProtectedAdminRoute from './components/admin/ProtectedAdminRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import ScrollToTop from './components/ScrollToTop';
@@ -54,6 +55,7 @@ function App() {
               <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
               <Route path="/admin/interesses" element={<AdminInteressesPage />} />
               <Route path="/admin/pedidos" element={<AdminOrdersPage />} />
+              <Route path="/admin/pagamentos" element={<AdminPaymentsPage />} />
               <Route path="/admin/auditoria" element={<AdminAuditPage />} />
             </Route>
           </Route>

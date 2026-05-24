@@ -532,3 +532,73 @@ $$;
 
 grant execute on function public.get_public_order_status(text, text) to anon, authenticated;
 ```
+
+## PIX automático com Asaas (base inicial com fallback obrigatório)
+
+### Variáveis de ambiente (backend/serverless)
+
+```env
+ASAAS_API_KEY=seu_token_asaas
+ASAAS_API_URL=https://api-sandbox.asaas.com/v3
+ASAAS_WEBHOOK_TOKEN=token_opcional_de_validacao_webhook
+SUPABASE_SERVICE_ROLE_KEY=sua_service_role_key
+```
+
+- `ASAAS_API_KEY` **não pode** usar prefixo `VITE_`.
+- `SUPABASE_SERVICE_ROLE_KEY` **não pode** usar prefixo `VITE_`.
+- Segredos devem existir apenas em backend/serverless.
+- Prefixo `VITE_` expõe variáveis no navegador e não deve ser usado para token Asaas.
+- Sandbox: `ASAAS_API_URL` para endpoint sandbox da Asaas.
+- Produção: `ASAAS_API_URL` para endpoint de produção da Asaas.
+
+### SQL sugerido para pagamentos
+
+```sql
+create table if not exists public.music_pagamentos (
+  id uuid primary key default gen_random_uuid(),
+  pedido_id uuid references public.music_pedidos(id) on delete cascade,
+  gateway text default 'asaas',
+  gateway_payment_id text,
+  metodo text default 'pix',
+  status text default 'pendente',
+  valor numeric(10,2),
+  qr_code_pix text,
+  copia_cola_pix text,
+  expires_at timestamp with time zone,
+  paid_at timestamp with time zone,
+  raw_response jsonb,
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone default now()
+);
+
+create table if not exists public.music_payment_events (
+  id uuid primary key default gen_random_uuid(),
+  pagamento_id uuid,
+  pedido_id uuid,
+  gateway text default 'asaas',
+  event_type text,
+  payload jsonb,
+  created_at timestamp with time zone default now()
+);
+
+alter table public.music_pagamentos enable row level security;
+alter table public.music_payment_events enable row level security;
+
+create policy "authenticated_select_music_pagamentos" on public.music_pagamentos
+for select to authenticated using (true);
+
+create policy "authenticated_select_music_payment_events" on public.music_payment_events
+for select to authenticated using (true);
+```
+
+> Importante: insert/update de `music_pagamentos` e insert de `music_payment_events` devem ser feitos somente por backend com `service_role`.
+
+### Rotas serverless adicionadas
+
+- `POST /api/asaas/create-pix`: tenta criar PIX automático e, em qualquer falha/configuração ausente, retorna fallback controlado para PIX manual.
+- `POST /api/webhooks/asaas`: recebe eventos Asaas, valida token quando configurado, registra evento e atualiza pagamento/pedido.
+
+### TODOs de integração Asaas
+
+- Confirmar e ajustar campos exatos do endpoint de QR Code PIX (`/payments/{id}/pixQrCode`) conforme documentação vigente da Asaas.
+- Confirmar estratégia de idempotência para reprocessamento de webhooks em produção.
