@@ -21,10 +21,14 @@ export async function createOrder({ customer, items, subtotal, total }) {
     total,
   };
 
-  const { data, error } = await supabase.rpc('create_music_order', payload);
+  const { data, error } = await supabase.rpc('create_music_order', { payload });
 
   if (error) {
-    throw new Error(`Erro ao finalizar pedido: ${error.message}`);
+    console.error('create_music_order RPC failed', {
+      message: error.message,
+      hasDocumento: Boolean(normalizedCustomer?.documento?.trim()),
+    });
+    throw new Error(`Erro ao finalizar pedido: ${error.message || 'falha na função create_music_order.'}`);
   }
 
   if (!data) {
