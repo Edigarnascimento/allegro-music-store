@@ -1,6 +1,9 @@
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
+import { createAuditLog } from './auditService';
+
 const ORDERS_TABLE = 'music_pedidos';
 const ORDER_ITEMS_TABLE = 'music_pedido_itens';
+
 export async function createOrder({ customer, items, subtotal, total }) {
   if (!isSupabaseConfigured || !supabase) {
     throw new Error('Supabase não está configurado para receber pedidos.');
@@ -25,6 +28,40 @@ export async function createOrder({ customer, items, subtotal, total }) {
 
   return data;
 }
-export async function getAdminOrders() { if (!isSupabaseConfigured || !supabase) return []; const { data, error } = await supabase.from(ORDERS_TABLE).select('*').order('created_at', { ascending: false }); if (error) return []; return data ?? []; }
-export async function getOrderItems(orderId) { if (!isSupabaseConfigured || !supabase) return []; const { data, error } = await supabase.from(ORDER_ITEMS_TABLE).select('*').eq('pedido_id', orderId).order('created_at'); if (error) return []; return data ?? []; }
-export async function updateOrderStatus(orderId, status) { if (!isSupabaseConfigured || !supabase) return null; const { data, error } = await supabase.from(ORDERS_TABLE).update({ status }).eq('id', orderId).select('*').single(); if (error) throw new Error(error.message); return data; }
+
+export async function getAdminOrders() {
+  if (!isSupabaseConfigured || !supabase) return [];
+  const { data, error } = await supabase.from(ORDERS_TABLE).select('*').order('created_at', { ascending: false });
+  if (error) return [];
+  return data ?? [];
+}
+
+export async function getOrderItems(orderId) {
+  if (!isSupabaseConfigured || !supabase) return [];
+  const { data, error } = await supabase.from(ORDER_ITEMS_TABLE).select('*').eq('pedido_id', orderId).order('created_at');
+  if (error) return [];
+  return data ?? [];
+}
+
+export async function updateOrderStatus(orderId, status) {
+  if (!isSupabaseConfigured || !supabase) return null;
+
+  const { data: currentOrder, error: currentOrderError } = await supabase.from(ORDERS_TABLE).select('*').eq('id', orderId).single();
+  if (currentOrderError) throw new Error(currentOrderError.message);
+
+  const { data, error } = await supabase.from(ORDERS_TABLE).update({ status }).eq('id', orderId).select('*').single();
+  if (error) throw new Error(error.message);
+
+  createAuditLog({
+    tipo: 'pedido',
+    acao: 'status_pedido_alterado',
+    tabela: ORDERS_TABLE,
+    registro_id: orderId,
+    descricao: `Status do pedido alterado de "${currentOrder?.status || 'desconhecido'}" para "${data?.status || status}".`,
+    antes: { status: currentOrder?.status },
+    depois: { status: data?.status || status },
+    origem: 'admin',
+  });
+
+  return data;
+}
