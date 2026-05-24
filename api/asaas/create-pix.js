@@ -6,6 +6,41 @@ async function safeAudit(supabase, payload) {
   try { await supabase.from('music_audit_logs').insert(payload); } catch (error) { console.warn('[asaas/create-pix] audit warn', error?.message || error); }
 }
 
+function safeStringify(value) {
+  try {
+    return JSON.stringify(value ?? null, null, 2);
+  } catch {
+    return String(value);
+  }
+}
+
+function maskEmail(email) {
+  if (!email || typeof email !== 'string') return null;
+  const [localPart, domain] = email.split('@');
+  if (!localPart || !domain) return '***';
+  const visibleLocal = localPart.slice(0, 2);
+  return `${visibleLocal}***@${domain}`;
+}
+
+function maskPhone(phone) {
+  if (!phone || typeof phone !== 'string') return null;
+  const digits = phone.replace(/\D/g, '');
+  if (!digits) return '***';
+  if (digits.length <= 4) return `${'*'.repeat(Math.max(digits.length - 2, 0))}${digits.slice(-2)}`;
+  return `${digits.slice(0, 2)}***${digits.slice(-2)}`;
+}
+
+function buildPaymentLogPayload(paymentPayload) {
+  return {
+    billingType: paymentPayload?.billingType || null,
+    value: paymentPayload?.value || null,
+    dueDate: paymentPayload?.dueDate || null,
+    externalReference: paymentPayload?.externalReference || null,
+    hasCustomer: Boolean(paymentPayload?.customer),
+    customerPreview: paymentPayload?.customer ? `${String(paymentPayload.customer).slice(0, 6)}***` : null,
+  };
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return json(res, 405, { ok: false, message: 'Method not allowed' });
   const { ASAAS_API_KEY, ASAAS_API_URL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
@@ -23,10 +58,17 @@ export default async function handler(req, res) {
 
   try {
     const logAsaasWarning = ({ stage, status, body }) => {
+      const bodyString = safeStringify(body);
       console.warn('[asaas/create-pix] asaas warning', {
         etapa: stage,
         status_http: status || null,
-        response_body: body || null,
+        code: body?.code || null,
+        description: body?.description || null,
+        message: body?.message || null,
+        errors: body?.errors || null,
+        status: body?.status || null,
+        body: body || null,
+        response_body: bodyString,
       });
     };
 
@@ -45,18 +87,38 @@ export default async function handler(req, res) {
       throw new Error('Falha ao criar cliente Asaas');
     }
 
+    const paymentPayload = {
+      customer: customerId,
+      billingType: 'PIX',
+      value: Number(pedido.total || 0),
+      dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+      externalReference: pedido.id,
+      description: `Pedido Allegro #${String(pedido.id).slice(0, 8)}`,
+    };
+
+    console.info('[asaas/create-pix] create_payment request', {
+      payload: buildPaymentLogPayload(paymentPayload),
+      customer_contact: {
+        email_masked: maskEmail(pedido.cliente_email),
+        phone_masked: maskPhone(pedido.cliente_whatsapp),
+      },
+    });
+
     const chargeResp = await fetch(`${ASAAS_API_URL}/payments`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', access_token: ASAAS_API_KEY }, body: JSON.stringify({
-        customer: customerId,
-        billingType: 'PIX',
-        value: Number(pedido.total || 0),
-        dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
-        externalReference: pedido.id,
-        description: `Pedido Allegro #${String(pedido.id).slice(0, 8)}`,
-      })
+      method: 'POST', headers: { 'Content-Type': 'application/json', access_token: ASAAS_API_KEY }, body: JSON.stringify(paymentPayload)
     });
     const chargeData = await chargeResp.json();
     if (!chargeResp.ok || !chargeData?.id) {
+      console.warn('[asaas/create-pix] create_payment failed', {
+        status_http: chargeResp.status,
+        code: chargeData?.code || null,
+        description: chargeData?.description || null,
+        message: chargeData?.message || null,
+        errors: chargeData?.errors || null,
+        status: chargeData?.status || null,
+        body: chargeData || null,
+        response_body: safeStringify(chargeData),
+      });
       logAsaasWarning({ stage: 'create_payment', status: chargeResp.status, body: chargeData });
       throw new Error('Falha ao criar cobrança PIX Asaas');
     }
