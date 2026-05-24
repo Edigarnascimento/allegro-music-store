@@ -52,6 +52,12 @@ function buildPaymentLogPayload(paymentPayload) {
   };
 }
 
+function buildQrCodeImage(encodedImage) {
+  if (!encodedImage || typeof encodedImage !== 'string') return null;
+  if (encodedImage.startsWith('data:image')) return encodedImage;
+  return `data:image/png;base64,${encodedImage}`;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return json(res, 405, { ok: false, message: 'Method not allowed' });
   const { ASAAS_API_KEY, ASAAS_API_URL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
@@ -146,14 +152,20 @@ export default async function handler(req, res) {
     }
 
     let qrData = {};
-    // TODO: confirmar endpoint e campos oficiais na documentação atual da Asaas para QR Code Pix.
-    const qrResp = await fetch(`${ASAAS_API_URL}/payments/${chargeData.id}/pixQrCode`, { headers: { access_token: ASAAS_API_KEY } });
+    const qrResp = await fetch(`${ASAAS_API_URL}/payments/${chargeData.id}/pixQrCode`, {
+      method: 'GET',
+      headers: { access_token: ASAAS_API_KEY, 'Content-Type': 'application/json' },
+    });
     if (qrResp.ok) {
       qrData = await qrResp.json();
     } else {
       const qrErrorBody = await qrResp.json().catch(() => null);
       logAsaasWarning({ stage: 'get_qr_code', status: qrResp.status, body: qrErrorBody });
     }
+
+    const qrCodeImage = buildQrCodeImage(qrData?.encodedImage);
+    const copiaColaPix = qrData?.payload || null;
+    const expiresAt = qrData?.expirationDate || (chargeData?.dueDate ? `${chargeData.dueDate}T23:59:59Z` : null);
 
     const paymentRow = {
       pedido_id: pedido.id,
@@ -162,9 +174,9 @@ export default async function handler(req, res) {
       metodo: 'pix',
       status: 'pendente',
       valor: Number(pedido.total || 0),
-      qr_code_pix: qrData?.encodedImage || qrData?.payload || null,
-      copia_cola_pix: qrData?.payload || null,
-      expires_at: chargeData?.dueDate ? `${chargeData.dueDate}T23:59:59Z` : null,
+      qr_code_pix: qrCodeImage,
+      copia_cola_pix: copiaColaPix,
+      expires_at: expiresAt,
       raw_response: { charge: chargeData, qr: qrData },
     };
 
@@ -182,7 +194,15 @@ export default async function handler(req, res) {
 
     await safeAudit(supabase, { tipo: 'pagamento', acao: 'pix_criado', tabela: 'music_pagamentos', registro_id: saved?.id || null, descricao: `Pagamento PIX criado para pedido ${pedido.id}.`, depois: saved || paymentRow, origem: 'serverless' });
 
-    return json(res, 200, { ok: true, payment_id: saved?.id, status: saved?.status || 'pendente', qr_code: saved?.qr_code_pix || null, qr_code_text: saved?.copia_cola_pix || null, expires_at: saved?.expires_at || null });
+    return json(res, 200, {
+      ok: true,
+      payment_id: saved?.id,
+      status: saved?.status || 'pendente',
+      qr_code: saved?.qr_code_pix || null,
+      qr_code_text: saved?.copia_cola_pix || null,
+      copia_cola_pix: saved?.copia_cola_pix || null,
+      expires_at: saved?.expires_at || null,
+    });
   } catch (error) {
     console.warn('[asaas/create-pix] fallback manual', { etapa: 'fallback_manual', error: error?.message || error });
     return json(res, 200, { ok: false, reason: 'fallback_manual', message: 'Falha ao gerar PIX automático. Use o PIX manual.' });
