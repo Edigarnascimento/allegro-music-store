@@ -173,6 +173,7 @@ export default function CheckoutPage() {
       <section className="container section">
         <h1>Pedido realizado com sucesso!</h1>
         <p>Seu pedido foi registrado. Nossa equipe acompanha a próxima etapa e também entrará em contato pelo WhatsApp informado.</p>
+        <p><strong>Após o pagamento via PIX, envie o comprovante pelo WhatsApp da loja.</strong></p>
         <p>
           <strong>Número do pedido:</strong> #{success.shortId}
         </p>
@@ -213,6 +214,20 @@ export default function CheckoutPage() {
             <WhatsAppIcon />
             <span>Enviar pedido pelo WhatsApp</span>
           </a>
+          {success.pix?.isPix ? (
+            <a
+              className="btn btn-whatsapp"
+              href={buildWhatsAppLink(whatsappNumber, `Olá, realizei o pagamento do pedido #${success.shortId} e estou enviando o comprovante para validação.`)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <WhatsAppIcon />
+              <span>Enviar comprovante pelo WhatsApp</span>
+            </a>
+          ) : null}
+          <Link className="btn btn-secondary" to="/acompanhar-pedido">
+            Acompanhar meu pedido
+          </Link>
           <Link className="btn btn-secondary" to="/catalogo">
             Voltar ao catálogo
           </Link>

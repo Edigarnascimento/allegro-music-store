@@ -9,6 +9,7 @@ import { getCategories } from '../services/categoriesService';
 const quickLinks = [
   { label: 'Central de atendimento', to: '/contato' },
   { label: 'Sobre a loja', to: '/institucional/sobre' },
+  { label: 'Acompanhar pedido', to: '/acompanhar-pedido' },
 ];
 
 const fallbackCategoryLinks = [

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { buildWhatsAppLink } from '../../lib/whatsapp';
 import {
   formatCurrencyBRL,
   formatDeliveryMethod,
@@ -11,6 +12,22 @@ import {
   getOrderItems,
   updateOrderStatus,
 } from '../../services/ordersService';
+
+const statusMessages = {
+  novo: 'Olá, recebemos seu pedido #{orderCode}. Em breve nossa equipe fará a conferência.',
+  aguardando_pagamento: 'Olá, seu pedido #{orderCode} está aguardando confirmação de pagamento. Caso tenha pago via PIX, envie o comprovante por aqui.',
+  pago: 'Olá, pagamento do pedido #{orderCode} confirmado. Vamos dar andamento à separação do produto.',
+  em_atendimento: 'Olá, seu pedido #{orderCode} está em atendimento.',
+  enviado: 'Olá, seu pedido #{orderCode} saiu para entrega.',
+  concluido: 'Olá, seu pedido #{orderCode} foi concluído. Agradecemos pela preferência.',
+  cancelado: 'Olá, seu pedido #{orderCode} foi cancelado. Em caso de dúvida, fale conosco por aqui.',
+};
+
+function buildStatusMessage(order) {
+  const orderCode = order.id.slice(0, 8);
+  const template = statusMessages[order.status || 'novo'] || statusMessages.novo;
+  return template.replace('#{orderCode}', orderCode);
+}
 
 const statuses = [
   'novo',
@@ -136,6 +153,9 @@ export default function AdminOrdersPage() {
           <p>
             <strong>Itens do pedido:</strong>
           </p>
+          <a className="btn btn-whatsapp" href={buildWhatsAppLink(selected.cliente_whatsapp, buildStatusMessage(selected))} target="_blank" rel="noreferrer">
+            Enviar atualização pelo WhatsApp
+          </a>
           {items.length ? (
             <ul>
               {items.map((it) => (
