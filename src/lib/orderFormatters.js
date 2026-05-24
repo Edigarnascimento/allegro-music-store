@@ -6,6 +6,8 @@ const ORDER_STATUS_LABELS = {
   enviado: 'Enviado',
   concluido: 'Concluído',
   cancelado: 'Cancelado',
+  expirado: 'Expirado',
+  estornado: 'Estornado',
 };
 
 const DELIVERY_METHOD_LABELS = {

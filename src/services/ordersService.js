@@ -3,6 +3,7 @@ import { createAuditLog } from './auditService';
 
 const ORDERS_TABLE = 'music_pedidos';
 const ORDER_ITEMS_TABLE = 'music_pedido_itens';
+const STOCK_RETURNABLE_STATUSES = new Set(['cancelado', 'expirado', 'estornado']);
 
 export async function createOrder({ customer, items, subtotal, total }) {
   if (!isSupabaseConfigured || !supabase) {
@@ -65,6 +66,32 @@ export async function updateOrderStatus(orderId, status) {
 
   const { data, error } = await supabase.from(ORDERS_TABLE).update({ status }).eq('id', orderId).select('*').single();
   if (error) throw new Error(error.message);
+
+  const shouldReturnStock = STOCK_RETURNABLE_STATUSES.has(status);
+  const stockAlreadyReturned = Boolean(currentOrder?.estoque_devolvido);
+
+  if (shouldReturnStock && !stockAlreadyReturned) {
+    const { data: stockReturnData, error: stockReturnError } = await supabase.rpc('return_order_stock', { order_id: orderId });
+
+    if (stockReturnError) {
+      throw new Error(stockReturnError.message || 'Falha ao devolver estoque do pedido.');
+    }
+
+    createAuditLog({
+      tipo: 'estoque',
+      acao: 'estoque_devolvido_por_cancelamento_manual',
+      tabela: ORDERS_TABLE,
+      registro_id: orderId,
+      descricao: `Estoque devolvido automaticamente após alteração manual do status do pedido para "${status}".`,
+      antes: { estoque_devolvido: currentOrder?.estoque_devolvido || false, status: currentOrder?.status },
+      depois: {
+        estoque_devolvido: true,
+        estoque_devolvido_at: stockReturnData?.estoque_devolvido_at || null,
+        status,
+      },
+      origem: 'admin',
+    });
+  }
 
   createAuditLog({
     tipo: 'pedido',

@@ -38,6 +38,8 @@ const statuses = [
   'enviado',
   'concluido',
   'cancelado',
+  'expirado',
+  'estornado',
 ];
 
 export default function AdminOrdersPage() {
@@ -176,6 +178,15 @@ export default function AdminOrdersPage() {
           </p>
           <p>
             <strong>Observações:</strong> {getFormattedValueOrFallback(selected.observacoes)}
+          </p>
+          <p>
+            <strong>Estoque devolvido:</strong> {selected.estoque_devolvido ? 'Sim' : 'Não'}
+          </p>
+          <p>
+            <strong>Data da devolução:</strong>{' '}
+            {selected.estoque_devolvido_at
+              ? new Date(selected.estoque_devolvido_at).toLocaleString('pt-BR')
+              : 'Não devolvido'}
           </p>
 
           <p>
