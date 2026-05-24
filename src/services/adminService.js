@@ -1,5 +1,6 @@
 import { products as mockProducts } from '../data/products';
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
+import { createAuditLog } from './auditService';
 
 const PRODUCTS_TABLE = 'music_produtos';
 const CATEGORIES_TABLE = 'music_categorias';
@@ -279,6 +280,17 @@ export async function createAdminProduct(payload) {
 
   const { data, error } = await supabase.from(PRODUCTS_TABLE).insert(payload).select().single();
   if (error) throw new Error(error.message);
+
+  createAuditLog({
+    tipo: 'produto',
+    acao: 'produto_criado',
+    tabela: PRODUCTS_TABLE,
+    registro_id: data?.id,
+    descricao: `Produto "${data?.nome || payload?.nome || 'sem nome'}" criado.`,
+    depois: data,
+    origem: 'admin',
+  });
+
   return data;
 }
 
@@ -288,8 +300,37 @@ export async function updateAdminProduct(id, payload) {
     return localProducts.find((item) => String(item.id) === String(id));
   }
 
+  const previous = await getAdminProductById(id);
   const { data, error } = await supabase.from(PRODUCTS_TABLE).update(payload).eq('id', id).select().single();
   if (error) throw new Error(error.message);
+
+  const isStockChange = Object.prototype.hasOwnProperty.call(payload || {}, 'estoque')
+    && Number(previous?.estoque ?? 0) !== Number(data?.estoque ?? 0);
+
+  createAuditLog({
+    tipo: 'produto',
+    acao: 'produto_editado',
+    tabela: PRODUCTS_TABLE,
+    registro_id: data?.id,
+    descricao: `Produto "${data?.nome || previous?.nome || 'sem nome'}" editado.`,
+    antes: previous,
+    depois: data,
+    origem: 'admin',
+  });
+
+  if (isStockChange) {
+    createAuditLog({
+      tipo: 'estoque',
+      acao: 'alteracao_estoque_manual',
+      tabela: PRODUCTS_TABLE,
+      registro_id: data?.id,
+      descricao: `Estoque manual alterado para "${data?.nome || previous?.nome || 'sem nome'}".`,
+      antes: { estoque: previous?.estoque },
+      depois: { estoque: data?.estoque },
+      origem: 'admin',
+    });
+  }
+
   return data;
 }
 
@@ -313,8 +354,20 @@ export async function deleteAdminProduct(productId) {
     throw new Error('Este produto já possui histórico de pedidos ou interesses. Para preservar o histórico, use a opção Inativar.');
   }
 
+  const previous = await getAdminProductById(productId);
   const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq('id', productId);
   if (error) throw new Error(error.message);
+
+  createAuditLog({
+    tipo: 'produto',
+    acao: 'produto_excluido',
+    tabela: PRODUCTS_TABLE,
+    registro_id: productId,
+    descricao: `Produto "${previous?.nome || 'sem nome'}" excluído.`,
+    antes: previous,
+    origem: 'admin',
+  });
+
   return true;
 }
 
@@ -325,8 +378,21 @@ export async function deleteOrDeactivateProduct(id, hardDelete = false) {
       return true;
     }
 
-    const { error } = await supabase.from(PRODUCTS_TABLE).update({ ativo: false }).eq('id', id);
+    const previous = await getAdminProductById(id);
+    const { data, error } = await supabase.from(PRODUCTS_TABLE).update({ ativo: false }).eq('id', id).select().single();
     if (error) throw new Error(error.message);
+
+    createAuditLog({
+      tipo: 'produto',
+      acao: 'produto_inativado',
+      tabela: PRODUCTS_TABLE,
+      registro_id: id,
+      descricao: `Produto "${data?.nome || previous?.nome || 'sem nome'}" inativado.`,
+      antes: previous,
+      depois: data,
+      origem: 'admin',
+    });
+
     return true;
   }
 
@@ -427,5 +493,44 @@ export async function getAdminStoreSettings() {
 }
 
 export async function updateAdminStoreSettings(payload) {
-  return upsertStoreSettings(payload);
+  const before = await getAdminStoreSettings();
+  const updated = await upsertStoreSettings(payload);
+
+  const safeBefore = {
+    nome_loja: before?.nome_loja,
+    whatsapp: before?.whatsapp,
+    instagram: before?.instagram,
+    endereco: before?.endereco,
+    horario_funcionamento: before?.horario_funcionamento,
+    sobre: before?.sobre,
+    logo_url: before?.logo_url,
+    chave_pix: before?.chave_pix ? '***' : null,
+    nome_recebedor_pix: before?.nome_recebedor_pix,
+    banco_pix: before?.banco_pix,
+  };
+  const safeAfter = {
+    nome_loja: updated?.nome_loja,
+    whatsapp: updated?.whatsapp,
+    instagram: updated?.instagram,
+    endereco: updated?.endereco,
+    horario_funcionamento: updated?.horario_funcionamento,
+    sobre: updated?.sobre,
+    logo_url: updated?.logo_url,
+    chave_pix: updated?.chave_pix ? '***' : null,
+    nome_recebedor_pix: updated?.nome_recebedor_pix,
+    banco_pix: updated?.banco_pix,
+  };
+
+  createAuditLog({
+    tipo: 'configuracoes',
+    acao: 'configuracoes_loja_alteradas',
+    tabela: STORE_SETTINGS_TABLE,
+    registro_id: updated?.id || 'store_settings',
+    descricao: 'Configurações da loja alteradas no painel administrativo.',
+    antes: safeBefore,
+    depois: safeAfter,
+    origem: 'admin',
+  });
+
+  return updated;
 }

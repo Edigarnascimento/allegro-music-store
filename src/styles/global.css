@@ -314,3 +314,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   .product-card img { height: 150px; }
   .cart-added-actions .btn, .cart-cta-group .btn { width: 100%; }
 }
+
+.admin-audit-filters { display: grid; grid-template-columns: minmax(220px, 320px); gap: .6rem; margin-bottom: 1rem; }
+.admin-audit-filters label { display: grid; gap: .35rem; font-size: .82rem; color: #495262; font-weight: 600; }
+.admin-audit-filters select { width: 100%; border-radius: 10px; border: 1px solid #d0d7e2; background: #fff; color: #111; padding: .62rem .7rem; }

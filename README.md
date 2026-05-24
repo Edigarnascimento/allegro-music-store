@@ -374,3 +374,103 @@ revoke all on public.music_pedidos from anon;
 revoke all on public.music_pedido_itens from anon;
 revoke update on public.music_produtos from anon;
 ```
+
+## Auditoria básica (music_audit_logs)
+
+### SQL para criar tabela
+
+```sql
+create table if not exists public.music_audit_logs (
+  id uuid primary key default gen_random_uuid(),
+  tipo text,
+  acao text,
+  tabela text,
+  registro_id text,
+  descricao text,
+  antes jsonb,
+  depois jsonb,
+  usuario_email text,
+  origem text default 'admin',
+  created_at timestamp with time zone default now()
+);
+```
+
+### RLS recomendado
+
+```sql
+alter table public.music_audit_logs enable row level security;
+
+create policy "authenticated_insert_music_audit_logs"
+on public.music_audit_logs
+for insert
+to authenticated
+with check (true);
+
+create policy "authenticated_select_music_audit_logs"
+on public.music_audit_logs
+for select
+to authenticated
+using (true);
+```
+
+> Importante: não crie policy para `anon` em `select` ou `insert`.
+
+### Versão opcional da RPC `create_music_order` com auditoria
+
+> Esta etapa é **somente documentação**. Não altere automaticamente a função atual se ela já está em produção.
+
+```sql
+-- Dentro da função create_music_order (SECURITY DEFINER), após inserir pedido e itens:
+
+insert into public.music_audit_logs (
+  tipo,
+  acao,
+  tabela,
+  registro_id,
+  descricao,
+  antes,
+  depois,
+  usuario_email,
+  origem
+)
+values (
+  'pedido',
+  'pedido_criado',
+  'music_pedidos',
+  v_order_id::text,
+  'Pedido criado via checkout.',
+  null,
+  jsonb_build_object('pedido_id', v_order_id, 'total', v_total),
+  null,
+  'checkout_rpc'
+);
+
+-- Em cada baixa de estoque dentro do loop de itens:
+insert into public.music_audit_logs (
+  tipo,
+  acao,
+  tabela,
+  registro_id,
+  descricao,
+  antes,
+  depois,
+  usuario_email,
+  origem
+)
+values (
+  'estoque',
+  'baixa_estoque_automatica',
+  'music_produtos',
+  (item->>'produto_id'),
+  'Baixa de estoque automática após pedido.',
+  jsonb_build_object('estoque', v_stock_before),
+  jsonb_build_object(
+    'estoque', v_stock_after,
+    'pedido_id', v_order_id,
+    'produto_nome', item->>'nome',
+    'quantidade', (item->>'quantidade')::int
+  ),
+  null,
+  'checkout_rpc'
+);
+```
