@@ -71,8 +71,8 @@ export default function CheckoutPage() {
     whatsapp: '',
     email: '',
     endereco: '',
-    formaEntrega: 'retirada_na_loja',
-    formaPagamento: 'a_combinar',
+    formaEntrega: '',
+    formaPagamento: '',
     observacoes: '',
   });
   const [error, setError] = useState('');
@@ -109,6 +109,11 @@ export default function CheckoutPage() {
       const snapshotItems = items.map((item) => ({ ...item }));
       const snapshotForm = { ...form };
       const total = subtotal;
+
+      if (!snapshotForm.formaEntrega || !snapshotForm.formaPagamento) {
+        setError('Selecione a forma de entrega e a forma de pagamento.');
+        return;
+      }
 
       const order = await createOrder({
         customer: snapshotForm,
@@ -226,11 +231,13 @@ export default function CheckoutPage() {
         <input required name="whatsapp" placeholder="WhatsApp" value={form.whatsapp} onChange={onChange} />
         <input name="email" placeholder="E-mail (opcional)" value={form.email} onChange={onChange} />
         <textarea required name="endereco" placeholder="Endereço de entrega" value={form.endereco} onChange={onChange} />
-        <select name="formaEntrega" value={form.formaEntrega} onChange={onChange}>
+        <select required name="formaEntrega" value={form.formaEntrega} onChange={onChange}>
+          <option value="">Selecione a forma de entrega</option>
           <option value="retirada_na_loja">Retirada na loja</option>
           <option value="entrega">Entrega</option>
         </select>
-        <select name="formaPagamento" value={form.formaPagamento} onChange={onChange}>
+        <select required name="formaPagamento" value={form.formaPagamento} onChange={onChange}>
+          <option value="">Selecione a forma de pagamento</option>
           <option value="a_combinar">A combinar</option>
           <option value="pix">PIX</option>
           <option value="dinheiro">Dinheiro</option>
