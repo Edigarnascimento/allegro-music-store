@@ -218,6 +218,7 @@ create table if not exists public.music_pedidos (
   cliente_nome text not null,
   cliente_whatsapp text not null,
   cliente_email text,
+  cliente_documento text,
   endereco_entrega text,
   observacoes text,
   status text default 'novo',
@@ -251,6 +252,8 @@ for update to authenticated using (true) with check (true);
 
 create policy "admin_select_music_pedido_itens" on public.music_pedido_itens
 for select to authenticated using (true);
+
+alter table public.music_pedidos add column if not exists cliente_documento text;
 
 -- Função RPC segura para checkout público/anônimo
 create or replace function public.create_music_order(payload jsonb)
@@ -311,6 +314,7 @@ begin
     cliente_nome,
     cliente_whatsapp,
     cliente_email,
+    cliente_documento,
     endereco_entrega,
     observacoes,
     status,
@@ -322,6 +326,7 @@ begin
     nullif(v_customer->>'nome', ''),
     nullif(v_customer->>'whatsapp', ''),
     nullif(v_customer->>'email', ''),
+    nullif(v_customer->>'documento', ''),
     nullif(v_customer->>'endereco', ''),
     nullif(v_customer->>'observacoes', ''),
     v_status,

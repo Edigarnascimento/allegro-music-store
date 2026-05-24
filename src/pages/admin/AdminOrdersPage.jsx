@@ -160,6 +160,9 @@ export default function AdminOrdersPage() {
             <strong>E-mail:</strong> {getFormattedValueOrFallback(selected.cliente_email)}
           </p>
           <p>
+            <strong>CPF/CNPJ:</strong> {getFormattedValueOrFallback(selected.cliente_documento)}
+          </p>
+          <p>
             <strong>Endereço de entrega:</strong>{' '}
             {getFormattedValueOrFallback(selected.endereco_entrega)}
           </p>

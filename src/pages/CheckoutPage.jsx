@@ -74,6 +74,7 @@ export default function CheckoutPage() {
     endereco: '',
     formaEntrega: '',
     formaPagamento: '',
+    documento: '',
     observacoes: '',
   });
   const [error, setError] = useState('');
@@ -114,6 +115,11 @@ export default function CheckoutPage() {
 
       if (!snapshotForm.formaEntrega || !snapshotForm.formaPagamento) {
         setError('Selecione a forma de entrega e a forma de pagamento.');
+        return;
+      }
+
+      if (snapshotForm.formaPagamento === 'pix' && !snapshotForm.documento?.trim()) {
+        setError('Informe o CPF ou CNPJ para pagamento via PIX.');
         return;
       }
 
@@ -282,6 +288,13 @@ export default function CheckoutPage() {
         <input required name="nome" placeholder="Nome" value={form.nome} onChange={onChange} />
         <input required name="whatsapp" placeholder="WhatsApp" value={form.whatsapp} onChange={onChange} />
         <input name="email" placeholder="E-mail (opcional)" value={form.email} onChange={onChange} />
+        <input
+          name="documento"
+          placeholder="CPF ou CNPJ"
+          value={form.documento}
+          onChange={onChange}
+          required={form.formaPagamento === 'pix'}
+        />
         <textarea required name="endereco" placeholder="Endereço de entrega" value={form.endereco} onChange={onChange} />
         <select required name="formaEntrega" value={form.formaEntrega} onChange={onChange}>
           <option value="">Selecione a forma de entrega</option>
