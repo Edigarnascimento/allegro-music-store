@@ -31,11 +31,13 @@ export async function createOrder({ customer, items, subtotal, total }) {
     throw new Error(`Erro ao finalizar pedido: ${error.message || 'falha na função create_music_order.'}`);
   }
 
-  if (!data) {
-    throw new Error('Erro ao finalizar pedido: resposta vazia da função create_music_order.');
+  const order = Array.isArray(data) ? data[0] : data;
+
+  if (!order || !order.id) {
+    throw new Error('Erro ao finalizar pedido: resposta inválida da função create_music_order.');
   }
 
-  return data;
+  return order;
 }
 
 export async function getAdminOrders() {
