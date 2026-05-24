@@ -20,6 +20,15 @@ const STATUS_MAP = {
   CANCELED: 'cancelado',
 };
 
+const CANCELLATION_EVENTS = new Set(['PAYMENT_DELETED', 'CANCELED', 'PAYMENT_OVERDUE', 'PAYMENT_REFUNDED']);
+
+function mapOrderStatusByEvent(eventType) {
+  if (eventType === 'PAYMENT_OVERDUE') return 'expirado';
+  if (eventType === 'PAYMENT_REFUNDED') return 'estornado';
+  if (eventType === 'PAYMENT_DELETED' || eventType === 'CANCELED') return 'cancelado';
+  return null;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return json(res, 405, { ok: false });
 
@@ -87,6 +96,47 @@ export default async function handler(req, res) {
       ]);
     } catch (error) {
       console.warn('[webhook/asaas] audit warn', error?.message || error);
+    }
+  }
+
+  if (CANCELLATION_EVENTS.has(eventType) && mappedStatus !== 'pago') {
+    const targetOrderStatus = mapOrderStatusByEvent(eventType);
+    if (targetOrderStatus) {
+      await supabase.from('music_pedidos').update({ status: targetOrderStatus }).eq('id', pagamento.pedido_id);
+    }
+
+    const { data: orderData } = await supabase
+      .from('music_pedidos')
+      .select('id, status, estoque_devolvido, estoque_devolvido_at')
+      .eq('id', pagamento.pedido_id)
+      .maybeSingle();
+
+    const shouldReturnStock = orderData && !orderData.estoque_devolvido && orderData.status !== 'pago';
+
+    if (shouldReturnStock) {
+      const { data: stockReturnData, error: stockReturnError } = await supabase.rpc('return_order_stock', { order_id: pagamento.pedido_id });
+      if (stockReturnError) {
+        console.warn('[webhook/asaas] erro ao devolver estoque', stockReturnError?.message || stockReturnError);
+      } else {
+        try {
+          await supabase.from('music_audit_logs').insert({
+            tipo: 'estoque',
+            acao: 'estoque_devolvido_por_webhook_asaas',
+            tabela: 'music_pedidos',
+            registro_id: pagamento.pedido_id,
+            descricao: `Estoque devolvido automaticamente por webhook Asaas (${eventType}).`,
+            antes: { estoque_devolvido: false, status: orderData.status },
+            depois: {
+              estoque_devolvido: true,
+              estoque_devolvido_at: stockReturnData?.estoque_devolvido_at || null,
+              status: targetOrderStatus || orderData.status,
+            },
+            origem: 'webhook',
+          });
+        } catch (error) {
+          console.warn('[webhook/asaas] audit warn', error?.message || error);
+        }
+      }
     }
   }
 

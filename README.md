@@ -607,3 +607,72 @@ for select to authenticated using (true);
 
 - Confirmar e ajustar campos exatos do endpoint de QR Code PIX (`/payments/{id}/pixQrCode`) conforme documentação vigente da Asaas.
 - Confirmar estratégia de idempotência para reprocessamento de webhooks em produção.
+
+## SQL obrigatório: devolução automática de estoque em cancelamentos
+
+### 1) Novas colunas em `music_pedidos`
+
+```sql
+alter table public.music_pedidos add column if not exists estoque_devolvido boolean default false;
+alter table public.music_pedidos add column if not exists estoque_devolvido_at timestamp with time zone;
+```
+
+### 2) RPC segura para devolver estoque (`public.return_order_stock`)
+
+```sql
+create or replace function public.return_order_stock(order_id uuid)
+returns table (
+  pedido_id uuid,
+  estoque_devolvido boolean,
+  estoque_devolvido_at timestamp with time zone
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order public.music_pedidos%rowtype;
+  v_item public.music_pedido_itens%rowtype;
+begin
+  select * into v_order
+  from public.music_pedidos
+  where id = order_id;
+
+  if not found then
+    raise exception 'Pedido % não encontrado.', order_id;
+  end if;
+
+  if coalesce(v_order.estoque_devolvido, false) then
+    return query
+    select v_order.id, true, v_order.estoque_devolvido_at;
+    return;
+  end if;
+
+  for v_item in
+    select *
+    from public.music_pedido_itens
+    where pedido_id = v_order.id
+  loop
+    update public.music_produtos
+    set estoque = coalesce(estoque, 0) + coalesce(v_item.quantidade, 0)
+    where id = v_item.produto_id;
+  end loop;
+
+  update public.music_pedidos
+  set
+    estoque_devolvido = true,
+    estoque_devolvido_at = now()
+  where id = v_order.id;
+
+  return query
+  select p.id, p.estoque_devolvido, p.estoque_devolvido_at
+  from public.music_pedidos p
+  where p.id = v_order.id;
+end;
+$$;
+
+revoke all on function public.return_order_stock(uuid) from public;
+grant execute on function public.return_order_stock(uuid) to authenticated;
+```
+
+> Recomendação: usar o webhook com `service_role` (backend) e manter RLS ativa, sem abrir update público de produtos.
