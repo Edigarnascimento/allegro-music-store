@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { WhatsAppIcon } from '../../components/PublicButtonIcons';
 import { buildWhatsAppLink } from '../../lib/whatsapp';
 import {
   formatCurrencyBRL,
@@ -43,6 +44,7 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [selected, setSelected] = useState(null);
   const [items, setItems] = useState([]);
+  const detailsRef = useRef(null);
 
   useEffect(() => {
     getAdminOrders().then(setOrders);
@@ -52,6 +54,14 @@ export default function AdminOrdersPage() {
     setSelected(order);
     setItems(await getOrderItems(order.id));
   }
+
+  useEffect(() => {
+    if (!selected || !detailsRef.current) return;
+
+    requestAnimationFrame(() => {
+      detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, [selected]);
 
   async function changeStatus(orderId, status) {
     await updateOrderStatus(orderId, status);
@@ -116,8 +126,12 @@ export default function AdminOrdersPage() {
       </div>
 
       {selected ? (
-        <div className="admin-page admin-order-details" style={{ marginTop: '1rem' }}>
-          <h2>Pedido {selected.id.slice(0, 8)}</h2>
+        <div
+          ref={detailsRef}
+          className="admin-page admin-order-details"
+          style={{ marginTop: '1rem' }}
+        >
+          <h2>Pedido #{selected.id.slice(0, 8)}</h2>
 
           <div className={`admin-order-status-badge status-${selected.status || 'novo'}`}>
             {formatOrderStatus(selected.status)}
@@ -153,8 +167,14 @@ export default function AdminOrdersPage() {
           <p>
             <strong>Itens do pedido:</strong>
           </p>
-          <a className="btn btn-whatsapp" href={buildWhatsAppLink(selected.cliente_whatsapp, buildStatusMessage(selected))} target="_blank" rel="noreferrer">
-            Enviar atualização pelo WhatsApp
+          <a
+            className="btn btn-whatsapp"
+            href={buildWhatsAppLink(selected.cliente_whatsapp, buildStatusMessage(selected))}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <WhatsAppIcon />
+            <span>Enviar atualização pelo WhatsApp</span>
           </a>
           {items.length ? (
             <ul>
