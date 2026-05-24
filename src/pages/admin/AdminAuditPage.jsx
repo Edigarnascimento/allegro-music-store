@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
 import { getAuditLogsByType } from '../../services/auditService';
+import {
+  formatAuditAction,
+  formatAuditOrigin,
+  formatAuditType,
+  getAuditBadgeClassByType,
+} from '../../helpers/auditFormatters';
 
 const filterOptions = [
   { label: 'Todos', value: 'all' },
@@ -67,10 +73,14 @@ export default function AdminAuditPage() {
                 <tr key={log.id}>
                   <td>{new Date(log.created_at).toLocaleString('pt-BR')}</td>
                   <td>{log.usuario_email || 'Sistema'}</td>
-                  <td>{log.tipo || '-'}</td>
-                  <td>{log.acao || '-'}</td>
+                  <td>
+                    <span className={`audit-badge ${getAuditBadgeClassByType(log.tipo)}`}>
+                      {formatAuditType(log.tipo)}
+                    </span>
+                  </td>
+                  <td>{formatAuditAction(log.acao)}</td>
                   <td>{log.descricao || '-'}</td>
-                  <td>{log.origem || 'admin'}</td>
+                  <td>{formatAuditOrigin(log.origem)}</td>
                 </tr>
               ))
             )}
