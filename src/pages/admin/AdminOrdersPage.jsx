@@ -85,6 +85,7 @@ export default function AdminOrdersPage() {
               <th>Total</th>
               <th>Status</th>
               <th>Pagamento</th>
+              <th>PIX auto</th>
               <th>Entrega</th>
               <th />
             </tr>
@@ -113,6 +114,16 @@ export default function AdminOrdersPage() {
                   </select>
                 </td>
                 <td>{formatPaymentMethod(o.forma_pagamento)}</td>
+                <td>
+                  {o.music_pagamentos?.length ? (
+                    <div>
+                      <div className={`admin-order-status-badge status-${o.music_pagamentos[0]?.status || 'pendente'}`}>
+                        {o.music_pagamentos[0]?.status || 'pendente'}
+                      </div>
+                      <small>{o.music_pagamentos[0]?.gateway || 'asaas'}</small>
+                    </div>
+                  ) : 'Sem vínculo'}
+                </td>
                 <td>{formatDeliveryMethod(o.forma_entrega)}</td>
                 <td>
                   <button className="btn-link" onClick={() => open(o)}>

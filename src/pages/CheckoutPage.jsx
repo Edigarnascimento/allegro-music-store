@@ -6,6 +6,7 @@ import { buildWhatsAppLink, formatPriceBRL } from '../lib/whatsapp';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { WhatsAppIcon } from '../components/PublicButtonIcons';
 import { getStoreSettings } from '../services/storeSettingsService';
+import { createAsaasPixPayment } from '../services/paymentsService';
 
 const deliveryLabels = {
   retirada_na_loja: 'Retirada na loja',
@@ -79,6 +80,7 @@ export default function CheckoutPage() {
   const [success, setSuccess] = useState(null);
   const [storeSettings, setStoreSettings] = useState(null);
   const [copyFeedback, setCopyFeedback] = useState('');
+  const [copyAutoPixFeedback, setCopyAutoPixFeedback] = useState('');
 
   useEffect(() => {
     getStoreSettings().then(setStoreSettings).catch(() => setStoreSettings(null));
@@ -122,7 +124,7 @@ export default function CheckoutPage() {
         total,
       });
 
-      setSuccess({
+      const successPayload = {
         id: order.id,
         shortId: order.id.slice(0, 8),
         total,
@@ -143,7 +145,20 @@ export default function CheckoutPage() {
           banco: snapshotForm.formaPagamento === 'pix' ? storeSettings?.banco_pix || '' : '',
           instrucoes: snapshotForm.formaPagamento === 'pix' ? storeSettings?.instrucoes_pix || '' : '',
         },
-      });
+        pixAutomatico: null,
+        pixFallbackReason: '',
+      };
+
+      if (snapshotForm.formaPagamento === 'pix') {
+        const pixAutomatico = await createAsaasPixPayment({ pedidoId: order.id });
+        if (pixAutomatico.ok) {
+          successPayload.pixAutomatico = pixAutomatico.data;
+        } else {
+          successPayload.pixFallbackReason = pixAutomatico.message || 'PIX automático indisponível. Use o PIX manual.';
+        }
+      }
+
+      setSuccess(successPayload);
 
       clearCart();
     } catch (err) {
@@ -168,6 +183,15 @@ export default function CheckoutPage() {
         setCopyFeedback('Não foi possível copiar automaticamente. Copie a chave manualmente.');
       }
     }
+    async function handleCopyAutoPixCode() {
+      if (!success.pixAutomatico?.copiaColaPix) return;
+      try {
+        await navigator.clipboard.writeText(success.pixAutomatico.copiaColaPix);
+        setCopyAutoPixFeedback('Código PIX copiado com sucesso.');
+      } catch (copyError) {
+        setCopyAutoPixFeedback('Não foi possível copiar automaticamente. Copie o código manualmente.');
+      }
+    }
 
     return (
       <section className="container section">
@@ -180,9 +204,22 @@ export default function CheckoutPage() {
         <p>
           <strong>Resumo:</strong> {success.items.length} item(ns) · Total {formatPriceBRL(success.total)}
         </p>
-        {success.pix?.isPix ? (
+        {success.pix?.isPix && success.pixAutomatico ? (
+          <div className="hero-panel" style={{ marginTop: '1rem' }}>
+            <h2 style={{ marginTop: 0 }}>Pagamento PIX automático</h2>
+            <p>Status: <strong>{success.pixAutomatico.status}</strong></p>
+            {success.pixAutomatico.qrCode ? <p><img src={success.pixAutomatico.qrCode} alt="QR Code PIX automático" style={{ maxWidth: 220 }} /></p> : null}
+            {success.pixAutomatico.copiaColaPix ? <p><strong>PIX copia e cola:</strong> {success.pixAutomatico.copiaColaPix}</p> : <p>Código PIX indisponível no momento.</p>}
+            {success.pixAutomatico.expiresAt ? <p><strong>Validade:</strong> {new Date(success.pixAutomatico.expiresAt).toLocaleString('pt-BR')}</p> : null}
+            <p>Após o pagamento, o status do pedido será atualizado automaticamente. Em caso de dúvida, fale conosco no WhatsApp.</p>
+            {success.pixAutomatico.copiaColaPix ? <button type="button" className="btn btn-secondary" onClick={handleCopyAutoPixCode}>Copiar código PIX</button> : null}
+            {copyAutoPixFeedback ? <p style={{ marginTop: '.5rem' }}>{copyAutoPixFeedback}</p> : null}
+          </div>
+        ) : null}
+        {success.pix?.isPix && !success.pixAutomatico ? (
           <div className="hero-panel" style={{ marginTop: '1rem' }}>
             <h2 style={{ marginTop: 0 }}>Pagamento via PIX</h2>
+            {success.pixFallbackReason ? <p>{success.pixFallbackReason}</p> : null}
             {pixSemCadastro ? (
               <p className="admin-alert error">
                 PIX indisponível no momento. Fale com nossa equipe pelo WhatsApp para receber os dados de pagamento.

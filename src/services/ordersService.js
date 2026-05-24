@@ -31,7 +31,10 @@ export async function createOrder({ customer, items, subtotal, total }) {
 
 export async function getAdminOrders() {
   if (!isSupabaseConfigured || !supabase) return [];
-  const { data, error } = await supabase.from(ORDERS_TABLE).select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase
+    .from(ORDERS_TABLE)
+    .select('*, music_pagamentos(id, gateway, status, paid_at)')
+    .order('created_at', { ascending: false });
   if (error) return [];
   return data ?? [];
 }
