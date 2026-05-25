@@ -676,3 +676,6 @@ grant execute on function public.return_order_stock(uuid) to authenticated;
 ```
 
 > Recomendação: usar o webhook com `service_role` (backend) e manter RLS ativa, sem abrir update público de produtos.
+
+
+alter table public.music_pagamentos add column if not exists payment_url text;

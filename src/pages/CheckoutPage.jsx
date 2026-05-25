@@ -6,7 +6,7 @@ import { buildWhatsAppLink, formatPriceBRL } from '../lib/whatsapp';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { WhatsAppIcon } from '../components/PublicButtonIcons';
 import { getStoreSettings } from '../services/storeSettingsService';
-import { createAsaasPixPayment } from '../services/paymentsService';
+import { createAsaasCardPayment, createAsaasPixPayment } from '../services/paymentsService';
 
 const deliveryLabels = {
   retirada_na_loja: 'Retirada na loja',
@@ -17,7 +17,9 @@ const paymentLabels = {
   a_combinar: 'A combinar',
   pix: 'PIX',
   dinheiro: 'Dinheiro',
-  cartao_na_loja: 'Cartão na loja',
+  cartao_na_loja: 'Cartão presencial na loja',
+  cartao_credito_online: 'Cartão de crédito online',
+  cartao_debito_online: 'Cartão de débito online',
 };
 
 const formatValueOrFallback = (value) => {
@@ -153,6 +155,8 @@ export default function CheckoutPage() {
         },
         pixAutomatico: null,
         pixFallbackReason: '',
+        cartaoOnline: null,
+        cartaoOnlineErro: '',
       };
 
       if (snapshotForm.formaPagamento === 'pix') {
@@ -161,6 +165,15 @@ export default function CheckoutPage() {
           successPayload.pixAutomatico = pixAutomatico.data;
         } else {
           successPayload.pixFallbackReason = pixAutomatico.message || 'PIX automático indisponível. Use o PIX manual.';
+        }
+      }
+
+      if (snapshotForm.formaPagamento === 'cartao_credito_online' || snapshotForm.formaPagamento === 'cartao_debito_online') {
+        const cartaoOnline = await createAsaasCardPayment({ pedidoId: order.id, metodo: snapshotForm.formaPagamento });
+        if (cartaoOnline.ok) {
+          successPayload.cartaoOnline = cartaoOnline.data;
+        } else {
+          successPayload.cartaoOnlineErro = cartaoOnline.message || 'Não foi possível gerar o link de pagamento por cartão agora.';
         }
       }
 
@@ -203,13 +216,30 @@ export default function CheckoutPage() {
       <section className="container section">
         <h1>Pedido realizado com sucesso!</h1>
         <p>Seu pedido foi registrado. Nossa equipe acompanha a próxima etapa e também entrará em contato pelo WhatsApp informado.</p>
-        <p><strong>Após o pagamento via PIX, envie o comprovante pelo WhatsApp da loja.</strong></p>
+        {success.pix?.isPix ? <p><strong>Após o pagamento via PIX, envie o comprovante pelo WhatsApp da loja.</strong></p> : null}
         <p>
           <strong>Número do pedido:</strong> #{success.shortId}
         </p>
         <p>
           <strong>Resumo:</strong> {success.items.length} item(ns) · Total {formatPriceBRL(success.total)}
         </p>
+        {success.cartaoOnline ? (
+          <div className="hero-panel" style={{ marginTop: '1rem' }}>
+            <h2 style={{ marginTop: 0 }}>Pagamento online por cartão</h2>
+            <p>Status: <strong>{success.cartaoOnline.status}</strong></p>
+            <p>Finalize o pagamento com segurança na página da Asaas.</p>
+            {success.cartaoOnline.paymentUrl ? (
+              <a className="btn" href={success.cartaoOnline.paymentUrl} target="_blank" rel="noreferrer">Pagar com cartão</a>
+            ) : null}
+          </div>
+        ) : null}
+        {!success.cartaoOnline && (success.cliente?.formaPagamentoLabel === 'Cartão de crédito online' || success.cliente?.formaPagamentoLabel === 'Cartão de débito online') ? (
+          <div className="hero-panel" style={{ marginTop: '1rem' }}>
+            <h2 style={{ marginTop: 0 }}>Pagamento online por cartão</h2>
+            <p>{success.cartaoOnlineErro || 'Não foi possível gerar o pagamento online neste momento.'}</p>
+            <p>Seu pedido foi criado normalmente. Fale com a loja pelo WhatsApp para concluir o pagamento.</p>
+          </div>
+        ) : null}
         {success.pix?.isPix && success.pixAutomatico ? (
           <div className="hero-panel" style={{ marginTop: '1rem' }}>
             <h2 style={{ marginTop: 0 }}>Pagamento PIX automático</h2>
@@ -321,7 +351,9 @@ export default function CheckoutPage() {
           <option value="a_combinar">A combinar</option>
           <option value="pix">PIX</option>
           <option value="dinheiro">Dinheiro</option>
-          <option value="cartao_na_loja">Cartão na loja</option>
+          <option value="cartao_na_loja">Cartão presencial na loja</option>
+          <option value="cartao_credito_online">Cartão de crédito online</option>
+          <option value="cartao_debito_online">Cartão de débito online</option>
         </select>
         <textarea name="observacoes" placeholder="Observações" value={form.observacoes} onChange={onChange} />
         <button className="btn" type="submit">

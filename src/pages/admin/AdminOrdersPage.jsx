@@ -87,7 +87,7 @@ export default function AdminOrdersPage() {
               <th>Total</th>
               <th>Status</th>
               <th>Pagamento</th>
-              <th>PIX auto</th>
+              <th>Pagamento</th>
               <th>Entrega</th>
               <th />
             </tr>
@@ -123,6 +123,9 @@ export default function AdminOrdersPage() {
                         {o.music_pagamentos[0]?.status || 'pendente'}
                       </div>
                       <small>{o.music_pagamentos[0]?.gateway || 'asaas'}</small>
+                      {o.music_pagamentos[0]?.payment_url ? (
+                        <div><a className="btn-link" href={o.music_pagamentos[0].payment_url} target="_blank" rel="noreferrer">Abrir pagamento Asaas</a></div>
+                      ) : null}
                     </div>
                   ) : 'Sem vínculo'}
                 </td>
