@@ -84,6 +84,9 @@ export default function CheckoutPage() {
   const [storeSettings, setStoreSettings] = useState(null);
   const [copyFeedback, setCopyFeedback] = useState('');
   const [copyAutoPixFeedback, setCopyAutoPixFeedback] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCopyingPix, setIsCopyingPix] = useState(false);
+  const [isCopyingAutoPix, setIsCopyingAutoPix] = useState(false);
 
   useEffect(() => {
     getStoreSettings().then(setStoreSettings).catch(() => setStoreSettings(null));
@@ -109,6 +112,7 @@ export default function CheckoutPage() {
   async function onSubmit(e) {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
 
     try {
       const snapshotItems = items.map((item) => ({ ...item }));
@@ -182,6 +186,8 @@ export default function CheckoutPage() {
       clearCart();
     } catch (err) {
       setError(`Não foi possível finalizar o pedido: ${err.message}`);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -195,20 +201,26 @@ export default function CheckoutPage() {
 
     async function handleCopyPixKey() {
       if (!success.pix?.chave) return;
+      setIsCopyingPix(true);
       try {
         await navigator.clipboard.writeText(success.pix.chave);
         setCopyFeedback('Chave PIX copiada com sucesso.');
       } catch (copyError) {
         setCopyFeedback('Não foi possível copiar automaticamente. Copie a chave manualmente.');
+      } finally {
+        setIsCopyingPix(false);
       }
     }
     async function handleCopyAutoPixCode() {
       if (!success.pixAutomatico?.copiaColaPix) return;
+      setIsCopyingAutoPix(true);
       try {
         await navigator.clipboard.writeText(success.pixAutomatico.copiaColaPix);
         setCopyAutoPixFeedback('Código PIX copiado com sucesso.');
       } catch (copyError) {
         setCopyAutoPixFeedback('Não foi possível copiar automaticamente. Copie o código manualmente.');
+      } finally {
+        setIsCopyingAutoPix(false);
       }
     }
 
@@ -252,7 +264,7 @@ export default function CheckoutPage() {
             )}
             {success.pixAutomatico.expiresAt ? <p><strong>Validade:</strong> {new Date(success.pixAutomatico.expiresAt).toLocaleString('pt-BR')}</p> : null}
             <p>Após o pagamento, o status do pedido será atualizado automaticamente. Em caso de dúvida, fale conosco no WhatsApp.</p>
-            {success.pixAutomatico.copiaColaPix ? <button type="button" className="btn btn-secondary" onClick={handleCopyAutoPixCode}>Copiar código PIX</button> : null}
+            {success.pixAutomatico.copiaColaPix ? <button type="button" className="btn btn-secondary" onClick={handleCopyAutoPixCode} disabled={isCopyingAutoPix}>{isCopyingAutoPix ? 'Copiando...' : 'Copiar código PIX'}</button> : null}
             {copyAutoPixFeedback ? <p style={{ marginTop: '.5rem' }}>{copyAutoPixFeedback}</p> : null}
             {!success.pixAutomatico.copiaColaPix && !pixSemCadastro ? (
               <>
@@ -283,8 +295,8 @@ export default function CheckoutPage() {
                 <p><strong>Total:</strong> {formatPriceBRL(success.total)}</p>
                 {success.pix.instrucoes ? <p><strong>Instruções:</strong> {success.pix.instrucoes}</p> : null}
                 <p>Seu pedido será confirmado após o envio e validação do pagamento.</p>
-                <button type="button" className="btn btn-secondary" onClick={handleCopyPixKey}>
-                  Copiar chave PIX
+                <button type="button" className="btn btn-secondary" onClick={handleCopyPixKey} disabled={isCopyingPix}>
+                  {isCopyingPix ? 'Copiando...' : 'Copiar chave PIX'}
                 </button>
                 {copyFeedback ? <p style={{ marginTop: '.5rem' }}>{copyFeedback}</p> : null}
               </>
@@ -356,8 +368,8 @@ export default function CheckoutPage() {
           <option value="cartao_debito_online">Cartão de débito online</option>
         </select>
         <textarea name="observacoes" placeholder="Observações" value={form.observacoes} onChange={onChange} />
-        <button className="btn" type="submit">
-          Finalizar pedido ({formatPriceBRL(subtotal)})
+        <button className="btn" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Processando pedido...' : `Finalizar pedido (${formatPriceBRL(subtotal)})`}
         </button>
       </form>
     </section>

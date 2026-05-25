@@ -119,7 +119,11 @@ function Header() {
           />
           <button type="submit" className="btn btn-main btn-search">Buscar</button>
         </form>
-        <NavLink to="/carrinho" className={`btn btn-secondary cart-shortcut ${cartPulse ? 'is-highlighted' : ''}`} aria-live="polite">Carrinho <span className="cart-counter">{totalItems}</span></NavLink>
+        <NavLink to="/carrinho" className={`btn btn-secondary cart-shortcut ${cartPulse ? 'is-highlighted' : ''}`} aria-live="polite" aria-label={`Carrinho com ${totalItems} item(ns)`}>
+          <span role="img" aria-hidden="true">🛒</span>
+          <span>Carrinho</span>
+          <span className="cart-counter">{totalItems}</span>
+        </NavLink>
         </div>
       </div>
       <div className="menu-bar">
