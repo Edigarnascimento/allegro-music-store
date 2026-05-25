@@ -23,6 +23,9 @@ const PAYMENT_METHOD_LABELS = {
   dinheiro: 'Dinheiro',
   cartao_credito: 'Cartão de crédito',
   cartao_debito: 'Cartão de débito',
+  cartao_na_loja: 'Cartão presencial na loja',
+  cartao_credito_online: 'Cartão de crédito online',
+  cartao_debito_online: 'Cartão de débito online',
   boleto: 'Boleto',
   transferencia: 'Transferência',
 };

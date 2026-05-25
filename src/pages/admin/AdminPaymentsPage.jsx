@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { formatCurrencyBRL } from '../../lib/orderFormatters';
+import { formatCurrencyBRL, formatPaymentMethod } from '../../lib/orderFormatters';
 import { getAdminPayments } from '../../services/paymentsService';
 
 export default function AdminPaymentsPage() {
@@ -39,7 +39,7 @@ export default function AdminPaymentsPage() {
                 <td>#{String(p.pedido_id || '').slice(0, 8)}</td>
                 <td>{p.music_pedidos?.cliente_nome || 'Não informado'}</td>
                 <td>{formatCurrencyBRL(Number(p.valor || 0))}</td>
-                <td>{(p.metodo || 'pix').toUpperCase()}</td>
+                <td>{formatPaymentMethod(p.metodo || 'pix')}</td>
                 <td>{p.gateway || 'asaas'}</td>
                 <td><span className={`admin-order-status-badge status-${p.status || 'pendente'}`}>{p.status || 'pendente'}</span></td>
                 <td>{p.paid_at ? new Date(p.paid_at).toLocaleString('pt-BR') : '-'}</td>

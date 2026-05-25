@@ -35,3 +35,26 @@ export async function getAdminPayments() {
   if (error) return [];
   return data ?? [];
 }
+
+
+export async function createAsaasCardPayment({ pedidoId, metodo }) {
+  const response = await fetch('/api/asaas/create-card-payment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ pedido_id: pedidoId, metodo }),
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || !payload?.ok) {
+    return { ok: false, reason: payload?.reason || 'card_payment_unavailable', message: payload?.message || 'Não foi possível gerar pagamento online por cartão.' };
+  }
+
+  return {
+    ok: true,
+    data: {
+      paymentId: payload?.payment_id || '',
+      status: payload?.status || 'pendente',
+      paymentUrl: payload?.payment_url || payload?.invoice_url || '',
+    },
+  };
+}

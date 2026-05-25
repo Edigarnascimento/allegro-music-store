@@ -76,6 +76,12 @@ export default function TrackOrderPage() {
           <p><strong>Data do pedido:</strong> {new Date(result.created_at).toLocaleString('pt-BR')}</p>
           <p><strong>Observações:</strong> {getFormattedValueOrFallback(result.observacoes)}</p>
 
+          {result.status === 'aguardando_pagamento' && (result.payment_url || result.invoice_url) ? (
+            <p>
+              <a className="btn" href={result.payment_url || result.invoice_url} target="_blank" rel="noreferrer">Pagar agora</a>
+            </p>
+          ) : null}
+
           <p><strong>Itens do pedido:</strong></p>
           {Array.isArray(result.items) && result.items.length ? (
             <ul>

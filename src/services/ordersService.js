@@ -45,7 +45,7 @@ export async function getAdminOrders() {
   if (!isSupabaseConfigured || !supabase) return [];
   const { data, error } = await supabase
     .from(ORDERS_TABLE)
-    .select('*, music_pagamentos(id, gateway, status, paid_at)')
+    .select('*, music_pagamentos(id, gateway, status, paid_at, payment_url)')
     .order('created_at', { ascending: false });
   if (error) return [];
   return data ?? [];
