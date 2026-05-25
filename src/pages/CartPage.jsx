@@ -25,6 +25,10 @@ export default function CartPage() {
       <div className="cart-shell">
         <h1>Seu carrinho</h1>
         <p className="subtitle">Revise os itens, ajuste quantidades e finalize quando quiser.</p>
+        <div className="cart-cta-group cart-cta-top">
+          <button className="btn" onClick={() => navigate('/checkout')}>Finalizar compra</button>
+          <Link className="btn btn-secondary" to="/catalogo">Continuar comprando</Link>
+        </div>
         {feedback ? <p className="admin-alert error">{feedback}</p> : null}
         <div className="admin-table-wrap">
           <table className="admin-table">
@@ -60,10 +64,13 @@ export default function CartPage() {
           </table>
         </div>
         <div className="catalog-highlight cart-summary-actions">
-          <strong>Total: {formatPriceBRL(subtotal)}</strong>
+          <div>
+            <strong>Total: {formatPriceBRL(subtotal)}</strong>
+            <p className="subtitle">Itens: {items.length} • Quantidade total: {items.reduce((acc, item) => acc + item.quantidade, 0)} • Próximo passo: finalizar compra.</p>
+          </div>
           <div className="cart-cta-group">
             <Link className="btn btn-secondary" to="/catalogo">Continuar comprando</Link>
-            <button className="btn" onClick={() => navigate('/checkout')}>Finalizar pedido</button>
+            <button className="btn" onClick={() => navigate('/checkout')}>Finalizar compra</button>
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowIcon, CartIcon, WhatsAppIcon } from './PublicButtonIcons';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink, formatPriceBRL, resolveWhatsappNumber } from '../lib/whatsapp';
@@ -9,10 +9,12 @@ import { useState } from 'react';
 const PRODUCT_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80';
 
 function ProductCard({ product }) {
+  const navigate = useNavigate();
   const whatsappNumber = useStoreWhatsappNumber();
   const { addToCart } = useCart();
   const [cartFeedback, setCartFeedback] = useState('');
   const [addedToCart, setAddedToCart] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   const normalizedProduct = {
     id: product.id,
@@ -62,8 +64,10 @@ function ProductCard({ product }) {
     }
   }
 
-  function handleAddToCart() {
+  function handleAddToCart(goToCheckout = false) {
+    setAddingToCart(true);
     const result = addToCart(normalizedProduct);
+    setAddingToCart(false);
     if (!result?.ok) {
       setCartFeedback(result.message);
       return;
@@ -73,6 +77,7 @@ function ProductCard({ product }) {
     setAddedToCart(true);
     window.dispatchEvent(new CustomEvent('cart:item-added'));
     window.setTimeout(() => setAddedToCart(false), 2600);
+    if (goToCheckout) navigate('/checkout');
   }
 
   return (
@@ -100,15 +105,17 @@ function ProductCard({ product }) {
         {cartFeedback ? <p className="error-text">{cartFeedback}</p> : null}
         {addedToCart ? (
           <div className="cart-added-banner" role="status" aria-live="polite">
-            <strong>Adicionado!</strong>
+            <strong>Produto adicionado ao carrinho.</strong>
             <div className="cart-added-actions">
               <Link to="/carrinho" className="btn btn-secondary btn-compact">Ver carrinho</Link>
+              <Link to="/checkout" className="btn btn-secondary btn-compact">Finalizar compra</Link>
               <button type="button" className="btn btn-secondary btn-compact" onClick={() => setAddedToCart(false)}>Continuar</button>
             </div>
           </div>
         ) : null}
         <div className="product-actions">
-          <button type="button" className={`btn btn-cart btn-compact ${addedToCart ? 'is-added' : ''}`} disabled={indisponivel} onClick={handleAddToCart}><CartIcon /><span>{indisponivel ? 'Indisponível' : addedToCart ? 'Adicionado!' : 'Adicionar'}</span></button>
+          <button type="button" className={`btn btn-cart btn-compact ${addedToCart ? 'is-added' : ''}`} disabled={indisponivel || addingToCart} onClick={() => handleAddToCart(false)}><CartIcon /><span>{indisponivel ? 'Indisponível' : addingToCart ? 'Adicionando...' : addedToCart ? 'Adicionado!' : 'Adicionar'}</span></button>
+          <button type="button" className="btn btn-main btn-compact" disabled={indisponivel || addingToCart} onClick={() => handleAddToCart(true)}>{addingToCart ? 'Processando...' : 'Comprar agora'}</button>
           <Link to={detailsPath} className="btn btn-main btn-compact"><span>Detalhes</span><ArrowIcon /></Link>
           <a href={whatsappLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp btn-compact" onClick={handleWhatsappClick}><WhatsAppIcon /><span>WhatsApp</span></a>
         </div>

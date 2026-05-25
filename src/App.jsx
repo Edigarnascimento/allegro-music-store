@@ -23,6 +23,7 @@ import AdminPaymentsPage from './pages/admin/AdminPaymentsPage';
 import ProtectedAdminRoute from './components/admin/ProtectedAdminRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import ScrollToTop from './components/ScrollToTop';
+import MobileCartBar from './components/MobileCartBar';
 
 function App() {
   const location = useLocation();
@@ -62,6 +63,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      {!isAdminRoute ? <MobileCartBar /> : null}
       {!isAdminRoute ? <Footer /> : null}
     </div>
   );
