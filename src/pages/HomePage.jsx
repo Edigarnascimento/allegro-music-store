@@ -26,6 +26,70 @@ const iconByCategoryName = {
   acessorios: 'accessories',
 };
 
+const arrivalVideos = [
+  {
+    id: 'reposicao-cordas',
+    title: 'Reposição de cordas para violão',
+    description: 'Cordas de aço e nylon com reposição frequente para todos os níveis de músicos.',
+    category: 'Cordas',
+    videoUrl: '',
+    thumbnailUrl: '',
+    productLink: '/catalogo?categoria=Cordas',
+    categoryLink: '/catalogo?categoria=Cordas',
+  },
+  {
+    id: 'palhetas-acessorios',
+    title: 'Palhetas e acessórios',
+    description: 'Novas palhetas, correias, afinadores e itens essenciais para o dia a dia.',
+    category: 'Acessórios',
+    videoUrl: '',
+    thumbnailUrl: '',
+    productLink: '/catalogo?categoria=Acess%C3%B3rios',
+    categoryLink: '/catalogo?categoria=Acess%C3%B3rios',
+  },
+  {
+    id: 'cabos-conectores',
+    title: 'Cabos e conectores',
+    description: 'Cabos P10, XLR e conectores de alta durabilidade para ensaios e apresentações.',
+    category: 'Áudio',
+    videoUrl: '',
+    thumbnailUrl: '',
+    productLink: '/catalogo?categoria=%C3%81udio',
+    categoryLink: '/catalogo?categoria=%C3%81udio',
+  },
+  {
+    id: 'iniciante-musicos',
+    title: 'Produtos para músicos iniciantes',
+    description: 'Kits acessíveis para começar com qualidade no estudo de música.',
+    category: 'Iniciante',
+    videoUrl: '',
+    thumbnailUrl: '',
+    productLink: '/catalogo',
+    categoryLink: '/catalogo',
+  },
+  {
+    id: 'novidades-fisica-online',
+    title: 'Novidades para loja física e online',
+    description: 'Produtos recém-chegados com disponibilidade na loja física e no e-commerce.',
+    category: 'Novidades',
+    videoUrl: '',
+    thumbnailUrl: '',
+    productLink: '/catalogo',
+    categoryLink: '/catalogo',
+  },
+  {
+    id: 'servico-luteria',
+    title: 'Serviço de luteria',
+    description: 'Ajustes, regulagem e cuidados técnicos para manter seu instrumento pronto para tocar.',
+    category: 'Luteria',
+    videoUrl: 'https://www.instagram.com/reel/DXkefWWDV9_/?igsh=MWZpeHVtczU4ZjF0OQ==',
+    thumbnailUrl: '',
+    productLink: '/servicos',
+    categoryLink: '/servicos',
+    isService: true,
+  },
+];
+
 function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
@@ -135,6 +199,55 @@ function HomePage() {
           <Link to="/catalogo" className="btn btn-secondary">Ver todos os produtos</Link>
         </div>
         {loadingFeatured ? <p>Carregando produtos em destaque...</p> : <div className="products-grid">{featuredProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div>}
+      </div>
+
+      <div className="container section arrived-section">
+        <div className="section-heading">
+          <h2>Chegou na Allegro</h2>
+          <p className="subtitle">Novidades, reposições e produtos disponíveis na loja física e online.</p>
+        </div>
+        <div className="arrival-videos-row" aria-label="Vídeos de novidades da Allegro Music Store">
+          {arrivalVideos.map((video) => (
+            <article key={video.id} className="arrival-video-card">
+              <Link
+                className="arrival-video-cover"
+                to={video.categoryLink}
+                aria-label={`Ir para categoria ${video.category}`}
+              >
+                <span className="arrival-video-tag">{video.category}</span>
+                <span className="arrival-video-play" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M8 6v12l10-6z" fill="currentColor" />
+                  </svg>
+                </span>
+              </Link>
+              <div className="arrival-video-content">
+                <h3>{video.title}</h3>
+                <p>{video.description}</p>
+                <div className="arrival-video-actions">
+                  {video.videoUrl ? (
+                    <a className="btn btn-secondary" href={video.videoUrl} target="_blank" rel="noreferrer">Assistir vídeo</a>
+                  ) : null}
+                  <Link className="btn btn-secondary" to={video.productLink}>{video.isService ? 'Ver serviços' : 'Ver produtos'}</Link>
+                  <a
+                    className="btn btn-whatsapp"
+                    href={buildWhatsAppLink(
+                      whatsappNumber,
+                      video.isService
+                        ? 'Olá, vi um vídeo de serviço de luteria no site da Allegro Music Store e gostaria de saber mais.'
+                        : 'Olá, vi no site da Allegro Music Store que chegaram novidades e gostaria de saber mais sobre os produtos disponíveis.',
+                    )}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <WhatsAppIcon />
+                    <span>Falar no WhatsApp</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
 
       <div className="container section">
