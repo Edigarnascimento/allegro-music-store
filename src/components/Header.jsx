@@ -7,6 +7,7 @@ import CategoryIcon from './CategoryIcon';
 import { getCategories } from '../services/categoriesService';
 
 const quickLinks = [
+  { label: 'Serviços', to: '/servicos' },
   { label: 'Central de atendimento', to: '/contato' },
   { label: 'Sobre a loja', to: '/institucional/sobre' },
   { label: 'Acompanhar pedido', to: '/acompanhar-pedido' },
@@ -29,6 +30,15 @@ const iconByCategoryName = {
   acessórios: 'accessories',
   acessorios: 'accessories',
 };
+
+
+function normalizeCategoryLabel(value) {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .trim();
+}
 
 function Header() {
   const navigate = useNavigate();
@@ -128,11 +138,18 @@ function Header() {
       </div>
       <div className="menu-bar">
         <div className="container menu-content">
-          {categoryLinks.map((category) => (
-            <NavLink key={category.label} to={`/catalogo?categoria=${encodeURIComponent(category.label)}`} className="menu-link">
-              <CategoryIcon type={category.icon} /><span className="menu-link-label">{category.label}</span>
-            </NavLink>
-          ))}
+          {categoryLinks.map((category) => {
+            const isServicesCategory = normalizeCategoryLabel(category.label) === 'servicos';
+            const destination = isServicesCategory
+              ? '/servicos'
+              : `/catalogo?categoria=${encodeURIComponent(category.label)}`;
+
+            return (
+              <NavLink key={category.label} to={destination} className="menu-link">
+                <CategoryIcon type={category.icon} /><span className="menu-link-label">{category.label}</span>
+              </NavLink>
+            );
+          })}
         </div>
       </div>
     </header>
