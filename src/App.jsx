@@ -10,6 +10,7 @@ import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import InstitutionalPage from './pages/InstitutionalPage';
 import TrackOrderPage from './pages/TrackOrderPage';
+import DigitalCardPage from './pages/DigitalCardPage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminProductsPage from './pages/admin/AdminProductsPage';
@@ -43,6 +44,7 @@ function App() {
           <Route path="/carrinho" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/acompanhar-pedido" element={<TrackOrderPage />} />
+          <Route path="/cartao" element={<DigitalCardPage />} />
           <Route path="/institucional/:slug" element={<InstitutionalPage />} />
 
           <Route path="/admin/login" element={<AdminLoginPage />} />
