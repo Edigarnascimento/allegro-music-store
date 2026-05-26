@@ -425,3 +425,101 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   .service-detail-card .btn, .services-cta .btn { width: 100%; min-height: 42px; }
   .work-gallery-image { min-height: 130px; }
 }
+
+.digital-card-page {
+  background: radial-gradient(circle at top right, rgba(193, 18, 31, .14), transparent 46%), #f5f6f8;
+}
+
+.digital-card {
+  max-width: 960px;
+  margin: 0 auto;
+  background: linear-gradient(160deg, #121212 0%, #1d1d1d 50%, #111111 100%);
+  color: #fff;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  padding: clamp(1rem, 3vw, 2rem);
+  box-shadow: 0 26px 50px rgba(0, 0, 0, .32), 0 0 0 1px rgba(193, 18, 31, .22);
+}
+
+.digital-card-kicker {
+  margin: 0;
+  color: #ff8f98;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 800;
+  font-size: .8rem;
+}
+
+.digital-card h1 {
+  color: #fff;
+  margin-top: .3rem;
+}
+
+.digital-card-info-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 1rem;
+}
+
+.digital-card-info,
+.digital-card-qr-wrap {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .03);
+  padding: 1rem;
+}
+
+.digital-card-info h2 { margin-top: 0; }
+.digital-card-info ul { margin: 0; padding-left: 1rem; display: grid; gap: .6rem; }
+.digital-card-info li { color: #eef0f3; }
+.digital-card-info a { color: #ffd5d9; text-decoration: underline; }
+
+.digital-card-qr-wrap {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .7rem;
+}
+
+.digital-card-qr {
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 12px;
+  padding: .7rem;
+  text-align: center;
+  background: rgba(255, 255, 255, .03);
+}
+
+.digital-card-qr h3 {
+  margin: 0 0 .5rem;
+  font-size: .92rem;
+  color: #ffe7e9;
+}
+
+.digital-card-qr img {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+}
+
+.digital-card-actions {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .7rem;
+}
+
+.digital-card-actions .btn-secondary {
+  background: #fff;
+  color: #1b1f27;
+  border-color: #fff;
+}
+
+@media (max-width: 980px) {
+  .digital-card-info-grid,
+  .digital-card-actions,
+  .digital-card-qr-wrap {
+    grid-template-columns: 1fr;
+  }
+}
