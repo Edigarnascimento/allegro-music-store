@@ -37,12 +37,14 @@ export default function AdminDashboardPage() {
   const cards = useMemo(() => {
     if (!stats) return [];
     return [
-      { label: 'Total em pedidos', value: formatCurrency(stats.cards.totalEmPedidos) },
+      { label: 'Faturamento confirmado', value: formatCurrency(stats.cards.faturamentoConfirmado) },
+      { label: 'Pagamentos confirmados', value: stats.cards.pagamentosConfirmados },
       { label: 'Pedidos novos', value: stats.cards.pedidosNovos },
-      { label: 'Pedidos pagos', value: stats.cards.pedidosPagos },
+      { label: 'Aguardando entrega/retirada', value: stats.cards.aguardandoEntregaRetirada },
       { label: 'Pedidos concluídos', value: stats.cards.pedidosConcluidos },
+      { label: 'Cancelados/estornados', value: stats.cards.canceladosOuEstornados },
       { label: 'Ticket médio', value: formatCurrency(stats.cards.ticketMedio) },
-      { label: 'Total de produtos ativos', value: stats.cards.totalProdutosAtivos },
+      { label: 'Produtos ativos', value: stats.cards.totalProdutosAtivos },
       { label: 'Produtos com estoque baixo', value: stats.cards.produtosEstoqueBaixo },
       { label: 'Produtos indisponíveis', value: stats.cards.produtosIndisponiveis },
     ];
