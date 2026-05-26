@@ -1,8 +1,9 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { signOutAdmin } from '../../services/adminService';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const { signOutAdmin, user } = useAdminAuth();
 
   async function handleLogout() {
     await signOutAdmin();
@@ -26,6 +27,11 @@ export default function AdminLayout() {
           <NavLink to="/admin/pagamentos" className="admin-link">Pagamentos</NavLink>
           <NavLink to="/admin/auditoria" className="admin-link">Auditoria</NavLink>
         </nav>
+        {user ? (
+          <p className="admin-user-badge" title={user.email || 'Usuário autenticado'}>
+            Logado como: {user.user_metadata?.name || user.user_metadata?.full_name || user.email}
+          </p>
+        ) : null}
         <button className="btn btn-secondary" type="button" onClick={handleLogout}>Sair</button>
       </aside>
       <section className="admin-content">

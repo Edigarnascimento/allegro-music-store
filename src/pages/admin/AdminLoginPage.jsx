@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { signInAdmin } from '../../services/adminService';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 
 export default function AdminLoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -8,6 +8,9 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { signInAdmin, isAuthenticated } = useAdminAuth();
+
+  if (isAuthenticated) return <Navigate to="/admin" replace />;
 
   async function handleSubmit(event) {
     event.preventDefault();
