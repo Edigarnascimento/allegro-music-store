@@ -7,11 +7,14 @@ const CATEGORIES_TABLE = 'music_categorias';
 const STORE_SETTINGS_TABLE = 'music_configuracoes_loja';
 const ORDERS_TABLE = 'music_pedidos';
 const ORDER_ITEMS_TABLE = 'music_pedido_itens';
+const PAYMENTS_TABLE = 'music_pagamentos';
 const INTERESTS_TABLE = 'music_interesses';
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const LOW_STOCK_THRESHOLD = 5;
-const PAID_STATUSES = new Set(['pago', 'concluido']);
+const PAYMENT_CONFIRMED_STATUS = 'pago';
+const NEW_ORDER_STATUSES = new Set(['novo', 'pendente']);
+const CANCELED_ORDER_STATUSES = new Set(['cancelado', 'expirado', 'estornado']);
 
 const PRODUCT_IMAGES_BUCKET = 'product-images';
 
@@ -107,6 +110,11 @@ function sanitizeStoreSettingsPayload(payload = {}) {
   };
 }
 
+
+function normalizeStatus(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
 function toNumber(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
@@ -186,31 +194,34 @@ export function onAdminAuthStateChange(callback) {
 }
 
 export async function getAdminDashboardStats() {
-  const [produtos, pedidos, pedidoItens, interesses] = await Promise.all([
+  const [produtos, pedidos, pagamentos, pedidoItens, interesses] = await Promise.all([
     getAdminProducts(),
     getAdminOrdersRaw(),
+    getPaymentsRaw(),
     getOrderItemsRaw(),
     getInterestsRaw(),
   ]);
-
-  const pedidosPagosOuConcluidos = pedidos.filter((pedido) => PAID_STATUSES.has(String(pedido?.status || '').toLowerCase()));
   const produtosAtivos = produtos.filter((produto) => produto?.ativo !== false);
   const lowStockProducts = produtosAtivos.filter((produto) => toNumber(produto?.estoque) > 0 && toNumber(produto?.estoque) <= LOW_STOCK_THRESHOLD);
   const outOfStockProducts = produtosAtivos.filter((produto) => toNumber(produto?.estoque) <= 0);
 
+  const pagamentosConfirmados = pagamentos.filter((pagamento) => normalizeStatus(pagamento?.status) === PAYMENT_CONFIRMED_STATUS);
+  const faturamentoConfirmado = pagamentosConfirmados.reduce((acc, pagamento) => acc + toNumber(pagamento?.valor), 0);
+
   const totalPedidos = pedidos.reduce((acc, pedido) => acc + toNumber(pedido?.total), 0);
-  const ticketMedio = pedidos.length ? totalPedidos / pedidos.length : 0;
+  const ticketMedio = pagamentosConfirmados.length ? faturamentoConfirmado / pagamentosConfirmados.length : 0;
 
   const startOfToday = getStartOfTodayIso();
   const pedidosHoje = pedidos.filter((pedido) => (pedido?.created_at || '') >= startOfToday);
-  const faturamentoHoje = pedidosHoje
-    .filter((pedido) => PAID_STATUSES.has(String(pedido?.status || '').toLowerCase()))
-    .reduce((acc, pedido) => acc + toNumber(pedido?.total), 0);
+  const faturamentoHoje = pagamentosConfirmados
+    .filter((pagamento) => (pagamento?.created_at || '') >= startOfToday)
+    .reduce((acc, pagamento) => acc + toNumber(pagamento?.valor), 0);
 
   const pedidosPorStatus = {
-    novos: pedidos.filter((pedido) => String(pedido?.status || '').toLowerCase() === 'novo').length,
-    pagos: pedidos.filter((pedido) => String(pedido?.status || '').toLowerCase() === 'pago').length,
-    concluidos: pedidos.filter((pedido) => String(pedido?.status || '').toLowerCase() === 'concluido').length,
+    novos: pedidos.filter((pedido) => NEW_ORDER_STATUSES.has(normalizeStatus(pedido?.status))).length,
+    aguardandoEntregaRetirada: pedidos.filter((pedido) => normalizeStatus(pedido?.status) === PAYMENT_CONFIRMED_STATUS).length,
+    concluidos: pedidos.filter((pedido) => normalizeStatus(pedido?.status) === 'concluido').length,
+    canceladosOuEstornados: pedidos.filter((pedido) => CANCELED_ORDER_STATUSES.has(normalizeStatus(pedido?.status))).length,
   };
 
   const vendidos = aggregateByProduct(pedidoItens)
@@ -223,10 +234,12 @@ export async function getAdminDashboardStats() {
 
   return {
     cards: {
-      totalEmPedidos: totalPedidos,
+      faturamentoConfirmado,
+      pagamentosConfirmados: pagamentosConfirmados.length,
       pedidosNovos: pedidosPorStatus.novos,
-      pedidosPagos: pedidosPorStatus.pagos,
+      aguardandoEntregaRetirada: pedidosPorStatus.aguardandoEntregaRetirada,
       pedidosConcluidos: pedidosPorStatus.concluidos,
+      canceladosOuEstornados: pedidosPorStatus.canceladosOuEstornados,
       ticketMedio,
       totalProdutosAtivos: produtosAtivos.length,
       produtosEstoqueBaixo: lowStockProducts.length,
@@ -238,7 +251,7 @@ export async function getAdminDashboardStats() {
       totalInteressesWhatsapp: interesses.length,
       pedidosDoDia: pedidosHoje.length,
       faturamentoDoDia: faturamentoHoje,
-      totalPedidosPagosOuConcluidos: pedidosPagosOuConcluidos.length,
+      totalPagamentosConfirmados: pagamentosConfirmados.length,
     },
     listas: {
       ultimosPedidos: pedidos.slice(0, 5),
@@ -253,6 +266,13 @@ export async function getAdminDashboardStats() {
 async function getAdminOrdersRaw() {
   if (!isSupabaseConfigured || !supabase) return [];
   const { data, error } = await supabase.from(ORDERS_TABLE).select('*').order('created_at', { ascending: false });
+  if (error) return [];
+  return data ?? [];
+}
+
+async function getPaymentsRaw() {
+  if (!isSupabaseConfigured || !supabase) return [];
+  const { data, error } = await supabase.from(PAYMENTS_TABLE).select('*');
   if (error) return [];
   return data ?? [];
 }
