@@ -77,6 +77,17 @@ const arrivalVideos = [
     productLink: '/catalogo',
     categoryLink: '/catalogo',
   },
+  {
+    id: 'servico-luteria',
+    title: 'Serviço de luteria',
+    description: 'Ajustes, regulagem e cuidados técnicos para manter seu instrumento pronto para tocar.',
+    category: 'Luteria',
+    videoUrl: 'https://www.instagram.com/reel/DXkefWWDV9_/?igsh=MWZpeHVtczU4ZjF0OQ==',
+    thumbnailUrl: '',
+    productLink: '/servicos',
+    categoryLink: '/servicos',
+    isService: true,
+  },
 ];
 
 function HomePage() {
@@ -198,7 +209,11 @@ function HomePage() {
         <div className="arrival-videos-row" aria-label="Vídeos de novidades da Allegro Music Store">
           {arrivalVideos.map((video) => (
             <article key={video.id} className="arrival-video-card">
-              <Link className="arrival-video-cover" to={video.categoryLink} aria-label={`Ir para categoria ${video.category}`}>
+              <Link
+                className="arrival-video-cover"
+                to={video.categoryLink}
+                aria-label={`Ir para categoria ${video.category}`}
+              >
                 <span className="arrival-video-tag">{video.category}</span>
                 <span className="arrival-video-play" aria-hidden="true">
                   <svg viewBox="0 0 24 24" focusable="false">
@@ -210,10 +225,18 @@ function HomePage() {
                 <h3>{video.title}</h3>
                 <p>{video.description}</p>
                 <div className="arrival-video-actions">
-                  <Link className="btn btn-secondary" to={video.productLink}>Ver produtos</Link>
+                  {video.videoUrl ? (
+                    <a className="btn btn-secondary" href={video.videoUrl} target="_blank" rel="noreferrer">Assistir vídeo</a>
+                  ) : null}
+                  <Link className="btn btn-secondary" to={video.productLink}>{video.isService ? 'Ver serviços' : 'Ver produtos'}</Link>
                   <a
                     className="btn btn-whatsapp"
-                    href={buildWhatsAppLink(whatsappNumber, 'Olá, vi no site da Allegro Music Store que chegaram novidades e gostaria de saber mais sobre os produtos disponíveis.')}
+                    href={buildWhatsAppLink(
+                      whatsappNumber,
+                      video.isService
+                        ? 'Olá, vi um vídeo de serviço de luteria no site da Allegro Music Store e gostaria de saber mais.'
+                        : 'Olá, vi no site da Allegro Music Store que chegaram novidades e gostaria de saber mais sobre os produtos disponíveis.',
+                    )}
                     target="_blank"
                     rel="noreferrer"
                   >
