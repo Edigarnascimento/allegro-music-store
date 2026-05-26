@@ -7,6 +7,7 @@ import CategoryIcon from './CategoryIcon';
 import { getCategories } from '../services/categoriesService';
 
 const quickLinks = [
+  { label: 'Serviços', to: '/servicos' },
   { label: 'Central de atendimento', to: '/contato' },
   { label: 'Sobre a loja', to: '/institucional/sobre' },
   { label: 'Acompanhar pedido', to: '/acompanhar-pedido' },

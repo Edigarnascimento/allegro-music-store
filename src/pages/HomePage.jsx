@@ -144,10 +144,10 @@ function HomePage() {
         </div>
         <div className="services-grid">
           {services.slice(0, 3).map((service) => (
-            <article key={service.title} className="service-card">
+            <Link key={service.title} className="service-card service-card-link" to="/servicos">
               <h3>{service.title}</h3>
               <p>{service.description}</p>
-            </article>
+            </Link>
           ))}
         </div>
       </div>
