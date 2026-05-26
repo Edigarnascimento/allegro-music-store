@@ -169,6 +169,22 @@ export async function getAdminSession() {
   return { user: data.session?.user ?? null, isMock: false };
 }
 
+
+export function onAdminAuthStateChange(callback) {
+  if (!isSupabaseConfigured || !supabase) {
+    callback({ email: 'admin@mock.local' });
+    return () => {};
+  }
+
+  const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    callback(session?.user ?? null);
+  });
+
+  return () => {
+    data?.subscription?.unsubscribe();
+  };
+}
+
 export async function getAdminDashboardStats() {
   const [produtos, pedidos, pedidoItens, interesses] = await Promise.all([
     getAdminProducts(),

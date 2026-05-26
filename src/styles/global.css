@@ -223,6 +223,8 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 .admin-alert { border-radius:10px; padding:.7rem .8rem; border:1px solid; margin-bottom:1rem; }
 .admin-alert.success { color:#136c37; background:#e7f6ee; border-color:#b9e4c8; }
 .admin-alert.error,.error-text { color:#9f1e27; background:#ffecee; border-color:#ffc6cc; }
+
+.admin-user-badge { margin: .2rem 0 0; font-size: .85rem; color: #c9cfdb; word-break: break-word; }
 .admin-login { min-height: 80vh; display:grid; place-items:center; }
 .admin-login-card { width:min(480px, 100%); background:#fff; padding:1.4rem; border-radius:16px; border:1px solid #e4e8ef; box-shadow:0 16px 32px rgba(0,0,0,.1); }
 @media (max-width: 900px){ .admin-shell{ grid-template-columns:1fr; } .admin-stats-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
