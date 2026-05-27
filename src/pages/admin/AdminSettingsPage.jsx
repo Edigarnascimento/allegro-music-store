@@ -9,6 +9,7 @@ export default function AdminSettingsPage() {
     endereco: '',
     horario_funcionamento: '',
     sobre: '',
+    email: '',
     logo_url: '',
     chave_pix: '',
     nome_recebedor_pix: '',
@@ -65,6 +66,7 @@ export default function AdminSettingsPage() {
         <label>Endereço<input value={form.endereco || ''} onChange={(e) => setForm({ ...form, endereco: e.target.value })} /></label>
         <label>Horário de funcionamento<input value={form.horario_funcionamento || ''} onChange={(e) => setForm({ ...form, horario_funcionamento: e.target.value })} /></label>
         <label>Sobre<textarea value={form.sobre || ''} onChange={(e) => setForm({ ...form, sobre: e.target.value })} /></label>
+        <label>E-mail de contato<input type="email" placeholder="contato@allegromusicstore.com.br" value={form.email || ''} onChange={(e) => setForm({ ...form, email: e.target.value })} /></label>
         <label>URL da logo<input value={form.logo_url || ''} onChange={(e) => setForm({ ...form, logo_url: e.target.value })} /></label>
         <label>Chave PIX<input value={form.chave_pix || ''} onChange={(e) => setForm({ ...form, chave_pix: e.target.value })} /></label>
         <label>Nome do recebedor PIX<input value={form.nome_recebedor_pix || ''} onChange={(e) => setForm({ ...form, nome_recebedor_pix: e.target.value })} /></label>

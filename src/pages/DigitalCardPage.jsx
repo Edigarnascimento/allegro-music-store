@@ -1,10 +1,17 @@
-const storeName = 'Allegro Music Store';
+import { useStoreSettings } from '../hooks/useStoreSettings';
+import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
+import { buildWhatsAppLink } from '../lib/whatsapp';
+
 const storeSite = 'https://www.allegromusicstore.com.br';
-const whatsappNumber = '5591985284572';
-const whatsappLink = `https://wa.me/${whatsappNumber}`;
 const services = 'instrumentos, acessórios, luteria, partituras, arranjos e aulas';
 
 function DigitalCardPage() {
+  const storeSettings = useStoreSettings();
+  const whatsappNumber = useStoreWhatsappNumber();
+  const storeName = storeSettings?.nome_loja || 'Allegro Music Store';
+  const storeAddress = storeSettings?.endereco;
+  const whatsappLink = buildWhatsAppLink(whatsappNumber, 'Olá, acessei o site da Allegro Music Store e gostaria de atendimento.');
+
   return (
     <section className="digital-card-page section">
       <div className="container">
@@ -24,9 +31,7 @@ function DigitalCardPage() {
                   <strong>WhatsApp:</strong>{' '}
                   <a href={whatsappLink} target="_blank" rel="noreferrer">{whatsappNumber}</a>
                 </li>
-                <li>
-                  <strong>Endereço:</strong> Rua Padre Cícero, nº 22 — Célio Miranda, Paragominas/PA
-                </li>
+                {storeAddress ? <li><strong>Endereço:</strong> {storeAddress}</li> : null}
                 <li>
                   <strong>Serviços:</strong> {services}
                 </li>
