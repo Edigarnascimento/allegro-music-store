@@ -25,6 +25,7 @@ import ProtectedAdminRoute from './components/admin/ProtectedAdminRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import ScrollToTop from './components/ScrollToTop';
 import MobileCartBar from './components/MobileCartBar';
+import WelcomeModal from './components/WelcomeModal';
 
 function App() {
   const location = useLocation();
@@ -34,6 +35,7 @@ function App() {
     <div className="app-shell">
       <ScrollToTop />
       {!isAdminRoute ? <Header /> : null}
+      <WelcomeModal />
       <main className="main-content">
         <Routes>
           <Route path="/" element={<HomePage />} />
