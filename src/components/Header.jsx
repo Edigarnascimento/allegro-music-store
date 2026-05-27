@@ -136,7 +136,7 @@ function Header() {
         </NavLink>
         </div>
       </div>
-      <div className="menu-bar">
+      <div className="menu-bar category-nav">
         <div className="container menu-content">
           {categoryLinks.map((category) => {
             const isServicesCategory = normalizeCategoryLabel(category.label) === 'servicos';
