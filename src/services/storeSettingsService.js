@@ -9,6 +9,7 @@ const mockStoreSettings = {
   endereco: '',
   horario_funcionamento: '',
   sobre: '',
+  email: '',
   logo_url: '',
 };
 

@@ -58,6 +58,7 @@ const mockSettings = {
   horario_funcionamento: 'Segunda a Sexta, 09:00 às 18:00',
   sobre: 'Loja especializada em instrumentos musicais e acessórios.',
   logo_url: '',
+  email: '',
 };
 
 function normalizeMockProduct(product) {
@@ -102,6 +103,7 @@ function sanitizeStoreSettingsPayload(payload = {}) {
     endereco: payload?.endereco ?? '',
     horario_funcionamento: payload?.horario_funcionamento ?? '',
     sobre: payload?.sobre ?? '',
+    email: payload?.email ?? payload?.email_contato ?? '',
     logo_url: payload?.logo_url ?? '',
     chave_pix: payload?.chave_pix ?? '',
     nome_recebedor_pix: payload?.nome_recebedor_pix ?? '',
@@ -539,6 +541,7 @@ export async function updateAdminStoreSettings(payload) {
     endereco: before?.endereco,
     horario_funcionamento: before?.horario_funcionamento,
     sobre: before?.sobre,
+    email: before?.email ?? before?.email_contato,
     logo_url: before?.logo_url,
     chave_pix: before?.chave_pix ? '***' : null,
     nome_recebedor_pix: before?.nome_recebedor_pix,
@@ -551,6 +554,7 @@ export async function updateAdminStoreSettings(payload) {
     endereco: updated?.endereco,
     horario_funcionamento: updated?.horario_funcionamento,
     sobre: updated?.sobre,
+    email: updated?.email ?? updated?.email_contato,
     logo_url: updated?.logo_url,
     chave_pix: updated?.chave_pix ? '***' : null,
     nome_recebedor_pix: updated?.nome_recebedor_pix,
