@@ -1,10 +1,13 @@
 import Breadcrumbs from '../components/Breadcrumbs';
 import { WhatsAppIcon } from '../components/PublicButtonIcons';
+import { useStoreSettings } from '../hooks/useStoreSettings';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink } from '../lib/whatsapp';
 
 function ContactPage() {
   const whatsappNumber = useStoreWhatsappNumber();
+  const storeSettings = useStoreSettings();
+  const contactEmail = storeSettings?.email || storeSettings?.contato_email;
 
   return (
     <section className="container section">
@@ -16,10 +19,17 @@ function ContactPage() {
       <div className="contact-layout">
         <div className="contact-card">
           <h2>Fale com um especialista</h2>
-          <p><strong>WhatsApp:</strong> Atendimento oficial pelo botão abaixo</p>
-          <p><strong>E-mail:</strong> contato@allegromusicstore.com</p>
-          <p><strong>Endereço:</strong> Atendimento sob agendamento em São Paulo - SP</p>
-          <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, 'Olá! Gostaria de informações sobre a Allegro Music Store.')} target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Chamar no WhatsApp</span></a>
+          <p><strong>WhatsApp:</strong> {whatsappNumber}</p>
+          {contactEmail ? (
+            <p><strong>E-mail:</strong> {contactEmail}</p>
+          ) : (
+            <p><strong>E-mail:</strong> Atendimento principal pelo WhatsApp</p>
+          )}
+          {storeSettings?.endereco ? <p><strong>Endereço:</strong> {storeSettings.endereco}</p> : null}
+          {storeSettings?.horario_funcionamento ? <p><strong>Horário:</strong> {storeSettings.horario_funcionamento}</p> : null}
+          {storeSettings?.instagram ? <p><strong>Instagram:</strong> {storeSettings.instagram}</p> : null}
+          {storeSettings?.sobre ? <p><strong>Atendimento:</strong> {storeSettings.sobre}</p> : null}
+          <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, 'Olá, acessei o site da Allegro Music Store e gostaria de atendimento.')} target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Chamar no WhatsApp</span></a>
         </div>
         <div className="contact-card">
           <h2>Atendimento confiável</h2>
