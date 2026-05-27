@@ -46,7 +46,7 @@ a { text-decoration: none; color: inherit; }
   border-radius: 12px;
   color: #f5f6f8;
   background: linear-gradient(180deg, #151515 0%, #101010 100%);
-  border: 1px solid rgba(255,255,255,.12);
+  border: 1px solid rgba(193,18,31,.88);
   white-space: nowrap;
   font-weight: 650;
   font-size: .92rem;
