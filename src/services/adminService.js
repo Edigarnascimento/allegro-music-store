@@ -52,13 +52,18 @@ export async function uploadProductImage(file) {
 const mockSettings = {
   id: 'mock-store-settings',
   nome_loja: 'Allegro Music Store',
-  whatsapp: '5511999999999',
-  instagram: '@allegromusicstore',
-  endereco: 'Rua das Cordas, 123 - São Paulo, SP',
-  horario_funcionamento: 'Segunda a Sexta, 09:00 às 18:00',
+  whatsapp: '5591985284572',
+  instagram: '@allegromusic',
+  endereco: 'Rua Padre Cícero, 22 Mercado Municipal Paragominas - Pará',
+  horario_funcionamento: 'Segunda a sábado, das 8h às 18h',
   sobre: 'Loja especializada em instrumentos musicais e acessórios.',
   logo_url: '',
   email: '',
+  footer_text: 'Instrumentos, áudio e acessórios com atendimento consultivo e suporte pós-venda.',
+  atendimento_linha_1: 'Segunda a sexta, das 8h às 18h',
+  atendimento_linha_2: 'Sábado, das 8h às 18h',
+  footer_payment_notice: 'Pagamentos via PIX e cartão online são processados com segurança.',
+  footer_whatsapp_label: 'Falar no WhatsApp',
 };
 
 function normalizeMockProduct(product) {
@@ -109,6 +114,11 @@ function sanitizeStoreSettingsPayload(payload = {}) {
     nome_recebedor_pix: payload?.nome_recebedor_pix ?? '',
     banco_pix: payload?.banco_pix ?? '',
     instrucoes_pix: payload?.instrucoes_pix ?? '',
+    footer_text: payload?.footer_text ?? '',
+    atendimento_linha_1: payload?.atendimento_linha_1 ?? '',
+    atendimento_linha_2: payload?.atendimento_linha_2 ?? '',
+    footer_payment_notice: payload?.footer_payment_notice ?? '',
+    footer_whatsapp_label: payload?.footer_whatsapp_label ?? '',
   };
 }
 
@@ -546,6 +556,11 @@ export async function updateAdminStoreSettings(payload) {
     chave_pix: before?.chave_pix ? '***' : null,
     nome_recebedor_pix: before?.nome_recebedor_pix,
     banco_pix: before?.banco_pix,
+    footer_text: before?.footer_text,
+    atendimento_linha_1: before?.atendimento_linha_1,
+    atendimento_linha_2: before?.atendimento_linha_2,
+    footer_payment_notice: before?.footer_payment_notice,
+    footer_whatsapp_label: before?.footer_whatsapp_label,
   };
   const safeAfter = {
     nome_loja: updated?.nome_loja,
@@ -559,6 +574,11 @@ export async function updateAdminStoreSettings(payload) {
     chave_pix: updated?.chave_pix ? '***' : null,
     nome_recebedor_pix: updated?.nome_recebedor_pix,
     banco_pix: updated?.banco_pix,
+    footer_text: updated?.footer_text,
+    atendimento_linha_1: updated?.atendimento_linha_1,
+    atendimento_linha_2: updated?.atendimento_linha_2,
+    footer_payment_notice: updated?.footer_payment_notice,
+    footer_whatsapp_label: updated?.footer_whatsapp_label,
   };
 
   createAuditLog({

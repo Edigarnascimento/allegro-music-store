@@ -16,22 +16,28 @@ function Footer() {
   const whatsappNumber = useStoreWhatsappNumber();
   const storeSettings = useStoreSettings();
   const contactEmail = storeSettings?.email || storeSettings?.contato_email;
+  const footerText = storeSettings?.footer_text || 'Instrumentos, áudio e acessórios com atendimento consultivo e suporte pós-venda.';
+  const atendimentoLinha1 = storeSettings?.atendimento_linha_1 || 'Segunda a sexta, das 8h às 18h';
+  const atendimentoLinha2 = storeSettings?.atendimento_linha_2 || 'Sábado, das 8h às 18h';
+  const footerPaymentNotice = storeSettings?.footer_payment_notice || 'Pagamentos via PIX e cartão online são processados com segurança.';
+  const footerWhatsappLabel = storeSettings?.footer_whatsapp_label || 'Falar no WhatsApp';
 
   return (
     <footer className="footer">
       <div className="container footer-grid">
         <div>
           <h3>{storeSettings?.nome_loja || 'Allegro Music Store'}</h3>
-          <p>Instrumentos, áudio e acessórios com atendimento consultivo e suporte pós-venda.</p>
+          <p>{footerText}</p>
         </div>
         <div>
           <h4>Atendimento</h4>
-          {storeSettings?.horario_funcionamento ? <p>{storeSettings.horario_funcionamento}</p> : <p>Consulte os horários pelo WhatsApp.</p>}
-          <p>Pedidos via PIX são confirmados após validação manual do pagamento.</p>
+          <p>{atendimentoLinha1}</p>
+          <p>{atendimentoLinha2}</p>
+          <p>{footerPaymentNotice}</p>
         </div>
         <div>
           <h4>Contato rápido</h4>
-          <a href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda com um pedido na Allegro Music Store.')} target="_blank" rel="noreferrer">Falar no WhatsApp</a>
+          <a href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda com um pedido na Allegro Music Store.')} target="_blank" rel="noreferrer">{footerWhatsappLabel}</a>
           {storeSettings?.endereco ? <p>{storeSettings.endereco}</p> : null}
           {contactEmail ? <p>{contactEmail}</p> : <p>Atendimento principal pelo WhatsApp</p>}
         </div>

@@ -75,6 +75,16 @@ alter table music_configuracoes_loja add column if not exists banco_pix text;
 alter table music_configuracoes_loja add column if not exists instrucoes_pix text;
 ```
 
+### SQL sugerido para campos de rodapé em `music_configuracoes_loja`
+
+```sql
+alter table public.music_configuracoes_loja add column if not exists footer_text text;
+alter table public.music_configuracoes_loja add column if not exists atendimento_linha_1 text;
+alter table public.music_configuracoes_loja add column if not exists atendimento_linha_2 text;
+alter table public.music_configuracoes_loja add column if not exists footer_payment_notice text;
+alter table public.music_configuracoes_loja add column if not exists footer_whatsapp_label text;
+```
+
 ## Painel administrativo
 
 ### Rotas
