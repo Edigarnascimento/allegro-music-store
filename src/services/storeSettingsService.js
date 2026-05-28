@@ -4,13 +4,18 @@ const STORE_SETTINGS_TABLE = 'music_configuracoes_loja';
 
 const mockStoreSettings = {
   nome_loja: 'Allegro Music Store',
-  whatsapp: '5511999999999',
-  instagram: '',
-  endereco: '',
-  horario_funcionamento: '',
+  whatsapp: '5591985284572',
+  instagram: '@allegromusic',
+  endereco: 'Rua Padre Cícero, 22 Mercado Municipal Paragominas - Pará',
+  horario_funcionamento: 'Segunda a sábado, das 8h às 18h',
   sobre: '',
   email: '',
   logo_url: '',
+  footer_text: 'Instrumentos, áudio e acessórios com atendimento consultivo e suporte pós-venda.',
+  atendimento_linha_1: 'Segunda a sexta, das 8h às 18h',
+  atendimento_linha_2: 'Sábado, das 8h às 18h',
+  footer_payment_notice: 'Pagamentos via PIX e cartão online são processados com segurança.',
+  footer_whatsapp_label: 'Falar no WhatsApp',
 };
 
 export async function getStoreSettings() {

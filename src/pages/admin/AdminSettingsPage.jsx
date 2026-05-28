@@ -15,6 +15,11 @@ export default function AdminSettingsPage() {
     nome_recebedor_pix: '',
     banco_pix: '',
     instrucoes_pix: '',
+    footer_text: '',
+    atendimento_linha_1: '',
+    atendimento_linha_2: '',
+    footer_payment_notice: '',
+    footer_whatsapp_label: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [status, setStatus] = useState({ type: '', message: '' });
@@ -72,6 +77,11 @@ export default function AdminSettingsPage() {
         <label>Nome do recebedor PIX<input value={form.nome_recebedor_pix || ''} onChange={(e) => setForm({ ...form, nome_recebedor_pix: e.target.value })} /></label>
         <label>Banco PIX (opcional)<input value={form.banco_pix || ''} onChange={(e) => setForm({ ...form, banco_pix: e.target.value })} /></label>
         <label>Instruções PIX<textarea value={form.instrucoes_pix || ''} onChange={(e) => setForm({ ...form, instrucoes_pix: e.target.value })} /></label>
+        <label>Texto do rodapé<textarea value={form.footer_text || ''} onChange={(e) => setForm({ ...form, footer_text: e.target.value })} /></label>
+        <label>Horário de atendimento - linha 1<input value={form.atendimento_linha_1 || ''} onChange={(e) => setForm({ ...form, atendimento_linha_1: e.target.value })} /></label>
+        <label>Horário de atendimento - linha 2<input value={form.atendimento_linha_2 || ''} onChange={(e) => setForm({ ...form, atendimento_linha_2: e.target.value })} /></label>
+        <label>Aviso de pagamento no rodapé<textarea value={form.footer_payment_notice || ''} onChange={(e) => setForm({ ...form, footer_payment_notice: e.target.value })} /></label>
+        <label>Texto do link WhatsApp<input value={form.footer_whatsapp_label || ''} onChange={(e) => setForm({ ...form, footer_whatsapp_label: e.target.value })} /></label>
         <button className="btn" type="submit" disabled={isSaving}>{isSaving ? 'Salvando...' : 'Salvar'}</button>
       </form>
     </div>
