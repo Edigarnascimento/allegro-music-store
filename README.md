@@ -66,6 +66,7 @@ VITE_SUPABASE_ANON_KEY=SUA_ANON_KEY
 - `music_categorias`
 - `music_configuracoes_loja`
 - `music_produto_imagens` (opcional para galeria de fotos adicionais por produto)
+- `music_home_videos` (cards da seção “Chegou na Allegro” da Home)
 
 
 ### SQL sugerido para galeria de imagens de produto
@@ -117,6 +118,59 @@ on public.music_produto_imagens
 for delete
 to authenticated
 using (true);
+```
+
+### SQL sugerido para cards da seção “Chegou na Allegro”
+
+A Home busca os cards ativos na tabela `music_home_videos`, ordenando pelo campo `ordem`. O painel administrativo em `/admin/chegou-na-allegro` permite criar, editar, excluir, ativar/desativar e alterar a ordem desses cards.
+
+```sql
+create table if not exists public.music_home_videos (
+  id uuid primary key default gen_random_uuid(),
+  titulo text not null,
+  categoria text,
+  descricao text,
+  video_url text,
+  botao_texto text default 'Ver produtos',
+  botao_link text default '/catalogo',
+  whatsapp_mensagem text,
+  ordem integer default 0,
+  ativo boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists idx_music_home_videos_ativo_ordem
+on public.music_home_videos(ativo, ordem);
+
+alter table public.music_home_videos enable row level security;
+
+create policy "Public can view active home videos"
+on public.music_home_videos
+for select
+to anon, authenticated
+using (ativo = true);
+
+create policy "Authenticated users can manage home videos"
+on public.music_home_videos
+for all
+to authenticated
+using (true)
+with check (true);
+```
+
+Para popular os cards iniciais diretamente pelo SQL Editor, execute depois de criar a tabela:
+
+```sql
+insert into public.music_home_videos
+  (titulo, categoria, descricao, video_url, botao_texto, botao_link, whatsapp_mensagem, ordem, ativo)
+values
+  ('Reposição de cordas para violão', 'Cordas', 'Cordas de aço e nylon com reposição frequente para todos os níveis de músicos.', null, 'Ver produtos', '/catalogo?categoria=Cordas', null, 1, true),
+  ('Palhetas e acessórios', 'Acessórios', 'Novas palhetas, correias, afinadores e itens essenciais para o dia a dia.', null, 'Ver produtos', '/catalogo?categoria=Acessórios', null, 2, true),
+  ('Cabos e conectores', 'Áudio', 'Cabos P10, XLR e conectores de alta durabilidade para ensaios e apresentações.', null, 'Ver produtos', '/catalogo?categoria=Áudio', null, 3, true),
+  ('Produtos para músicos iniciantes', 'Iniciante', 'Kits acessíveis para começar com qualidade no estudo de música.', null, 'Ver produtos', '/catalogo', null, 4, true),
+  ('Serviço de luteria', 'Luteria', 'Ajustes, regulagem e cuidados técnicos para manter seu instrumento pronto para tocar.', 'https://www.instagram.com/reel/DXkefWWDV9_/?igsh=MWZpeHVtczU4ZjF0OQ==', 'Ver serviços', '/servicos', 'Olá, vi um vídeo de serviço de luteria no site da Allegro Music Store e gostaria de saber mais.', 5, true)
+on conflict do nothing;
 ```
 
 ### SQL sugerido para campos PIX em `music_configuracoes_loja`

@@ -21,6 +21,7 @@ import AdminInteressesPage from './pages/admin/AdminInteressesPage';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import AdminAuditPage from './pages/admin/AdminAuditPage';
 import AdminPaymentsPage from './pages/admin/AdminPaymentsPage';
+import AdminHomeVideosPage from './pages/admin/AdminHomeVideosPage';
 import ProtectedAdminRoute from './components/admin/ProtectedAdminRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import ScrollToTop from './components/ScrollToTop';
@@ -58,6 +59,7 @@ function App() {
               <Route path="/admin/produtos/editar/:id" element={<AdminProductFormPage />} />
               <Route path="/admin/categorias" element={<AdminCategoriesPage />} />
               <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
+              <Route path="/admin/chegou-na-allegro" element={<AdminHomeVideosPage />} />
               <Route path="/admin/interesses" element={<AdminInteressesPage />} />
               <Route path="/admin/pedidos" element={<AdminOrdersPage />} />
               <Route path="/admin/pagamentos" element={<AdminPaymentsPage />} />

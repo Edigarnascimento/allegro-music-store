@@ -22,6 +22,7 @@ export default function AdminLayout() {
           <NavLink to="/admin/produtos" className="admin-link">Produtos</NavLink>
           <NavLink to="/admin/categorias" className="admin-link">Categorias</NavLink>
           <NavLink to="/admin/configuracoes" className="admin-link">Configurações</NavLink>
+          <NavLink to="/admin/chegou-na-allegro" className="admin-link">Chegou na Allegro</NavLink>
           <NavLink to="/admin/interesses" className="admin-link">Interesses</NavLink>
           <NavLink to="/admin/pedidos" className="admin-link">Pedidos</NavLink>
           <NavLink to="/admin/pagamentos" className="admin-link">Pagamentos</NavLink>
