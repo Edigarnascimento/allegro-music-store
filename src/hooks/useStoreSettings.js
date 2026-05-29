@@ -10,6 +10,7 @@ const defaultSettings = {
   sobre: '',
   email: '',
   contato_email: '',
+  logo_url: '',
 };
 
 export function useStoreSettings() {

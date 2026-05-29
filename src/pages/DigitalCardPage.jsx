@@ -9,6 +9,7 @@ function DigitalCardPage() {
   const storeSettings = useStoreSettings();
   const whatsappNumber = useStoreWhatsappNumber();
   const storeName = storeSettings?.nome_loja || 'Allegro Music Store';
+  const logoUrl = storeSettings?.logo_url;
   const storeAddress = storeSettings?.endereco;
   const whatsappLink = buildWhatsAppLink(whatsappNumber, 'Olá, acessei o site da Allegro Music Store e gostaria de atendimento.');
 
@@ -16,8 +17,13 @@ function DigitalCardPage() {
     <section className="digital-card-page section">
       <div className="container">
         <div className="digital-card" role="region" aria-label="Cartão digital Allegro Music Store">
-          <p className="digital-card-kicker">Cartão digital</p>
-          <h1>{storeName}</h1>
+          <div className="digital-card-brand">
+            {logoUrl ? <img src={logoUrl} alt={`Logo ${storeName}`} /> : null}
+            <div>
+              <p className="digital-card-kicker">Cartão digital</p>
+              <h1>{storeName}</h1>
+            </div>
+          </div>
 
           <div className="digital-card-info-grid">
             <div className="digital-card-info">
