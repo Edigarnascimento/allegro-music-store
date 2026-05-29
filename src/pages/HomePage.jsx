@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import CategoryIcon from '../components/CategoryIcon';
 import { services } from '../data/services';
@@ -10,21 +10,44 @@ import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink } from '../lib/whatsapp';
 
 const fallbackFeaturedCategories = [
-  { icon: 'strings', title: 'Guitarras e baixos', category: 'Cordas', description: 'Modelos para palco, estúdio e estudo.' },
-  { icon: 'keys', title: 'Teclados e pianos', category: 'Teclas', description: 'Sons expressivos e recursos modernos.' },
-  { icon: 'drums', title: 'Baterias e percussão', category: 'Bateria', description: 'Kits completos e peças de reposição.' },
-  { icon: 'audio', title: 'Áudio e gravação', category: 'Áudio', description: 'Microfones, interfaces e monitoramento.' },
+  { icon: 'accessories', title: 'Acessórios', category: 'Acessórios', description: 'Palhetas, correias, cabos e itens essenciais para o dia a dia.' },
+  { icon: 'audio', title: 'Áudio', category: 'Áudio', description: 'Microfones, interfaces, caixas e equipamentos para seu som.' },
+  { icon: 'strings', title: 'Cordas', category: 'Cordas', description: 'Cordas para violão, guitarra, baixo e instrumentos acústicos.' },
+  { icon: 'guitar', title: 'Violões', category: 'Violões', description: 'Modelos para estudo, palco, igreja e apresentações.' },
+  { icon: 'wind', title: 'Sopro', category: 'Sopro', description: 'Instrumentos de sopro e acessórios para performance.' },
+  { icon: 'guitar', title: 'Guitarras', category: 'Guitarras', description: 'Timbres, caps e modelos para diferentes estilos.' },
+  { icon: 'drums', title: 'Percussão', category: 'Percussão', description: 'Peças, acessórios e instrumentos para ritmo e palco.' },
+  { icon: 'services', title: 'Luteria/Serviços', category: 'Serviços', description: 'Regulagem, manutenção e soluções técnicas da Allegro.', isService: true },
 ];
 
 const iconByCategoryName = {
   cordas: 'strings',
   teclas: 'keys',
   bateria: 'drums',
+  baterias: 'drums',
+  percussao: 'drums',
+  percussão: 'drums',
   áudio: 'audio',
   audio: 'audio',
   acessórios: 'accessories',
   acessorios: 'accessories',
+  violões: 'guitar',
+  violoes: 'guitar',
+  guitarras: 'guitar',
+  guitarra: 'guitar',
+  sopro: 'wind',
+  luteria: 'services',
+  serviços: 'services',
+  servicos: 'services',
 };
+
+function normalizeCategoryName(value) {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
 
 const arrivalVideos = [
   {
@@ -95,6 +118,16 @@ function HomePage() {
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [featuredCategories, setFeaturedCategories] = useState(fallbackFeaturedCategories);
   const whatsappNumber = useStoreWhatsappNumber();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!location.hash) return;
+
+    const target = document.querySelector(location.hash);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [location.hash]);
 
   useEffect(() => {
     let isMounted = true;
@@ -129,19 +162,29 @@ function HomePage() {
       const data = await getCategories();
       if (!isMounted || !data.length) return;
 
-      const mapped = data.slice(0, 4).map((category) => {
-        const name = category.nome ?? category.name;
-        const normalizedName = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const categoriesByName = new Map(
+        data
+          .map((category) => {
+            const name = category.nome ?? category.name;
+            return name ? [normalizeCategoryName(name), category] : null;
+          })
+          .filter(Boolean),
+      );
+
+      const mapped = fallbackFeaturedCategories.map((featuredCategory) => {
+        const categoryData = categoriesByName.get(normalizeCategoryName(featuredCategory.category));
+        const name = categoryData?.nome ?? categoryData?.name ?? featuredCategory.category;
 
         return {
-          icon: iconByCategoryName[normalizedName] ?? 'generic',
-          title: name,
+          ...featuredCategory,
+          icon: iconByCategoryName[normalizeCategoryName(name)] ?? featuredCategory.icon,
+          title: featuredCategory.isService ? featuredCategory.title : name,
           category: name,
-          description: category.descricao || 'Explore os melhores produtos desta categoria.',
+          description: categoryData?.descricao || featuredCategory.description,
         };
       });
 
-      setFeaturedCategories(mapped.length ? mapped : fallbackFeaturedCategories);
+      setFeaturedCategories(mapped);
     }
 
     loadCategories();
@@ -175,22 +218,24 @@ function HomePage() {
         </div>
       </div>
 
-      <div className="container section">
+      <div className="container section" id="categorias">
         <div className="section-heading">
+          <p className="eyebrow">Compre por departamento</p>
           <h2>Categorias em destaque</h2>
           <p className="subtitle">Navegue pelas principais seções da loja e encontre seu próximo setup.</p>
         </div>
-        <div className="features-grid">
+        <div className="features-grid marketplace-categories" aria-label="Categorias em destaque">
           {featuredCategories.map((item) => (
-            <Link key={item.title} className="feature-card" to={`/catalogo?categoria=${encodeURIComponent(item.category)}`}>
-              <h3><CategoryIcon type={item.icon} /><span>{item.title}</span></h3>
-              <p>{item.description}</p>
+            <Link key={item.title} className="feature-card category-card" to={item.isService ? '/servicos' : `/catalogo?categoria=${encodeURIComponent(item.category)}`}>
+              <span className="category-card-icon"><CategoryIcon type={item.icon} /></span>
+              <span className="category-card-title">{item.title}</span>
+              <span className="category-card-description">{item.description}</span>
             </Link>
           ))}
         </div>
       </div>
 
-      <div className="container section">
+      <div className="container section" id="produtos">
         <div className="section-heading with-action">
           <div>
             <h2>Produtos em destaque</h2>
@@ -201,7 +246,7 @@ function HomePage() {
         {loadingFeatured ? <p>Carregando produtos em destaque...</p> : <div className="products-grid">{featuredProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div>}
       </div>
 
-      <div className="container section arrived-section">
+      <div className="container section arrived-section" id="chegou-na-allegro">
         <div className="section-heading">
           <h2>Chegou na Allegro</h2>
           <p className="subtitle">Novidades, reposições e produtos disponíveis na loja física e online.</p>

@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink } from '../lib/whatsapp';
 import { useCart } from '../context/CartContext';
-import CategoryIcon from './CategoryIcon';
-import { getCategories } from '../services/categoriesService';
 
 const quickLinks = [
   { label: 'Serviços', to: '/servicos' },
@@ -13,70 +11,21 @@ const quickLinks = [
   { label: 'Acompanhar pedido', to: '/acompanhar-pedido' },
 ];
 
-const fallbackCategoryLinks = [
-  { icon: 'strings', label: 'Cordas' },
-  { icon: 'keys', label: 'Teclas' },
-  { icon: 'drums', label: 'Bateria' },
-  { icon: 'audio', label: 'Áudio' },
-  { icon: 'accessories', label: 'Acessórios' },
+const navigationLinks = [
+  { label: 'Categorias', to: '/#categorias' },
+  { label: 'Mais vendidos', to: '/#produtos' },
+  { label: 'Novidades', to: '/catalogo' },
+  { label: 'Chegou na Allegro', to: '/#chegou-na-allegro' },
+  { label: 'Serviços', to: '/servicos' },
+  { label: 'Contato', to: '/contato' },
 ];
-
-const iconByCategoryName = {
-  cordas: 'strings',
-  teclas: 'keys',
-  bateria: 'drums',
-  áudio: 'audio',
-  audio: 'audio',
-  acessórios: 'accessories',
-  acessorios: 'accessories',
-};
-
-
-function normalizeCategoryLabel(value) {
-  return String(value ?? '')
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .trim();
-}
 
 function Header() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [categories, setCategories] = useState([]);
   const [cartPulse, setCartPulse] = useState(false);
   const { totalItems } = useCart();
   const whatsappNumber = useStoreWhatsappNumber();
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadCategories() {
-      const data = await getCategories();
-      if (isMounted) setCategories(data);
-    }
-
-    loadCategories();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const categoryLinks = useMemo(() => {
-    const source = categories.length
-      ? categories.map((category) => ({ label: category.nome ?? category.name ?? '' })).filter((category) => category.label)
-      : fallbackCategoryLinks;
-
-    return source.map((category) => {
-      const normalizedName = category.label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      return {
-        ...category,
-        icon: category.icon ?? iconByCategoryName[normalizedName] ?? 'generic',
-      };
-    });
-  }, [categories]);
-
 
   useEffect(() => {
     let timeoutId;
@@ -104,53 +53,49 @@ function Header() {
     <header className="header">
       <div className="topbar">
         <div className="container topbar-content">
-          {quickLinks.map((link) => (
-            link.href ? <a key={link.label} href={link.href} target="_blank" rel="noreferrer">{link.label}</a> : <NavLink key={link.label} to={link.to}>{link.label}</NavLink>
-          ))}
-          <a href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda na loja.')} target="_blank" rel="noreferrer">WhatsApp</a>
+          <span className="topbar-note">Loja online de instrumentos, áudio e serviços musicais</span>
+          <nav className="quick-links" aria-label="Links rápidos">
+            {quickLinks.map((link) => (
+              <NavLink key={link.label} to={link.to}>{link.label}</NavLink>
+            ))}
+            <a href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda na loja.')} target="_blank" rel="noreferrer">WhatsApp</a>
+          </nav>
         </div>
       </div>
       <div className="header-main-wrap">
         <div className="container header-main">
-        <NavLink to="/" className="brand">
-          <span className="brand-mark">♫</span>
-          <span className="brand-text">
-            <strong>Allegro Music Store</strong>
-            <small>Instrumentos e Áudio Profissional</small>
-          </span>
-        </NavLink>
-        <form className="search-bar" role="search" onSubmit={handleSearchSubmit}>
-          <input
-            type="search"
-            placeholder="Busque instrumentos, acessórios e equipamentos"
-            aria-label="Buscar produtos"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-          />
-          <button type="submit" className="btn btn-main btn-search">Buscar</button>
-        </form>
-        <NavLink to="/carrinho" className={`btn btn-secondary cart-shortcut ${cartPulse ? 'is-highlighted' : ''}`} aria-live="polite" aria-label={`Carrinho com ${totalItems} item(ns)`}>
-          <span role="img" aria-hidden="true">🛒</span>
-          <span>Carrinho</span>
-          <span className="cart-counter">{totalItems}</span>
-        </NavLink>
+          <NavLink to="/" className="brand">
+            <span className="brand-mark">♫</span>
+            <span className="brand-text">
+              <strong>Allegro Music Store</strong>
+              <small>Instrumentos e Áudio Profissional</small>
+            </span>
+          </NavLink>
+          <form className="search-bar" role="search" onSubmit={handleSearchSubmit}>
+            <input
+              type="search"
+              placeholder="Busque instrumentos, acessórios, áudio e serviços"
+              aria-label="Buscar produtos"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+            />
+            <button type="submit" className="btn btn-main btn-search">Buscar</button>
+          </form>
+          <NavLink to="/carrinho" className={`btn btn-secondary cart-shortcut ${cartPulse ? 'is-highlighted' : ''}`} aria-live="polite" aria-label={`Carrinho com ${totalItems} item(ns)`}>
+            <span role="img" aria-hidden="true">🛒</span>
+            <span>Carrinho</span>
+            <span className="cart-counter">{totalItems}</span>
+          </NavLink>
         </div>
       </div>
-      <div className="menu-bar category-nav">
-        <div className="container menu-content">
-          {categoryLinks.map((category) => {
-            const isServicesCategory = normalizeCategoryLabel(category.label) === 'servicos';
-            const destination = isServicesCategory
-              ? '/servicos'
-              : `/catalogo?categoria=${encodeURIComponent(category.label)}`;
-
-            return (
-              <NavLink key={category.label} to={destination} className="menu-link">
-                <CategoryIcon type={category.icon} /><span className="menu-link-label">{category.label}</span>
-              </NavLink>
-            );
-          })}
-        </div>
+      <div className="menu-bar marketplace-nav">
+        <nav className="container menu-content" aria-label="Navegação principal">
+          {navigationLinks.map((link) => (
+            <Link key={link.label} to={link.to} className="menu-link">
+              {link.label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </header>
   );
