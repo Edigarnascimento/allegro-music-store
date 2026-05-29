@@ -3,6 +3,7 @@ import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 import { createAuditLog } from './auditService';
 
 const PRODUCTS_TABLE = 'music_produtos';
+const PRODUCT_IMAGES_TABLE = 'music_produto_imagens';
 const CATEGORIES_TABLE = 'music_categorias';
 const STORE_SETTINGS_TABLE = 'music_configuracoes_loja';
 const ORDERS_TABLE = 'music_pedidos';
@@ -17,15 +18,17 @@ const NEW_ORDER_STATUSES = new Set(['novo', 'pendente']);
 const CANCELED_ORDER_STATUSES = new Set(['cancelado', 'expirado', 'estornado']);
 
 const PRODUCT_IMAGES_BUCKET = 'product-images';
+const ALLOWED_PRODUCT_IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 
 function getImageUploadPath(file, folder = 'products') {
   const safeName = (file?.name || 'image').toLowerCase().replace(/[^a-z0-9.\-_]/g, '-');
   return `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
 }
 
-async function uploadImageToProductBucket(file, folder = 'products') {
+async function uploadImageToProductBucket(file, folder = 'products', allowedTypes = null) {
   if (!file) throw new Error('Selecione uma imagem antes de enviar.');
   if (!file.type?.startsWith('image/')) throw new Error('Apenas arquivos de imagem são permitidos.');
+  if (allowedTypes && !allowedTypes.has(file.type)) throw new Error('Envie imagens nos formatos PNG, JPG/JPEG ou WEBP.');
 
   if (!isSupabaseConfigured || !supabase) {
     return URL.createObjectURL(file);
@@ -51,6 +54,10 @@ async function uploadImageToProductBucket(file, folder = 'products') {
 
 export async function uploadProductImage(file) {
   return uploadImageToProductBucket(file, 'products');
+}
+
+export async function uploadProductGalleryImage(file) {
+  return uploadImageToProductBucket(file, 'products/gallery', ALLOWED_PRODUCT_IMAGE_TYPES);
 }
 
 export async function uploadStoreLogo(file) {
@@ -89,6 +96,7 @@ function normalizeMockProduct(product) {
 }
 
 let localProducts = mockProducts.map(normalizeMockProduct);
+let localProductImages = [];
 let localCategories = Array.from(new Set(localProducts.map((p) => p.categoria))).map((categoria, index) => ({
   id: `mock-cat-${index + 1}`,
   nome: categoria,
@@ -325,6 +333,92 @@ export async function getAdminProducts() {
 export async function getAdminProductById(id) {
   const products = await getAdminProducts();
   return products.find((item) => String(item.id) === String(id)) ?? null;
+}
+
+
+export async function getAdminProductImages(productId) {
+  if (!productId) return [];
+
+  if (!isSupabaseConfigured || !supabase) {
+    return localProductImages
+      .filter((item) => String(item.produto_id) === String(productId))
+      .sort((a, b) => Number(a.ordem ?? 0) - Number(b.ordem ?? 0));
+  }
+
+  const { data, error } = await supabase
+    .from(PRODUCT_IMAGES_TABLE)
+    .select('*')
+    .eq('produto_id', productId)
+    .order('ordem', { ascending: true })
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.warn('[adminService] não foi possível carregar galeria do produto:', error.message);
+    return [];
+  }
+
+  return data ?? [];
+}
+
+export async function addAdminProductImages(productId, images = []) {
+  if (!productId || !images.length) return [];
+
+  const rows = images.map((image, index) => ({
+    produto_id: productId,
+    image_url: image.image_url,
+    ordem: Number.isFinite(Number(image.ordem)) ? Number(image.ordem) : index,
+    is_principal: false,
+  }));
+
+  if (!isSupabaseConfigured || !supabase) {
+    const createdRows = rows.map((row) => ({
+      ...row,
+      id: `mock-gallery-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      created_at: new Date().toISOString(),
+    }));
+    localProductImages = [...localProductImages, ...createdRows];
+    return createdRows;
+  }
+
+  const { data, error } = await supabase.from(PRODUCT_IMAGES_TABLE).insert(rows).select();
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function updateAdminProductImagesOrder(images = []) {
+  const updates = images
+    .filter((image) => image?.id)
+    .map((image) => ({ id: image.id, ordem: Number(image.ordem) || 0 }));
+
+  if (!updates.length) return [];
+
+  if (!isSupabaseConfigured || !supabase) {
+    localProductImages = localProductImages.map((item) => {
+      const update = updates.find((row) => String(row.id) === String(item.id));
+      return update ? { ...item, ordem: update.ordem } : item;
+    });
+    return updates;
+  }
+
+  const results = await Promise.all(
+    updates.map((image) => supabase.from(PRODUCT_IMAGES_TABLE).update({ ordem: image.ordem }).eq('id', image.id).select().single()),
+  );
+  const failed = results.find((result) => result.error);
+  if (failed?.error) throw new Error(failed.error.message);
+  return results.map((result) => result.data).filter(Boolean);
+}
+
+export async function deleteAdminProductImage(imageId) {
+  if (!imageId) throw new Error('Imagem inválida para remoção.');
+
+  if (!isSupabaseConfigured || !supabase) {
+    localProductImages = localProductImages.filter((item) => String(item.id) !== String(imageId));
+    return true;
+  }
+
+  const { error } = await supabase.from(PRODUCT_IMAGES_TABLE).delete().eq('id', imageId);
+  if (error) throw new Error(error.message);
+  return true;
 }
 
 export async function createAdminProduct(payload) {
