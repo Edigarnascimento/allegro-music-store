@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useStoreSettings } from '../hooks/useStoreSettings';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink } from '../lib/whatsapp';
 import { useCart } from '../context/CartContext';
@@ -26,6 +27,9 @@ function Header() {
   const [cartPulse, setCartPulse] = useState(false);
   const { totalItems } = useCart();
   const whatsappNumber = useStoreWhatsappNumber();
+  const storeSettings = useStoreSettings();
+  const logoUrl = storeSettings?.logo_url;
+  const storeName = storeSettings?.nome_loja || 'Allegro Music Store';
 
   useEffect(() => {
     let timeoutId;
@@ -65,9 +69,13 @@ function Header() {
       <div className="header-main-wrap">
         <div className="container header-main">
           <NavLink to="/" className="brand">
-            <span className="brand-mark">♫</span>
+            {logoUrl ? (
+              <img className="brand-logo" src={logoUrl} alt={`Logo ${storeName}`} />
+            ) : (
+              <span className="brand-mark">♫</span>
+            )}
             <span className="brand-text">
-              <strong>Allegro Music Store</strong>
+              <strong>{storeName}</strong>
               <small>Instrumentos e Áudio Profissional</small>
             </span>
           </NavLink>

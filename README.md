@@ -85,6 +85,17 @@ alter table public.music_configuracoes_loja add column if not exists footer_paym
 alter table public.music_configuracoes_loja add column if not exists footer_whatsapp_label text;
 ```
 
+### SQL sugerido para logo da loja em `music_configuracoes_loja`
+
+Se a coluna `logo_url` ainda não existir no Supabase, execute:
+
+```sql
+alter table public.music_configuracoes_loja
+add column if not exists logo_url text;
+```
+
+O upload da logo no painel administrativo reutiliza o bucket público de imagens de produto (`product-images`) e grava os arquivos na pasta `logos/`, usando a chave anônima do Supabase no frontend.
+
 ## Painel administrativo
 
 ### Rotas
@@ -131,9 +142,9 @@ npm run dev
 npm run build
 ```
 
-### Storage para imagens de produtos (`product-images`)
+### Storage para imagens de produtos e logos (`product-images`)
 
-Para o upload funcionar no painel (`/admin/produtos/novo` e `/admin/produtos/editar/:id`), crie um bucket no Supabase Storage:
+Para o upload funcionar no painel (`/admin/produtos/novo`, `/admin/produtos/editar/:id` e `/admin/configuracoes`), crie um bucket no Supabase Storage:
 
 1. No Supabase Dashboard, acesse **Storage > Buckets**.
 2. Clique em **Create bucket**.
@@ -174,7 +185,7 @@ to authenticated
 using (bucket_id = 'product-images');
 ```
 
-> Observação: se o bucket não existir, o cadastro/edição de produto continua disponível em modo mock/local, porém sem persistência remota de arquivos.
+> Observação: se o bucket não existir, o cadastro/edição de produto e a configuração de logo continuam disponíveis em modo mock/local, porém sem persistência remota de arquivos. As fotos de produto são gravadas em `products/` e as logos em `logos/` no mesmo bucket.
 
 ## Módulo de Interesses / Orçamentos (WhatsApp)
 

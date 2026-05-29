@@ -21,12 +21,15 @@ function Footer() {
   const atendimentoLinha2 = storeSettings?.atendimento_linha_2 || 'Sábado, das 8h às 18h';
   const footerPaymentNotice = storeSettings?.footer_payment_notice || 'Pagamentos via PIX e cartão online são processados com segurança.';
   const footerWhatsappLabel = storeSettings?.footer_whatsapp_label || 'Falar no WhatsApp';
+  const logoUrl = storeSettings?.logo_url;
+  const storeName = storeSettings?.nome_loja || 'Allegro Music Store';
 
   return (
     <footer className="footer">
       <div className="container footer-grid">
         <div>
-          <h3>{storeSettings?.nome_loja || 'Allegro Music Store'}</h3>
+          {logoUrl ? <img className="footer-logo" src={logoUrl} alt={`Logo ${storeName}`} /> : null}
+          <h3>{storeName}</h3>
           <p>{footerText}</p>
         </div>
         <div>

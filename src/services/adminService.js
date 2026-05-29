@@ -18,12 +18,12 @@ const CANCELED_ORDER_STATUSES = new Set(['cancelado', 'expirado', 'estornado']);
 
 const PRODUCT_IMAGES_BUCKET = 'product-images';
 
-function getProductImagePath(file) {
+function getImageUploadPath(file, folder = 'products') {
   const safeName = (file?.name || 'image').toLowerCase().replace(/[^a-z0-9.\-_]/g, '-');
-  return `products/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
+  return `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
 }
 
-export async function uploadProductImage(file) {
+async function uploadImageToProductBucket(file, folder = 'products') {
   if (!file) throw new Error('Selecione uma imagem antes de enviar.');
   if (!file.type?.startsWith('image/')) throw new Error('Apenas arquivos de imagem são permitidos.');
 
@@ -31,7 +31,7 @@ export async function uploadProductImage(file) {
     return URL.createObjectURL(file);
   }
 
-  const path = getProductImagePath(file);
+  const path = getImageUploadPath(file, folder);
 
   const { error: uploadError } = await supabase.storage
     .from(PRODUCT_IMAGES_BUCKET)
@@ -47,6 +47,14 @@ export async function uploadProductImage(file) {
   if (!data?.publicUrl) throw new Error('Não foi possível gerar URL pública para a imagem enviada.');
 
   return data.publicUrl;
+}
+
+export async function uploadProductImage(file) {
+  return uploadImageToProductBucket(file, 'products');
+}
+
+export async function uploadStoreLogo(file) {
+  return uploadImageToProductBucket(file, 'logos');
 }
 
 const mockSettings = {
