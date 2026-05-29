@@ -17,6 +17,7 @@ function ProductDetailsPage() {
   const whatsappNumber = useStoreWhatsappNumber();
   const { addToCart } = useCart();
   const [cartFeedback, setCartFeedback] = useState('');
+  const [selectedImageUrl, setSelectedImageUrl] = useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -34,6 +35,7 @@ function ProductDetailsPage() {
             preco: data.preco ?? data.price ?? 0,
             categoria: data.categoria ?? data.category,
             imagem_url: data.imagem_url ?? data.image,
+            imagens: Array.isArray(data.imagens) ? data.imagens : [],
             estoque: Number.isFinite(Number(data.estoque)) ? Number(data.estoque) : null,
           });
         }
@@ -45,6 +47,10 @@ function ProductDetailsPage() {
     loadProduct();
     return () => { isMounted = false; };
   }, [productId]);
+
+  useEffect(() => {
+    setSelectedImageUrl(product?.imagem_url || PRODUCT_IMAGE_FALLBACK);
+  }, [product?.id, product?.imagem_url]);
 
   if (loading) return <section className="container section"><h1>Carregando produto...</h1></section>;
   if (!product) return <section className="container section"><h1>Produto não encontrado</h1><Link to="/catalogo" className="btn">Voltar ao catálogo</Link></section>;
@@ -62,6 +68,11 @@ function ProductDetailsPage() {
   const indisponivel = estoqueInformado && Number(product.estoque) <= 0;
   const estoqueBaixo = estoqueInformado && Number(product.estoque) > 0 && Number(product.estoque) <= 3;
   const estoqueStatus = indisponivel ? 'Indisponível' : estoqueBaixo ? `Últimas unidades (${product.estoque})` : 'Em estoque';
+  const galleryImages = [
+    { id: 'principal', image_url: product.imagem_url || PRODUCT_IMAGE_FALLBACK, label: 'Imagem principal' },
+    ...(product.imagens || []).map((image, index) => ({ ...image, label: `Foto adicional ${index + 1}` })),
+  ].filter((image) => image.image_url);
+  const currentImageUrl = selectedImageUrl || product.imagem_url || PRODUCT_IMAGE_FALLBACK;
 
   async function handleWhatsappClick(event) {
     event.preventDefault();
@@ -85,15 +96,32 @@ function ProductDetailsPage() {
     <section className="container section">
       <Breadcrumbs items={[{ label: 'Início', to: '/' }, { label: 'Catálogo', to: '/catalogo' }, { label: product.nome }]} />
       <div className="product-details">
-        <img
-          src={product.imagem_url || PRODUCT_IMAGE_FALLBACK}
-          alt={product.nome}
-          className="details-image"
-          onError={(event) => {
-            event.currentTarget.onerror = null;
-            event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
-          }}
-        />
+        <div className="product-gallery">
+          <img
+            src={currentImageUrl}
+            alt={product.nome}
+            className="details-image"
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
+            }}
+          />
+          {galleryImages.length > 1 ? (
+            <div className="product-gallery-thumbs" aria-label="Galeria de imagens do produto">
+              {galleryImages.map((image) => (
+                <button
+                  className={`product-gallery-thumb ${currentImageUrl === image.image_url ? 'is-active' : ''}`}
+                  type="button"
+                  key={image.id || image.image_url}
+                  onClick={() => setSelectedImageUrl(image.image_url)}
+                  aria-label={`Ver ${image.label}`}
+                >
+                  <img src={image.image_url} alt="" />
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
         <div className="details-content">
           <span className="badge">{product.categoria}</span>
           <h1>{product.nome}</h1>

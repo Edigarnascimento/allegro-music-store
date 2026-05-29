@@ -65,6 +65,59 @@ VITE_SUPABASE_ANON_KEY=SUA_ANON_KEY
 - `music_produtos`
 - `music_categorias`
 - `music_configuracoes_loja`
+- `music_produto_imagens` (opcional para galeria de fotos adicionais por produto)
+
+
+### SQL sugerido para galeria de imagens de produto
+
+A imagem principal continua no campo `imagem_url` da tabela `music_produtos`. Para fotos adicionais, crie a tabela abaixo:
+
+```sql
+create table if not exists public.music_produto_imagens (
+  id uuid primary key default gen_random_uuid(),
+  produto_id uuid not null references public.music_produtos(id) on delete cascade,
+  image_url text not null,
+  ordem integer default 0,
+  is_principal boolean default false,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_music_produto_imagens_produto_id
+on public.music_produto_imagens(produto_id);
+```
+
+#### Políticas RLS recomendadas para `music_produto_imagens`
+
+As políticas abaixo mantêm leitura pública da galeria no site e escrita apenas por usuários autenticados do painel admin, sem uso de `service_role` no frontend:
+
+```sql
+alter table public.music_produto_imagens enable row level security;
+
+create policy "Public can view product gallery images"
+on public.music_produto_imagens
+for select
+to anon, authenticated
+using (true);
+
+create policy "Authenticated users can insert product gallery images"
+on public.music_produto_imagens
+for insert
+to authenticated
+with check (true);
+
+create policy "Authenticated users can update product gallery images"
+on public.music_produto_imagens
+for update
+to authenticated
+using (true)
+with check (true);
+
+create policy "Authenticated users can delete product gallery images"
+on public.music_produto_imagens
+for delete
+to authenticated
+using (true);
+```
 
 ### SQL sugerido para campos PIX em `music_configuracoes_loja`
 
@@ -114,10 +167,12 @@ O upload da logo no painel administrativo reutiliza o bucket público de imagens
 - `descricao`
 - `preco`
 - `categoria`
-- `imagem_url`
+- `imagem_url` (imagem principal, preservada para cards, carrinho e checkout)
 - `destaque`
 - `ativo`
 - `estoque`
+
+As fotos adicionais ficam em `music_produto_imagens.image_url`, relacionadas por `produto_id`, e são gerenciadas na seção “Galeria de imagens do produto” do cadastro/edição.
 
 ### Proteção de rotas administrativas
 
@@ -185,7 +240,7 @@ to authenticated
 using (bucket_id = 'product-images');
 ```
 
-> Observação: se o bucket não existir, o cadastro/edição de produto e a configuração de logo continuam disponíveis em modo mock/local, porém sem persistência remota de arquivos. As fotos de produto são gravadas em `products/` e as logos em `logos/` no mesmo bucket.
+> Observação: se o bucket não existir, o cadastro/edição de produto e a configuração de logo continuam disponíveis em modo mock/local, porém sem persistência remota de arquivos. As fotos principais de produto são gravadas em `products/`, as fotos adicionais da galeria em `products/gallery/` e as logos em `logos/` no mesmo bucket.
 
 ## Módulo de Interesses / Orçamentos (WhatsApp)
 

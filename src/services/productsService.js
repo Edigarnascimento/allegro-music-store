@@ -2,6 +2,31 @@ import { products as mockProducts } from '../data/products';
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 
 const PRODUCTS_TABLE = 'music_produtos';
+const PRODUCT_IMAGES_TABLE = 'music_produto_imagens';
+
+function normalizeGalleryImages(images = []) {
+  return images
+    .filter((image) => image?.image_url)
+    .sort((a, b) => Number(a.ordem ?? 0) - Number(b.ordem ?? 0));
+}
+
+async function getProductImages(productId) {
+  if (!productId || !isSupabaseConfigured || !supabase) return [];
+
+  const { data, error } = await supabase
+    .from(PRODUCT_IMAGES_TABLE)
+    .select('*')
+    .eq('produto_id', productId)
+    .order('ordem', { ascending: true })
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.warn('[productsService] galeria indisponível para o produto:', error.message);
+    return [];
+  }
+
+  return normalizeGalleryImages(data ?? []);
+}
 
 export async function getProducts() {
   if (!isSupabaseConfigured || !supabase) {
@@ -34,5 +59,10 @@ export async function getProductById(productId) {
     return mockProducts.find((product) => product.id === productId) ?? null;
   }
 
-  return data ?? mockProducts.find((product) => product.id === productId) ?? null;
+  const fallbackProduct = mockProducts.find((product) => product.id === productId) ?? null;
+  const product = data ?? fallbackProduct;
+  if (!product) return null;
+
+  const imagens = data ? await getProductImages(product.id) : [];
+  return { ...product, imagens };
 }
