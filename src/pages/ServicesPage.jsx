@@ -1,7 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink } from '../lib/whatsapp';
+import { getActiveServiceWorks, getPlaceholderServiceWorks } from '../services/serviceWorksService';
 
 const servicesSections = [
   {
@@ -45,15 +47,7 @@ const servicesSections = [
   },
 ];
 
-const galleryItems = [
-  { title: 'Antes e depois de regulagem', description: 'Comparativo visual do instrumento após regulagem e ajustes de tocabilidade.' },
-  { title: 'Troca de cordas', description: 'Substituição completa com calibres adequados para seu estilo e instrumento.' },
-  { title: 'Ajuste técnico', description: 'Correções de ação, oitavas e conforto para melhor desempenho.' },
-  { title: 'Retífica de trastes', description: 'Nivelamento para eliminar trastejamento e melhorar a afinação.' },
-  { title: 'Escrita de partitura', description: 'Material personalizado para estudo, ensaio e apresentação.' },
-  { title: 'Arranjo musical', description: 'Criação de arranjos para formações diversas com foco musical e prático.' },
-  { title: 'Aulas e prática musical', description: 'Momentos de aprendizado com foco em evolução técnica e musicalidade.' },
-];
+const fallbackGalleryItems = getPlaceholderServiceWorks();
 
 const faqs = [
   {
@@ -76,6 +70,22 @@ const faqs = [
 
 function ServicesPage() {
   const whatsappNumber = useStoreWhatsappNumber();
+  const [serviceWorks, setServiceWorks] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    getActiveServiceWorks().then((works) => {
+      if (isMounted) setServiceWorks(works);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const galleryItems = serviceWorks.length ? serviceWorks : fallbackGalleryItems;
+  const hasRealWorks = serviceWorks.length > 0;
 
   return (
     <section className="container section services-page">
@@ -109,16 +119,27 @@ function ServicesPage() {
       <div className="services-section-card">
         <div className="services-section-head">
           <h2>Trabalhos realizados</h2>
-          <p>Exemplos de serviços e resultados. Em breve, esta galeria receberá fotos reais dos trabalhos da Allegro Music Store.</p>
+          <p>{hasRealWorks ? 'Fotos reais dos serviços e resultados entregues pela Allegro Music Store.' : 'Exemplos de serviços e resultados. Em breve, esta galeria receberá fotos reais dos trabalhos da Allegro Music Store.'}</p>
         </div>
         <div className="work-gallery-grid">
-          {galleryItems.map((item) => (
-            <article key={item.title} className="work-gallery-card">
-              <div className="work-gallery-image" aria-hidden="true">Imagem</div>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-            </article>
-          ))}
+          {galleryItems.map((item) => {
+            const title = item.titulo || item.title;
+            const description = item.descricao || item.description;
+            const imageUrl = item.imagem_url;
+
+            return (
+              <article key={item.id || title} className="work-gallery-card">
+                {imageUrl ? (
+                  <img className="work-gallery-photo" src={imageUrl} alt={title} loading="lazy" />
+                ) : (
+                  <div className="work-gallery-image" aria-hidden="true">Imagem</div>
+                )}
+                {item.categoria ? <span className="work-gallery-category">{item.categoria}</span> : null}
+                <h3>{title}</h3>
+                <p>{description}</p>
+              </article>
+            );
+          })}
         </div>
       </div>
 

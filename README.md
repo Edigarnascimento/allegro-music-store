@@ -173,6 +173,44 @@ values
 on conflict do nothing;
 ```
 
+### SQL sugerido para galeria “Trabalhos realizados”
+
+A página pública `/servicos` busca os trabalhos ativos na tabela `music_trabalhos_realizados`, ordenando pelo campo `ordem`. O painel administrativo em `/admin/trabalhos-realizados` permite listar, criar, editar, excluir, ativar/desativar, alterar a ordem e enviar imagens para o bucket `product-images`, na pasta `services/works/`.
+
+```sql
+create table if not exists public.music_trabalhos_realizados (
+  id uuid primary key default gen_random_uuid(),
+  titulo text not null,
+  descricao text,
+  categoria text,
+  imagem_url text,
+  ordem integer default 0,
+  ativo boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists idx_music_trabalhos_realizados_ativo_ordem
+on public.music_trabalhos_realizados(ativo, ordem);
+
+alter table public.music_trabalhos_realizados enable row level security;
+
+create policy "Public can view active service works"
+on public.music_trabalhos_realizados
+for select
+to anon, authenticated
+using (ativo = true);
+
+create policy "Authenticated users can manage service works"
+on public.music_trabalhos_realizados
+for all
+to authenticated
+using (true)
+with check (true);
+```
+
+> Observação: se não houver trabalhos cadastrados/ativos, `/servicos` mantém os placeholders originais da seção “Trabalhos realizados”.
+
 ### SQL sugerido para campos PIX em `music_configuracoes_loja`
 
 ```sql
@@ -214,6 +252,7 @@ O upload da logo no painel administrativo reutiliza o bucket público de imagens
 - `/admin/produtos/editar/:id`: edição de produto
 - `/admin/categorias`: gerenciamento de categorias
 - `/admin/configuracoes`: edição de configurações da loja
+- `/admin/trabalhos-realizados`: gerenciamento da galeria “Trabalhos realizados” exibida em `/servicos`
 
 ### Campos de produto suportados
 
@@ -294,7 +333,7 @@ to authenticated
 using (bucket_id = 'product-images');
 ```
 
-> Observação: se o bucket não existir, o cadastro/edição de produto e a configuração de logo continuam disponíveis em modo mock/local, porém sem persistência remota de arquivos. As fotos principais de produto são gravadas em `products/`, as fotos adicionais da galeria em `products/gallery/` e as logos em `logos/` no mesmo bucket.
+> Observação: se o bucket não existir, o cadastro/edição de produto e a configuração de logo continuam disponíveis em modo mock/local, porém sem persistência remota de arquivos. As fotos principais de produto são gravadas em `products/`, as fotos adicionais da galeria em `products/gallery/`, as logos em `logos/` e os trabalhos realizados em `services/works/` no mesmo bucket.
 
 ## Módulo de Interesses / Orçamentos (WhatsApp)
 
