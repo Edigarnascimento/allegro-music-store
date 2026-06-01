@@ -5,6 +5,7 @@ import { buildWhatsAppLink, formatPriceBRL, resolveWhatsappNumber } from '../lib
 import { createInterest } from '../services/interessesService';
 import { useCart } from '../context/CartContext';
 import { useState } from 'react';
+import { trackEvent } from '../services/analyticsService';
 
 const PRODUCT_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80';
 
@@ -48,6 +49,12 @@ function ProductCard({ product }) {
 
   async function handleWhatsappClick(event) {
     event.preventDefault();
+    trackEvent('click_whatsapp', {
+      origem: 'product_card',
+      produto_id: normalizedProduct.id,
+      produto_nome: normalizedProduct.nome,
+      categoria: normalizedProduct.categoria ?? '',
+    });
 
     try {
       await createInterest({
@@ -65,6 +72,12 @@ function ProductCard({ product }) {
   }
 
   function handleAddToCart(goToCheckout = false) {
+    trackEvent(goToCheckout ? 'click_checkout' : 'click_cart', {
+      origem: goToCheckout ? 'product_card_buy_now' : 'product_card_add_to_cart',
+      produto_id: normalizedProduct.id,
+      produto_nome: normalizedProduct.nome,
+      categoria: normalizedProduct.categoria ?? '',
+    });
     setAddingToCart(true);
     const result = addToCart(normalizedProduct);
     setAddingToCart(false);
@@ -107,8 +120,8 @@ function ProductCard({ product }) {
           <div className="cart-added-banner" role="status" aria-live="polite">
             <strong>Produto adicionado ao carrinho.</strong>
             <div className="cart-added-actions">
-              <Link to="/carrinho" className="btn btn-secondary btn-compact">Ver carrinho</Link>
-              <Link to="/checkout" className="btn btn-secondary btn-compact">Finalizar compra</Link>
+              <Link to="/carrinho" className="btn btn-secondary btn-compact" onClick={() => trackEvent('click_cart', { origem: 'product_card_added_banner' })}>Ver carrinho</Link>
+              <Link to="/checkout" className="btn btn-secondary btn-compact" onClick={() => trackEvent('click_checkout', { origem: 'product_card_added_banner' })}>Finalizar compra</Link>
               <button type="button" className="btn btn-secondary btn-compact" onClick={() => setAddedToCart(false)}>Continuar</button>
             </div>
           </div>

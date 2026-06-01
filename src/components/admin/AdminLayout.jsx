@@ -28,6 +28,7 @@ export default function AdminLayout() {
           <NavLink to="/admin/pedidos" className="admin-link">Pedidos</NavLink>
           <NavLink to="/admin/pagamentos" className="admin-link">Pagamentos</NavLink>
           <NavLink to="/admin/auditoria" className="admin-link">Auditoria</NavLink>
+          <NavLink to="/admin/analytics" className="admin-link">Analytics</NavLink>
         </nav>
         {user ? (
           <p className="admin-user-badge" title={user.email || 'Usuário autenticado'}>

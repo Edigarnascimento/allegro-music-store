@@ -7,6 +7,7 @@ import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { WhatsAppIcon } from '../components/PublicButtonIcons';
 import { getStoreSettings } from '../services/storeSettingsService';
 import { createAsaasCardPayment, createAsaasPixPayment } from '../services/paymentsService';
+import { trackEvent } from '../services/analyticsService';
 
 const deliveryLabels = {
   retirada_na_loja: 'Retirada na loja',
@@ -68,6 +69,10 @@ function buildOrderWhatsappSummary(summary) {
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCart();
+
+  useEffect(() => {
+    trackEvent('click_checkout', { origem: 'checkout_page_access' });
+  }, []);
   const whatsappNumber = useStoreWhatsappNumber();
   const [form, setForm] = useState({
     nome: '',

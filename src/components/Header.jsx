@@ -4,6 +4,7 @@ import { useStoreSettings } from '../hooks/useStoreSettings';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink } from '../lib/whatsapp';
 import { useCart } from '../context/CartContext';
+import { trackEvent } from '../services/analyticsService';
 
 const quickLinks = [
   { label: 'Serviços', to: '/servicos' },
@@ -60,9 +61,9 @@ function Header() {
           <span className="topbar-note">Loja online de instrumentos, áudio e serviços musicais</span>
           <nav className="quick-links" aria-label="Links rápidos">
             {quickLinks.map((link) => (
-              <NavLink key={link.label} to={link.to}>{link.label}</NavLink>
+              <NavLink key={link.label} to={link.to} onClick={() => { if (link.to === '/servicos') trackEvent('click_services', { origem: 'header_topbar' }); }}>{link.label}</NavLink>
             ))}
-            <a href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda na loja.')} target="_blank" rel="noreferrer">WhatsApp</a>
+            <a href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda na loja.')} target="_blank" rel="noreferrer" onClick={() => trackEvent('click_whatsapp', { origem: 'header_topbar' })}>WhatsApp</a>
           </nav>
         </div>
       </div>
@@ -89,7 +90,7 @@ function Header() {
             />
             <button type="submit" className="btn btn-main btn-search">Buscar</button>
           </form>
-          <NavLink to="/carrinho" className={`btn btn-secondary cart-shortcut ${cartPulse ? 'is-highlighted' : ''}`} aria-live="polite" aria-label={`Carrinho com ${totalItems} item(ns)`}>
+          <NavLink to="/carrinho" className={`btn btn-secondary cart-shortcut ${cartPulse ? 'is-highlighted' : ''}`} aria-live="polite" aria-label={`Carrinho com ${totalItems} item(ns)`} onClick={() => trackEvent('click_cart', { origem: 'header' })}>
             <span role="img" aria-hidden="true">🛒</span>
             <span>Carrinho</span>
             <span className="cart-counter">{totalItems}</span>
@@ -99,7 +100,7 @@ function Header() {
       <div className="menu-bar marketplace-nav">
         <nav className="container menu-content" aria-label="Navegação principal">
           {navigationLinks.map((link) => (
-            <Link key={link.label} to={link.to} className="menu-link">
+            <Link key={link.label} to={link.to} className="menu-link" onClick={() => { if (link.to === '/servicos') trackEvent('click_services', { origem: 'header_menu' }); }}>
               {link.label}
             </Link>
           ))}

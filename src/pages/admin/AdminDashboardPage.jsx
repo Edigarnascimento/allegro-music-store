@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminDashboardStats } from '../../services/adminService';
+import { getAnalyticsDashboardStats } from '../../services/analyticsService';
 import { formatOrderStatus } from '../../lib/orderFormatters';
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -29,9 +30,11 @@ function EmptyState({ message }) {
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
+  const [analyticsSummary, setAnalyticsSummary] = useState(null);
 
   useEffect(() => {
     getAdminDashboardStats().then(setStats);
+    getAnalyticsDashboardStats(1).then(setAnalyticsSummary);
   }, []);
 
   const cards = useMemo(() => {
@@ -72,8 +75,22 @@ export default function AdminDashboardPage() {
           <Link className="admin-dashboard-quick-link" to="/admin/pedidos">Ver pedidos</Link>
           <Link className="admin-dashboard-quick-link" to="/admin/produtos">Ver produtos</Link>
           <Link className="admin-dashboard-quick-link" to="/admin/interesses">Ver interesses</Link>
+          <Link className="admin-dashboard-quick-link" to="/admin/analytics">Ver analytics</Link>
         </div>
       </section>
+
+      {analyticsSummary ? (
+        <section className="admin-stats-grid admin-dashboard-analytics-summary" aria-label="Resumo de analytics">
+          <article className="admin-stat-card">
+            <h3>Visitas hoje</h3>
+            <p>{analyticsSummary.cards.visitasHoje}</p>
+          </article>
+          <article className="admin-stat-card">
+            <h3>Cliques WhatsApp hoje</h3>
+            <p>{analyticsSummary.cards.cliquesWhatsapp}</p>
+          </article>
+        </section>
+      ) : null}
 
       <section className="admin-kpi-grid">
         <article className="admin-page">

@@ -4,6 +4,7 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink } from '../lib/whatsapp';
 import { getActiveServiceWorks, getPlaceholderServiceWorks } from '../services/serviceWorksService';
+import { trackEvent } from '../services/analyticsService';
 
 const servicesSections = [
   {
@@ -73,6 +74,10 @@ function ServicesPage() {
   const [serviceWorks, setServiceWorks] = useState([]);
 
   useEffect(() => {
+    trackEvent('click_services', { origem: 'services_page_access' });
+  }, []);
+
+  useEffect(() => {
     let isMounted = true;
 
     getActiveServiceWorks().then((works) => {
@@ -108,7 +113,7 @@ function ServicesPage() {
                 <article key={service.name} className="service-detail-card">
                   <h3>{service.name}</h3>
                   <p className="service-price">{service.price}</p>
-                  <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, text)} target="_blank" rel="noreferrer">Solicitar orçamento</a>
+                  <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, text)} target="_blank" rel="noreferrer" onClick={() => trackEvent('click_whatsapp', { origem: 'services_budget', servico: service.name })}>Solicitar orçamento</a>
                 </article>
               );
             })}
@@ -160,7 +165,7 @@ function ServicesPage() {
       <div className="services-cta">
         <h2>Precisa de um serviço musical personalizado?</h2>
         <p>Fale com a Allegro Music Store pelo WhatsApp e receba orientação para o serviço ideal.</p>
-        <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, 'Olá! Vim pelo site da Allegro Music Store e quero orientação sobre os serviços musicais.')} target="_blank" rel="noreferrer">Falar no WhatsApp</a>
+        <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, 'Olá! Vim pelo site da Allegro Music Store e quero orientação sobre os serviços musicais.')} target="_blank" rel="noreferrer" onClick={() => trackEvent('click_whatsapp', { origem: 'services_cta' })}>Falar no WhatsApp</a>
       </div>
 
       <div className="catalog-highlight">
