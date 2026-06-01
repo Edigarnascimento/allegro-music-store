@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useStoreSettings } from '../hooks/useStoreSettings';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink } from '../lib/whatsapp';
+import { trackEvent } from '../services/analyticsService';
 
 const storeSite = 'https://www.allegromusicstore.com.br';
 const services = 'instrumentos, acessórios, luteria, partituras, arranjos e aulas';
@@ -12,6 +14,10 @@ function DigitalCardPage() {
   const logoUrl = storeSettings?.logo_url;
   const storeAddress = storeSettings?.endereco;
   const whatsappLink = buildWhatsAppLink(whatsappNumber, 'Olá, acessei o site da Allegro Music Store e gostaria de atendimento.');
+
+  useEffect(() => {
+    trackEvent('click_digital_card', { origem: 'digital_card_page_access' });
+  }, []);
 
   return (
     <section className="digital-card-page section">
@@ -35,7 +41,7 @@ function DigitalCardPage() {
                 </li>
                 <li>
                   <strong>WhatsApp:</strong>{' '}
-                  <a href={whatsappLink} target="_blank" rel="noreferrer">{whatsappNumber}</a>
+                  <a href={whatsappLink} target="_blank" rel="noreferrer" onClick={() => trackEvent('click_whatsapp', { origem: 'digital_card_contact' })}>{whatsappNumber}</a>
                 </li>
                 {storeAddress ? <li><strong>Endereço:</strong> {storeAddress}</li> : null}
                 <li>
@@ -66,8 +72,8 @@ function DigitalCardPage() {
 
           <div className="digital-card-actions" aria-label="Ações do cartão digital">
             <a className="btn" href={storeSite} target="_blank" rel="noreferrer">Comprar na loja online</a>
-            <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer">Falar no WhatsApp</a>
-            <a className="btn btn-secondary" href="/servicos">Ver serviços musicais</a>
+            <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer" onClick={() => trackEvent('click_whatsapp', { origem: 'digital_card_actions' })}>Falar no WhatsApp</a>
+            <a className="btn btn-secondary" href="/servicos" onClick={() => trackEvent('click_services', { origem: 'digital_card_actions' })}>Ver serviços musicais</a>
           </div>
         </div>
       </div>

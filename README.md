@@ -67,7 +67,64 @@ VITE_SUPABASE_ANON_KEY=SUA_ANON_KEY
 - `music_configuracoes_loja`
 - `music_produto_imagens` (opcional para galeria de fotos adicionais por produto)
 - `music_home_videos` (cards da seção “Chegou na Allegro” da Home)
+- `music_analytics_events` (eventos internos de visitas e cliques, sem dados sensíveis)
 
+
+
+### SQL sugerido para Analytics interno
+
+O painel `/admin/analytics` lê os eventos registrados na tabela `music_analytics_events`. O frontend usa somente a `anon key` configurada em `VITE_SUPABASE_ANON_KEY` e falha silenciosamente se a tabela ainda não existir.
+
+> Não salve CPF, telefone, e-mail, endereço, dados de pagamento ou outros dados sensíveis em `metadata`.
+
+```sql
+create table if not exists public.music_analytics_events (
+  id uuid primary key default gen_random_uuid(),
+  event_name text not null,
+  page_path text,
+  produto_id uuid null,
+  produto_nome text,
+  metadata jsonb default '{}'::jsonb,
+  user_agent text,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_music_analytics_events_created_at
+on public.music_analytics_events(created_at);
+
+create index if not exists idx_music_analytics_events_event_name
+on public.music_analytics_events(event_name);
+```
+
+#### Políticas RLS recomendadas para `music_analytics_events`
+
+Visitantes públicos podem inserir eventos, usuários autenticados do painel podem visualizar os dados e visitantes públicos não conseguem ler os eventos diretamente.
+
+```sql
+alter table public.music_analytics_events enable row level security;
+
+create policy "Public can insert analytics events"
+on public.music_analytics_events
+for insert
+to anon, authenticated
+with check (true);
+
+create policy "Authenticated users can view analytics events"
+on public.music_analytics_events
+for select
+to authenticated
+using (true);
+```
+
+Eventos registrados pelo site:
+
+- `page_view_home`
+- `page_view_product`
+- `click_whatsapp`
+- `click_cart`
+- `click_services`
+- `click_digital_card`
+- `click_checkout`
 
 ### SQL sugerido para galeria de imagens de produto
 

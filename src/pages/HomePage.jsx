@@ -9,6 +9,7 @@ import { getCategories } from '../services/categoriesService';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink } from '../lib/whatsapp';
 import { DEFAULT_HOME_VIDEO_WHATSAPP_MESSAGE, getHomeVideos } from '../services/homeVideosService';
+import { trackEvent } from '../services/analyticsService';
 
 const fallbackFeaturedCategories = [
   { icon: 'accessories', title: 'Acessórios', category: 'Acessórios', description: 'Palhetas, correias, cabos e itens essenciais para o dia a dia.' },
@@ -59,6 +60,10 @@ function HomePage() {
   const [loadingArrivalVideos, setLoadingArrivalVideos] = useState(true);
   const whatsappNumber = useStoreWhatsappNumber();
   const location = useLocation();
+
+  useEffect(() => {
+    trackEvent('page_view_home');
+  }, []);
 
   useEffect(() => {
     if (!location.hash) return;
@@ -164,7 +169,7 @@ function HomePage() {
             <p>Catálogo com produtos selecionados, atendimento especializado e suporte completo para músicos, igrejas e estúdios.</p>
             <div className="hero-actions">
               <Link className="btn btn-main" to="/catalogo"><span>Ver catálogo completo</span><ArrowIcon /></Link>
-              <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, 'Olá! Quero consultoria para comprar equipamentos.')} target="_blank" rel="noreferrer"><WhatsAppIcon /><span>Atendimento via WhatsApp</span></a>
+              <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, 'Olá! Quero consultoria para comprar equipamentos.')} target="_blank" rel="noreferrer" onClick={() => trackEvent('click_whatsapp', { origem: 'home_hero' })}><WhatsAppIcon /><span>Atendimento via WhatsApp</span></a>
             </div>
           </div>
           <aside className="hero-panel">
@@ -186,7 +191,7 @@ function HomePage() {
         </div>
         <div className="features-grid marketplace-categories" aria-label="Categorias em destaque">
           {featuredCategories.map((item) => (
-            <Link key={item.title} className="feature-card category-card" to={item.isService ? '/servicos' : `/catalogo?categoria=${encodeURIComponent(item.category)}`}>
+            <Link key={item.title} className="feature-card category-card" to={item.isService ? '/servicos' : `/catalogo?categoria=${encodeURIComponent(item.category)}`} onClick={() => { if (item.isService) trackEvent('click_services', { origem: 'home_categorias' }); }}>
               <span className="category-card-icon"><CategoryIcon type={item.icon} /></span>
               <span className="category-card-title">{item.title}</span>
               <span className="category-card-description">{item.description}</span>
@@ -244,6 +249,7 @@ function HomePage() {
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackEvent('click_whatsapp', { origem: 'home_chegou_na_allegro' })}
                   >
                     <WhatsAppIcon />
                     <span>Falar no WhatsApp</span>
@@ -262,7 +268,7 @@ function HomePage() {
         </div>
         <div className="services-grid">
           {services.slice(0, 3).map((service) => (
-            <Link key={service.title} className="service-card service-card-link" to="/servicos">
+            <Link key={service.title} className="service-card service-card-link" to="/servicos" onClick={() => trackEvent('click_services', { origem: 'home_servicos' })}>
               <h3>{service.title}</h3>
               <p>{service.description}</p>
             </Link>

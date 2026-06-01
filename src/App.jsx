@@ -20,6 +20,7 @@ import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminInteressesPage from './pages/admin/AdminInteressesPage';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import AdminAuditPage from './pages/admin/AdminAuditPage';
+import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminPaymentsPage from './pages/admin/AdminPaymentsPage';
 import AdminHomeVideosPage from './pages/admin/AdminHomeVideosPage';
 import AdminServiceWorksPage from './pages/admin/AdminServiceWorksPage';
@@ -66,6 +67,7 @@ function App() {
               <Route path="/admin/pedidos" element={<AdminOrdersPage />} />
               <Route path="/admin/pagamentos" element={<AdminPaymentsPage />} />
               <Route path="/admin/auditoria" element={<AdminAuditPage />} />
+              <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

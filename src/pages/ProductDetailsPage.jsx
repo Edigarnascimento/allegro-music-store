@@ -7,6 +7,7 @@ import { buildWhatsAppLink, formatPriceBRL, resolveWhatsappNumber } from '../lib
 import { getProductById } from '../services/productsService';
 import { createInterest } from '../services/interessesService';
 import { useCart } from '../context/CartContext';
+import { trackEvent } from '../services/analyticsService';
 
 const PRODUCT_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80';
 
@@ -52,6 +53,15 @@ function ProductDetailsPage() {
     setSelectedImageUrl(product?.imagem_url || PRODUCT_IMAGE_FALLBACK);
   }, [product?.id, product?.imagem_url]);
 
+  useEffect(() => {
+    if (!product) return;
+    trackEvent('page_view_product', {
+      produto_id: product.id,
+      produto_nome: product.nome,
+      categoria: product.categoria ?? '',
+    });
+  }, [product]);
+
   if (loading) return <section className="container section"><h1>Carregando produto...</h1></section>;
   if (!product) return <section className="container section"><h1>Produto não encontrado</h1><Link to="/catalogo" className="btn">Voltar ao catálogo</Link></section>;
 
@@ -76,6 +86,12 @@ function ProductDetailsPage() {
 
   async function handleWhatsappClick(event) {
     event.preventDefault();
+    trackEvent('click_whatsapp', {
+      origem: 'product_details',
+      produto_id: product.id,
+      produto_nome: product.nome,
+      categoria: product.categoria ?? '',
+    });
 
     try {
       await createInterest({
@@ -137,7 +153,7 @@ function ProductDetailsPage() {
           </ul>
           <div className="product-actions">
             <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer" onClick={handleWhatsappClick}><WhatsAppIcon /><span>Falar no WhatsApp</span></a>
-            <button className="btn btn-cart" type="button" disabled={indisponivel} onClick={() => { const result = addToCart(product); if (!result?.ok) setCartFeedback(result.message); else setCartFeedback(''); }}><CartIcon /><span>{indisponivel ? 'Indisponível' : 'Adicionar ao carrinho'}</span></button>
+            <button className="btn btn-cart" type="button" disabled={indisponivel} onClick={() => { trackEvent('click_cart', { origem: 'product_details', produto_id: product.id, produto_nome: product.nome }); const result = addToCart(product); if (!result?.ok) setCartFeedback(result.message); else setCartFeedback(''); }}><CartIcon /><span>{indisponivel ? 'Indisponível' : 'Adicionar ao carrinho'}</span></button>
             <Link to="/catalogo" className="btn btn-secondary">Voltar ao catálogo</Link>
           </div>
         </div>

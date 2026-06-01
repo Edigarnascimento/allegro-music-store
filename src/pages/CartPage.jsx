@@ -1,12 +1,22 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { formatPriceBRL } from '../lib/whatsapp';
+import { trackEvent } from '../services/analyticsService';
 
 export default function CartPage() {
   const { items, subtotal, updateQuantity, removeFromCart } = useCart();
   const [feedback, setFeedback] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    trackEvent('click_cart', { origem: 'cart_page_access' });
+  }, []);
+
+  function goToCheckout(source) {
+    trackEvent('click_checkout', { origem: source });
+    navigate('/checkout');
+  }
 
   if (!items.length) {
     return (
@@ -26,7 +36,7 @@ export default function CartPage() {
         <h1>Seu carrinho</h1>
         <p className="subtitle">Revise os itens, ajuste quantidades e finalize quando quiser.</p>
         <div className="cart-cta-group cart-cta-top">
-          <button className="btn" onClick={() => navigate('/checkout')}>Finalizar compra</button>
+          <button className="btn" onClick={() => goToCheckout('cart_top')}>Finalizar compra</button>
           <Link className="btn btn-secondary" to="/catalogo">Continuar comprando</Link>
         </div>
         {feedback ? <p className="admin-alert error">{feedback}</p> : null}
@@ -70,7 +80,7 @@ export default function CartPage() {
           </div>
           <div className="cart-cta-group">
             <Link className="btn btn-secondary" to="/catalogo">Continuar comprando</Link>
-            <button className="btn" onClick={() => navigate('/checkout')}>Finalizar compra</button>
+            <button className="btn" onClick={() => goToCheckout('cart_top')}>Finalizar compra</button>
           </div>
         </div>
       </div>

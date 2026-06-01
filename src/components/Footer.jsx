@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { useStoreSettings } from '../hooks/useStoreSettings';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink } from '../lib/whatsapp';
+import { trackEvent } from '../services/analyticsService';
 
 const institutionalLinks = [
   { label: 'Política de Privacidade', to: '/institucional/privacidade' },
@@ -40,7 +41,7 @@ function Footer() {
         </div>
         <div>
           <h4>Contato rápido</h4>
-          <a href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda com um pedido na Allegro Music Store.')} target="_blank" rel="noreferrer">{footerWhatsappLabel}</a>
+          <a href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda com um pedido na Allegro Music Store.')} target="_blank" rel="noreferrer" onClick={() => trackEvent('click_whatsapp', { origem: 'footer' })}>{footerWhatsappLabel}</a>
           {storeSettings?.endereco ? <p>{storeSettings.endereco}</p> : null}
           {contactEmail ? <p>{contactEmail}</p> : <p>Atendimento principal pelo WhatsApp</p>}
         </div>
