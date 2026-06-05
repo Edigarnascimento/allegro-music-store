@@ -67,8 +67,8 @@ function CatalogPage() {
     <section className="container section">
       <Breadcrumbs items={[{ label: 'Início', to: '/' }, { label: 'Catálogo' }]} />
       <div className="section-heading">
-        <h1>Catálogo de Produtos</h1>
-        <p className="subtitle">Instrumentos selecionados para quem busca performance, timbre e confiabilidade.</p>
+        <h1>Catálogo de instrumentos musicais e acessórios</h1>
+        <p className="subtitle">Encontre instrumentos musicais, cordas, acessórios, equipamentos de áudio, violões, guitarras e produtos selecionados para estudo, igreja, palco e uso profissional.</p>
         {query || category ? (
           <div className="catalog-search-info">
             {query ? <p className="subtitle">Resultados para “{query}”</p> : null}
@@ -78,10 +78,10 @@ function CatalogPage() {
         ) : null}
       </div>
       <div className="catalog-highlight">
-        <p>Precisa de ajuda para escolher? Nossa equipe recomenda o melhor setup para seu estilo.</p>
+        <p>Precisa de ajuda para escolher cordas para violão, acessórios musicais, equipamentos de som ou seu próximo instrumento? Nossa equipe orienta pelo WhatsApp de acordo com seu estilo e necessidade.</p>
         <a
           className="btn btn-whatsapp"
-          href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda para escolher um instrumento.')}
+          href={buildWhatsAppLink(whatsappNumber, 'Olá! Preciso de ajuda para escolher instrumentos musicais, acessórios ou equipamentos de áudio.')}
           target="_blank"
           rel="noreferrer"
         ><WhatsAppIcon /><span>Atendimento no WhatsApp</span></a>

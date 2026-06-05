@@ -12,14 +12,14 @@ import { DEFAULT_HOME_VIDEO_WHATSAPP_MESSAGE, getHomeVideos } from '../services/
 import { trackEvent } from '../services/analyticsService';
 
 const fallbackFeaturedCategories = [
-  { icon: 'accessories', title: 'Acessórios', category: 'Acessórios', description: 'Palhetas, correias, cabos e itens essenciais para o dia a dia.' },
-  { icon: 'audio', title: 'Áudio', category: 'Áudio', description: 'Microfones, interfaces, caixas e equipamentos para seu som.' },
-  { icon: 'strings', title: 'Cordas', category: 'Cordas', description: 'Cordas para violão, guitarra, baixo e instrumentos acústicos.' },
+  { icon: 'accessories', title: 'Acessórios', category: 'Acessórios', description: 'Acessórios musicais, cabos, palhetas e itens essenciais para estudo, palco e igreja.' },
+  { icon: 'audio', title: 'Áudio', category: 'Áudio', description: 'Áudio profissional, microfones, caixas e equipamentos de som para diferentes usos.' },
+  { icon: 'strings', title: 'Cordas', category: 'Cordas', description: 'Cordas para violão, guitarra, baixo e instrumentos acústicos, com orientação na escolha.' },
   { icon: 'guitar', title: 'Violões', category: 'Violões', description: 'Modelos para estudo, palco, igreja e apresentações.' },
   { icon: 'wind', title: 'Sopro', category: 'Sopro', description: 'Instrumentos de sopro e acessórios para performance.' },
   { icon: 'guitar', title: 'Guitarras', category: 'Guitarras', description: 'Timbres, caps e modelos para diferentes estilos.' },
   { icon: 'drums', title: 'Percussão', category: 'Percussão', description: 'Peças, acessórios e instrumentos para ritmo e palco.' },
-  { icon: 'services', title: 'Luteria/Serviços', category: 'Serviços', description: 'Regulagem, manutenção e soluções técnicas da Allegro.', isService: true },
+  { icon: 'services', title: 'Luteria/Serviços', category: 'Serviços', description: 'Luteria em Paragominas, regulagem, troca de cordas, partituras, arranjos e aulas.', isService: true },
 ];
 
 const iconByCategoryName = {
@@ -174,20 +174,20 @@ function HomePage() {
       <div className="hero">
         <div className="container hero-grid">
           <div>
-            <p className="eyebrow">E-commerce profissional de instrumentos musicais</p>
-            <h1>Compre instrumentos e áudio profissional com confiança.</h1>
-            <p>Catálogo com produtos selecionados, atendimento especializado e suporte completo para músicos, igrejas e estúdios.</p>
+            <p className="eyebrow">Loja física e online em Paragominas/PA</p>
+            <h1>Allegro Music Store: instrumentos musicais, acessórios e áudio profissional em Paragominas</h1>
+            <p>A Allegro Music Store é uma loja física e online de instrumentos musicais, acessórios e áudio profissional em Paragominas/PA. Atendemos músicos, estudantes, igrejas, bandas e apaixonados por música com produtos selecionados, serviços musicais e suporte pelo WhatsApp.</p>
             <div className="hero-actions">
               <Link className="btn btn-main" to="/catalogo"><span>Ver catálogo completo</span><ArrowIcon /></Link>
               <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, 'Olá! Quero consultoria para comprar equipamentos.')} target="_blank" rel="noreferrer" onClick={() => trackEvent('click_whatsapp', { origem: 'home_hero' })}><WhatsAppIcon /><span>Atendimento via WhatsApp</span></a>
             </div>
           </div>
           <aside className="hero-panel">
-            <h2>Vantagens da Allegro</h2>
+            <h2>Produtos, serviços e atendimento musical</h2>
             <ul>
-              <li>Entrega para todo o Brasil com rastreamento</li>
-              <li>Parcelamento em até 12x</li>
-              <li>Suporte técnico pré e pós-venda</li>
+              <li>Loja de instrumentos musicais em Paragominas com venda online</li>
+              <li>Violões, guitarras, acessórios musicais, cordas e equipamentos de som</li>
+              <li>Serviços musicais, luteria e atendimento pelo WhatsApp</li>
             </ul>
           </aside>
         </div>
@@ -232,7 +232,7 @@ function HomePage() {
         <div className="section-heading">
           <p className="eyebrow">Compre por departamento</p>
           <h2>Categorias em destaque</h2>
-          <p className="subtitle">Navegue pelas principais seções da loja e encontre seu próximo setup.</p>
+          <p className="subtitle">Navegue por instrumentos musicais, acessórios, áudio profissional e serviços para estudo, igreja, palco e uso profissional.</p>
         </div>
         <div className="features-grid marketplace-categories" aria-label="Categorias em destaque">
           {featuredCategories.map((item) => (
@@ -249,7 +249,7 @@ function HomePage() {
         <div className="section-heading with-action">
           <div>
             <h2>Produtos em destaque</h2>
-            <p className="subtitle">Ofertas selecionadas para equipar seu som com qualidade.</p>
+            <p className="subtitle">Produtos musicais selecionados para equipar seu som com qualidade, do estudo às apresentações.</p>
           </div>
           <Link to="/catalogo" className="btn btn-secondary">Ver todos os produtos</Link>
         </div>
@@ -309,7 +309,7 @@ function HomePage() {
       <div className="container section">
         <div className="section-heading">
           <h2>Serviços da loja</h2>
-          <p className="subtitle">Soluções técnicas para manter seu instrumento sempre pronto.</p>
+          <p className="subtitle">Luteria, regulagem, troca de cordas, partituras, arranjos musicais e aulas para apoiar sua rotina musical.</p>
         </div>
         <div className="services-grid">
           {services.slice(0, 3).map((service) => (

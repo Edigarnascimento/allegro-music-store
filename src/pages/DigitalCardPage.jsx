@@ -5,7 +5,7 @@ import { buildWhatsAppLink } from '../lib/whatsapp';
 import { trackEvent } from '../services/analyticsService';
 
 const storeSite = 'https://www.allegromusicstore.com.br';
-const services = 'instrumentos, acessórios, luteria, partituras, arranjos e aulas';
+const services = 'instrumentos musicais, acessórios, áudio profissional, luteria, partituras, arranjos e aulas';
 
 function DigitalCardPage() {
   const storeSettings = useStoreSettings();
@@ -28,6 +28,7 @@ function DigitalCardPage() {
             <div>
               <p className="digital-card-kicker">Cartão digital</p>
               <h1>{storeName}</h1>
+              <p>Loja física e online para quem vive a música.</p>
             </div>
           </div>
 
