@@ -52,6 +52,16 @@ function normalizeCategoryName(value) {
 }
 
 
+
+const worldCupCampaignCards = [
+  'Instrumentos para animar a torcida',
+  'Acessórios musicais para a festa',
+  'Som e áudio para reunir a galera',
+  'Serviços musicais e luteria para deixar tudo pronto',
+];
+
+const WORLD_CUP_CAMPAIGN_WHATSAPP_MESSAGE = 'Olá, vi a campanha Esquenta da Copa no site da Allegro Music Store e gostaria de atendimento.';
+
 function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
@@ -180,6 +190,41 @@ function HomePage() {
               <li>Suporte técnico pré e pós-venda</li>
             </ul>
           </aside>
+        </div>
+      </div>
+
+      <div className="world-cup-campaign" aria-labelledby="world-cup-campaign-title">
+        <div className="container world-cup-campaign-grid">
+          <div className="world-cup-campaign-copy">
+            <p className="world-cup-campaign-kicker">Copa, Brasil, música e comemoração</p>
+            <h2 id="world-cup-campaign-title">Esquenta da Copa na Allegro</h2>
+            <p className="world-cup-campaign-subtitle">Prepare sua torcida com música, acessórios e atendimento especial na loja física e online.</p>
+            <p className="world-cup-campaign-text">Produtos musicais, acessórios, serviços e atendimento pelo WhatsApp para entrar no clima da maior festa do futebol.</p>
+            <div className="world-cup-campaign-actions">
+              <Link className="btn btn-main world-cup-campaign-products" to="/catalogo" onClick={() => trackEvent('click_campaign_products', { campanha: 'esquenta_copa' })}>
+                <span>Ver produtos</span>
+                <ArrowIcon />
+              </Link>
+              <a
+                className="btn btn-whatsapp world-cup-campaign-whatsapp"
+                href={buildWhatsAppLink(whatsappNumber, WORLD_CUP_CAMPAIGN_WHATSAPP_MESSAGE)}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => trackEvent('click_whatsapp', { origem: 'home_esquenta_copa' })}
+              >
+                <WhatsAppIcon />
+                <span>Falar no WhatsApp</span>
+              </a>
+            </div>
+          </div>
+          <div className="world-cup-campaign-panel" aria-label="Destaques da campanha">
+            {worldCupCampaignCards.map((card, index) => (
+              <article key={card} className="world-cup-campaign-card">
+                <span className="world-cup-campaign-card-number">0{index + 1}</span>
+                <h3>{card}</h3>
+              </article>
+            ))}
+          </div>
         </div>
       </div>
 

@@ -78,6 +78,138 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 }
 .hero-panel { padding: 1.2rem; }
 
+
+.world-cup-campaign {
+  position: relative;
+  overflow: hidden;
+  padding: 2.3rem 0;
+  background:
+    radial-gradient(circle at 9% 22%, rgba(255, 219, 69, .25) 0 3px, transparent 4px 100%),
+    radial-gradient(circle at 90% 18%, rgba(255, 255, 255, .22) 0 2px, transparent 3px 100%),
+    radial-gradient(circle at 76% 82%, rgba(255, 219, 69, .2) 0 4px, transparent 5px 100%),
+    linear-gradient(135deg, #063f28 0%, #075437 38%, #06346a 100%);
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,.14);
+}
+.world-cup-campaign::before,
+.world-cup-campaign::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  opacity: .75;
+}
+.world-cup-campaign::before {
+  width: 230px;
+  height: 230px;
+  right: -72px;
+  top: -92px;
+  border-radius: 50%;
+  border: 24px solid rgba(255, 219, 69, .22);
+  box-shadow: -118px 182px 0 -96px rgba(255,255,255,.55);
+}
+.world-cup-campaign::after {
+  inset: 0;
+  background:
+    linear-gradient(115deg, transparent 0 16%, rgba(255, 219, 69, .18) 16.4% 17.4%, transparent 17.8% 100%),
+    linear-gradient(155deg, transparent 0 72%, rgba(255,255,255,.16) 72.3% 72.8%, transparent 73.2% 100%);
+}
+.world-cup-campaign-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+  align-items: center;
+  gap: 1.2rem;
+}
+.world-cup-campaign-copy {
+  max-width: 760px;
+}
+.world-cup-campaign-kicker {
+  display: inline-flex;
+  margin: 0 0 .75rem;
+  padding: .32rem .7rem;
+  border: 1px solid rgba(255, 219, 69, .58);
+  border-radius: 999px;
+  background: rgba(0,0,0,.18);
+  color: #ffdb45;
+  font-size: .76rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.world-cup-campaign h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  line-height: 1.02;
+  text-shadow: 0 12px 28px rgba(0,0,0,.32);
+}
+.world-cup-campaign-subtitle {
+  max-width: 58ch;
+  margin: .85rem 0 0;
+  color: #f6fbff;
+  font-size: clamp(1.03rem, 1.7vw, 1.3rem);
+  font-weight: 700;
+}
+.world-cup-campaign-text {
+  max-width: 66ch;
+  margin: .7rem 0 0;
+  color: rgba(255,255,255,.86);
+}
+.world-cup-campaign-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .7rem;
+  margin-top: 1.2rem;
+}
+.world-cup-campaign-products {
+  background: linear-gradient(170deg, #ffdb45 0%, #f4a908 100%);
+  border-color: rgba(255,255,255,.55);
+  color: #162413;
+}
+.world-cup-campaign-products:hover {
+  background: linear-gradient(170deg, #ffe46c 0%, #f7b418 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 14px 24px rgba(0,0,0,.28), 0 0 0 1px rgba(255,255,255,.28), 0 0 18px rgba(255, 219, 69, .28);
+}
+.world-cup-campaign-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+}
+.world-cup-campaign-card {
+  position: relative;
+  min-height: 138px;
+  margin: 0;
+  padding: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 18px;
+  background: rgba(255,255,255,.1);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 18px 35px rgba(0,0,0,.2);
+  backdrop-filter: blur(8px);
+}
+.world-cup-campaign-card::after {
+  content: '✦';
+  position: absolute;
+  right: .8rem;
+  bottom: .5rem;
+  color: rgba(255, 219, 69, .72);
+  font-size: 1.35rem;
+}
+.world-cup-campaign-card-number {
+  display: inline-flex;
+  margin-bottom: .72rem;
+  color: #ffdb45;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.world-cup-campaign-card h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.28;
+}
+
 .category-icon {
   width: 1.1rem;
   height: 1.1rem;
@@ -1393,4 +1525,20 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   .admin-analytics-filters { width: 100%; }
   .admin-analytics-filters .admin-action-btn { flex: 1 1 auto; }
   .admin-dashboard-analytics-summary { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 980px) {
+  .world-cup-campaign { padding: 1.65rem 0; }
+  .world-cup-campaign-grid { grid-template-columns: 1fr; }
+  .world-cup-campaign-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 680px) {
+  .world-cup-campaign { padding: 1.35rem 0; }
+  .world-cup-campaign-grid { gap: .95rem; }
+  .world-cup-campaign-copy { text-align: left; }
+  .world-cup-campaign-kicker { font-size: .66rem; }
+  .world-cup-campaign-actions { gap: .55rem; }
+  .world-cup-campaign-panel { grid-template-columns: 1fr; gap: .58rem; }
+  .world-cup-campaign-card { min-height: auto; padding: .82rem; border-radius: 14px; }
 }
