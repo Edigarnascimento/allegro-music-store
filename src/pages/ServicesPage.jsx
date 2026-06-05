@@ -10,7 +10,7 @@ const servicesSections = [
   {
     id: 'luteria',
     title: 'Luteria e manutenção de instrumentos',
-    description: 'Cuidados técnicos para manter seu instrumento regulado, confortável e pronto para tocar.',
+    description: 'Serviços de luteria em Paragominas para regulagem de instrumentos, troca de cordas, retífica de trastes, ajustes e manutenção preventiva.',
     tone: 'maintenance',
     services: [
       { name: 'Regulagem básica de instrumentos de cordas', price: 'R$ 180,00' },
@@ -25,7 +25,7 @@ const servicesSections = [
   {
     id: 'partituras',
     title: 'Partituras, transcrições e arranjos',
-    description: 'Produção de material musical personalizado para estudos, ensaios, apresentações, grupos e projetos musicais.',
+    description: 'Escrita de partituras, transcrições e arranjos musicais personalizados para estudos, ensaios, igrejas, bandas, corais e apresentações.',
     tone: 'production',
     services: [
       { name: 'Escrita de partituras', price: 'Sob orçamento' },
@@ -38,7 +38,7 @@ const servicesSections = [
   {
     id: 'aulas',
     title: 'Aulas de música',
-    description: 'Aulas para iniciantes e estudantes que desejam desenvolver sua musicalidade com orientação prática e objetiva.',
+    description: 'Aulas de violão, aulas de teclado e aulas de flauta doce para iniciantes, estudantes e pessoas que desejam desenvolver a musicalidade com orientação prática.',
     tone: 'teaching',
     services: [
       { name: 'Aulas de violão', price: 'Sob consulta' },
@@ -57,7 +57,7 @@ const faqs = [
   },
   {
     question: 'O orçamento é feito pelo WhatsApp?',
-    answer: 'Sim, você pode solicitar orçamento pelo WhatsApp informando o serviço desejado.',
+    answer: 'Sim, você pode solicitar orçamento pelo WhatsApp informando o serviço desejado, como luteria, regulagem, troca de cordas, partituras, arranjos ou aulas.',
   },
   {
     question: 'As aulas são presenciais ou online?',
@@ -96,8 +96,8 @@ function ServicesPage() {
     <section className="container section services-page">
       <Breadcrumbs items={[{ label: 'Início', to: '/' }, { label: 'Serviços' }]} />
       <div className="section-heading">
-        <h1>Serviços de Luteria, Partituras e Aulas de Música</h1>
-        <p className="subtitle">Conheça nossos serviços especializados e solicite seu orçamento de forma rápida pelo WhatsApp.</p>
+        <h1>Serviços musicais e luteria em Paragominas</h1>
+        <p className="subtitle">A Allegro Music Store oferece luteria, regulagem de instrumentos, troca de cordas, retífica de trastes, escrita de partituras, arranjos musicais e aulas de violão, teclado e flauta doce. Solicite orientação e orçamento pelo WhatsApp.</p>
       </div>
 
       {servicesSections.map((section) => (
@@ -164,7 +164,7 @@ function ServicesPage() {
 
       <div className="services-cta">
         <h2>Precisa de um serviço musical personalizado?</h2>
-        <p>Fale com a Allegro Music Store pelo WhatsApp e receba orientação para o serviço ideal.</p>
+        <p>Fale com a Allegro Music Store pelo WhatsApp para avaliar luteria, aulas, partituras, arranjos musicais ou outro serviço para seu projeto.</p>
         <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, 'Olá! Vim pelo site da Allegro Music Store e quero orientação sobre os serviços musicais.')} target="_blank" rel="noreferrer" onClick={() => trackEvent('click_whatsapp', { origem: 'services_cta' })}>Falar no WhatsApp</a>
       </div>
 
