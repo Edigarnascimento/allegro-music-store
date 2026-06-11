@@ -52,6 +52,16 @@ function normalizeCategoryName(value) {
 }
 
 
+const homeTrustCards = [
+  { title: 'Loja física em Paragominas', description: 'Atendimento presencial para conhecer produtos, tirar dúvidas e comprar com mais segurança.' },
+  { title: 'Atendimento especializado', description: 'Orientação para músicos, estudantes, igrejas, bandas e profissionais de áudio.' },
+  { title: 'Pagamento online seguro', description: 'Compra online com fluxo protegido e opções pensadas para facilitar sua decisão.' },
+  { title: 'Produtos selecionados', description: 'Instrumentos, acessórios e áudio profissional escolhidos para estudo, palco e rotina musical.' },
+  { title: 'Suporte pelo WhatsApp', description: 'Converse com a equipe para receber indicação, disponibilidade e detalhes antes de comprar.' },
+  { title: 'Serviços musicais', description: 'Luteria, regulagem, troca de cordas, partituras, arranjos e aulas em Paragominas/PA.' },
+];
+
+const HOME_SPECIALIST_WHATSAPP_MESSAGE = 'Olá, acessei o site da Allegro Music Store e gostaria de ajuda para escolher um produto.';
 
 const worldCupCampaignCards = [
   'Instrumentos para animar a torcida',
@@ -171,35 +181,55 @@ function HomePage() {
 
   return (
     <section>
-      <div className="hero">
-        <div className="container hero-grid">
-          <div>
-            <p className="eyebrow">Loja física e online em Paragominas/PA</p>
-            <h1>Allegro Music Store: instrumentos musicais, acessórios e áudio profissional em Paragominas</h1>
-            <p>A Allegro Music Store é uma loja física e online de instrumentos musicais, acessórios e áudio profissional em Paragominas/PA. Atendemos músicos, estudantes, igrejas, bandas e apaixonados por música com produtos selecionados, serviços musicais e suporte pelo WhatsApp.</p>
-            <div className="hero-actions">
-              <Link className="btn btn-main" to="/catalogo"><span>Ver catálogo completo</span><ArrowIcon /></Link>
-              <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, 'Olá! Quero consultoria para comprar equipamentos.')} target="_blank" rel="noreferrer" onClick={() => trackEvent('click_whatsapp', { origem: 'home_hero' })}><WhatsAppIcon /><span>Atendimento via WhatsApp</span></a>
+      <div className="hero home-hero">
+        <div className="container hero-grid home-hero-grid">
+          <div className="home-hero-copy">
+            <p className="eyebrow home-hero-eyebrow">Loja física e online em Paragominas/PA</p>
+            <h1>Loja física e online para quem vive a música</h1>
+            <p className="home-hero-lead">Instrumentos musicais, acessórios, áudio profissional, luteria, partituras, arranjos e aulas em Paragominas/PA.</p>
+            <p className="home-hero-support">Na Allegro Music Store, você encontra curadoria de produtos, atendimento próximo e suporte pelo WhatsApp para comprar com confiança — seja para estudo, igreja, palco, banda ou produção musical.</p>
+            <div className="hero-actions home-hero-actions">
+              <Link className="btn btn-main" to="/catalogo"><span>Ver catálogo</span><ArrowIcon /></Link>
+              <a className="btn btn-whatsapp" href={buildWhatsAppLink(whatsappNumber, HOME_SPECIALIST_WHATSAPP_MESSAGE)} target="_blank" rel="noreferrer" onClick={() => trackEvent('click_whatsapp', { origem: 'home_hero' })}><WhatsAppIcon /><span>Falar no WhatsApp</span></a>
+              <Link className="btn btn-secondary home-hero-service-btn" to="/servicos" onClick={() => trackEvent('click_services', { origem: 'home_hero' })}><span>Ver serviços</span></Link>
             </div>
           </div>
-          <aside className="hero-panel">
-            <h2>Produtos, serviços e atendimento musical</h2>
+          <aside className="hero-panel home-hero-panel" aria-label="Diferenciais da Allegro Music Store">
+            <span className="home-hero-panel-tag">Compra orientada</span>
+            <h2>Produtos, serviços e atendimento musical no mesmo lugar</h2>
             <ul>
-              <li>Loja de instrumentos musicais em Paragominas com venda online</li>
-              <li>Violões, guitarras, acessórios musicais, cordas e equipamentos de som</li>
-              <li>Serviços musicais, luteria e atendimento pelo WhatsApp</li>
+              <li>Loja física em Paragominas/PA com venda online</li>
+              <li>Instrumentos, acessórios, cordas, áudio e equipamentos de som</li>
+              <li>Luteria, partituras, arranjos, aulas e suporte pelo WhatsApp</li>
             </ul>
           </aside>
+        </div>
+      </div>
+
+      <div className="container section trust-section" aria-labelledby="trust-title">
+        <div className="section-heading">
+          <p className="eyebrow">Confiança para comprar</p>
+          <h2 id="trust-title">Por que comprar na Allegro?</h2>
+          <p className="subtitle">Uma loja local, física e online, com atendimento especializado para ajudar você a escolher melhor antes, durante e depois da compra.</p>
+        </div>
+        <div className="trust-grid" aria-label="Diferenciais da Allegro Music Store">
+          {homeTrustCards.map((card, index) => (
+            <article key={card.title} className="trust-card">
+              <span className="trust-card-icon" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <h3>{card.title}</h3>
+              <p>{card.description}</p>
+            </article>
+          ))}
         </div>
       </div>
 
       <div className="world-cup-campaign" aria-labelledby="world-cup-campaign-title">
         <div className="container world-cup-campaign-grid">
           <div className="world-cup-campaign-copy">
-            <p className="world-cup-campaign-kicker">Copa, Brasil, música e comemoração</p>
+            <p className="world-cup-campaign-kicker">Oferta da semana · Copa, Brasil, música e comemoração</p>
             <h2 id="world-cup-campaign-title">Esquenta da Copa na Allegro</h2>
             <p className="world-cup-campaign-subtitle">Prepare sua torcida com música, acessórios e atendimento especial na loja física e online.</p>
-            <p className="world-cup-campaign-text">Produtos musicais, acessórios, serviços e atendimento pelo WhatsApp para entrar no clima da maior festa do futebol.</p>
+            <p className="world-cup-campaign-text">Produtos para começar hoje: opções musicais, acessórios, serviços e atendimento pelo WhatsApp para entrar no clima da maior festa do futebol.</p>
             <div className="world-cup-campaign-actions">
               <Link className="btn btn-main world-cup-campaign-products" to="/catalogo" onClick={() => trackEvent('click_campaign_products', { campanha: 'esquenta_copa' })}>
                 <span>Ver produtos</span>
@@ -245,15 +275,35 @@ function HomePage() {
         </div>
       </div>
 
-      <div className="container section" id="produtos">
+      <div className="container section home-products-section" id="produtos">
         <div className="section-heading with-action">
           <div>
             <h2>Produtos em destaque</h2>
-            <p className="subtitle">Produtos musicais selecionados para equipar seu som com qualidade, do estudo às apresentações.</p>
+            <p className="subtitle">Produtos selecionados pela equipe para equipar seu som com qualidade, visual valorizado, preço em destaque e compra rápida quando disponível.</p>
           </div>
           <Link to="/catalogo" className="btn btn-secondary">Ver todos os produtos</Link>
         </div>
         {loadingFeatured ? <p>Carregando produtos em destaque...</p> : <div className="products-grid">{featuredProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div>}
+      </div>
+
+      <div className="container section whatsapp-choice-section" aria-labelledby="whatsapp-choice-title">
+        <div className="whatsapp-choice-cta">
+          <div>
+            <p className="eyebrow">Atendimento especializado</p>
+            <h2 id="whatsapp-choice-title">Precisa de ajuda para escolher seu instrumento ou acessório?</h2>
+            <p>Fale com a equipe da Allegro Music Store e receba orientação para encontrar o produto certo para sua necessidade.</p>
+          </div>
+          <a
+            className="btn btn-whatsapp"
+            href={buildWhatsAppLink(whatsappNumber, HOME_SPECIALIST_WHATSAPP_MESSAGE)}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => trackEvent('click_whatsapp', { origem: 'home_cta_especialista' })}
+          >
+            <WhatsAppIcon />
+            <span>Falar com especialista no WhatsApp</span>
+          </a>
+        </div>
       </div>
 
       <div className="container section arrived-section" id="chegou-na-allegro">
