@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import CategoryIcon from '../components/CategoryIcon';
@@ -7,7 +7,7 @@ import { getProducts } from '../services/productsService';
 import { ArrowIcon, WhatsAppIcon } from '../components/PublicButtonIcons';
 import { getCategories } from '../services/categoriesService';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
-import { buildWhatsAppLink } from '../lib/whatsapp';
+import { buildWhatsAppLink, formatPriceBRL } from '../lib/whatsapp';
 import { DEFAULT_HOME_VIDEO_WHATSAPP_MESSAGE, getHomeVideos } from '../services/homeVideosService';
 import { trackEvent } from '../services/analyticsService';
 
@@ -63,23 +63,47 @@ const homeTrustCards = [
 
 const HOME_SPECIALIST_WHATSAPP_MESSAGE = 'Olá, acessei o site da Allegro Music Store e gostaria de ajuda para escolher um produto.';
 
-const worldCupCampaignCards = [
-  'Instrumentos para animar a torcida',
-  'Acessórios musicais para a festa',
-  'Som e áudio para reunir a galera',
-  'Serviços musicais e luteria para deixar tudo pronto',
+const worldCupCampaignCategories = ['Áudio', 'Acessórios', 'Cordas', 'Instrumentos', 'Serviços'];
+
+const campaignCategoryPriority = [
+  ['audio', 'som', 'microfone', 'caixa'],
+  ['acessorios', 'acessorio', 'cabos', 'palhetas'],
+  ['cordas'],
+  ['instrumentos', 'instrumento', 'violao', 'violoes', 'guitarra', 'baixo', 'teclado', 'teclas', 'bateria', 'percussao', 'sopro'],
+  ['servicos', 'servico', 'luteria'],
 ];
 
+const PRODUCT_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80';
+
 const WORLD_CUP_CAMPAIGN_WHATSAPP_MESSAGE = 'Olá, vi a campanha Esquenta da Copa no site da Allegro Music Store e gostaria de atendimento.';
+
+function normalizeProduct(product) {
+  return {
+    id: product.id,
+    nome: product.nome ?? product.name ?? 'Produto Allegro',
+    preco: product.preco ?? product.price ?? 0,
+    categoria: product.categoria ?? product.category ?? 'Produtos',
+    imagem_url: product.imagem_url ?? product.image ?? PRODUCT_IMAGE_FALLBACK,
+  };
+}
+
+function productCampaignScore(product) {
+  const normalizedCategory = normalizeCategoryName(product.categoria ?? product.category);
+  const categoryIndex = campaignCategoryPriority.findIndex((categoryGroup) => categoryGroup.some((category) => normalizedCategory.includes(category)));
+  const featuredScore = product.destaque === true ? 0 : 10;
+  return featuredScore + (categoryIndex >= 0 ? categoryIndex : 8);
+}
 
 function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [featuredCategories, setFeaturedCategories] = useState(fallbackFeaturedCategories);
+  const [campaignProducts, setCampaignProducts] = useState([]);
   const [arrivalVideos, setArrivalVideos] = useState([]);
   const [loadingArrivalVideos, setLoadingArrivalVideos] = useState(true);
   const whatsappNumber = useStoreWhatsappNumber();
   const location = useLocation();
+  const campaignCarouselRef = useRef(null);
 
   useEffect(() => {
     trackEvent('page_view_home');
@@ -105,7 +129,9 @@ function HomePage() {
 
         const activeProducts = data.filter((product) => product.ativo === true || typeof product.ativo === 'undefined');
         const featured = activeProducts.filter((product) => product.destaque === true);
+        const prioritizedProducts = [...activeProducts].sort((firstProduct, secondProduct) => productCampaignScore(firstProduct) - productCampaignScore(secondProduct));
         setFeaturedProducts(featured.length ? featured.slice(0, 6) : activeProducts.slice(0, 6));
+        setCampaignProducts(prioritizedProducts.slice(0, 8));
       } finally {
         if (isMounted) {
           setLoadingFeatured(false);
@@ -179,6 +205,17 @@ function HomePage() {
     };
   }, []);
 
+
+  function handleCampaignCarouselScroll(direction) {
+    const carousel = campaignCarouselRef.current;
+    if (!carousel) return;
+
+    carousel.scrollBy({
+      left: direction * Math.max(260, carousel.clientWidth * 0.72),
+      behavior: 'smooth',
+    });
+  }
+
   return (
     <section>
       <div className="hero home-hero">
@@ -228,8 +265,8 @@ function HomePage() {
           <div className="world-cup-campaign-copy">
             <p className="world-cup-campaign-kicker">Oferta da semana · Copa, Brasil, música e comemoração</p>
             <h2 id="world-cup-campaign-title">Esquenta da Copa na Allegro</h2>
-            <p className="world-cup-campaign-subtitle">Prepare sua torcida com música, acessórios e atendimento especial na loja física e online.</p>
-            <p className="world-cup-campaign-text">Produtos para começar hoje: opções musicais, acessórios, serviços e atendimento pelo WhatsApp para entrar no clima da maior festa do futebol.</p>
+            <p className="world-cup-campaign-subtitle">Entre no clima da Copa com música, som e acessórios para animar sua torcida.</p>
+            <p className="world-cup-campaign-text">Produtos musicais, áudio, acessórios e atendimento especial na loja física e online.</p>
             <div className="world-cup-campaign-actions">
               <Link className="btn btn-main world-cup-campaign-products" to="/catalogo" onClick={() => trackEvent('click_campaign_products', { campanha: 'esquenta_copa' })}>
                 <span>Ver produtos</span>
@@ -247,13 +284,67 @@ function HomePage() {
               </a>
             </div>
           </div>
-          <div className="world-cup-campaign-panel" aria-label="Destaques da campanha">
-            {worldCupCampaignCards.map((card, index) => (
-              <article key={card} className="world-cup-campaign-card">
-                <span className="world-cup-campaign-card-number">0{index + 1}</span>
-                <h3>{card}</h3>
-              </article>
-            ))}
+          <div className="world-cup-campaign-showcase" aria-label="Produtos em destaque da campanha Esquenta da Copa na Allegro">
+            <div className="world-cup-campaign-category-row" aria-label="Categorias priorizadas">
+              {worldCupCampaignCategories.map((category) => <span key={category}>{category}</span>)}
+            </div>
+            <div className="world-cup-campaign-carousel-shell">
+              <button
+                type="button"
+                className="world-cup-campaign-arrow world-cup-campaign-arrow-left"
+                aria-label="Ver produtos anteriores da campanha"
+                onClick={() => handleCampaignCarouselScroll(-1)}
+              >
+                ‹
+              </button>
+              <div className="world-cup-campaign-carousel" ref={campaignCarouselRef} tabIndex="0">
+                {loadingFeatured ? (
+                  <article className="world-cup-campaign-product-card world-cup-campaign-product-card-placeholder">
+                    <span>Carregando produtos da campanha...</span>
+                  </article>
+                ) : null}
+                {!loadingFeatured && campaignProducts.length ? campaignProducts.map((product) => {
+                  const normalizedProduct = normalizeProduct(product);
+                  const detailsPath = normalizedProduct.id ? `/produto/${normalizedProduct.id}` : '/catalogo';
+
+                  return (
+                    <article key={normalizedProduct.id ?? normalizedProduct.nome} className="world-cup-campaign-product-card">
+                      <Link to={detailsPath} className="world-cup-campaign-product-image" aria-label={`Ver ${normalizedProduct.nome}`}>
+                        <img
+                          src={normalizedProduct.imagem_url || PRODUCT_IMAGE_FALLBACK}
+                          alt={normalizedProduct.nome}
+                          loading="lazy"
+                          onError={(event) => {
+                            event.currentTarget.onerror = null;
+                            event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
+                          }}
+                        />
+                      </Link>
+                      <div className="world-cup-campaign-product-content">
+                        <span className="world-cup-campaign-product-category">{normalizedProduct.categoria}</span>
+                        <h3>{normalizedProduct.nome}</h3>
+                        <strong>{formatPriceBRL(normalizedProduct.preco)}</strong>
+                        <Link className="btn btn-main btn-compact world-cup-campaign-product-button" to={detailsPath} onClick={() => trackEvent('click_campaign_product', { campanha: 'esquenta_copa', produto_id: normalizedProduct.id })}>Comprar</Link>
+                      </div>
+                    </article>
+                  );
+                }) : null}
+                {!loadingFeatured && !campaignProducts.length ? (
+                  <article className="world-cup-campaign-product-card world-cup-campaign-product-card-placeholder">
+                    <span>Produtos musicais, áudio, acessórios e serviços para animar sua torcida.</span>
+                    <Link className="btn btn-main btn-compact world-cup-campaign-product-button" to="/catalogo">Ver catálogo</Link>
+                  </article>
+                ) : null}
+              </div>
+              <button
+                type="button"
+                className="world-cup-campaign-arrow world-cup-campaign-arrow-right"
+                aria-label="Ver próximos produtos da campanha"
+                onClick={() => handleCampaignCarouselScroll(1)}
+              >
+                ›
+              </button>
+            </div>
           </div>
         </div>
       </div>
