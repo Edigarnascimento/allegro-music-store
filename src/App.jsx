@@ -23,6 +23,7 @@ import AdminAuditPage from './pages/admin/AdminAuditPage';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminPaymentsPage from './pages/admin/AdminPaymentsPage';
 import AdminHomeVideosPage from './pages/admin/AdminHomeVideosPage';
+import AdminVideosPage from './pages/admin/AdminVideosPage';
 import AdminServiceWorksPage from './pages/admin/AdminServiceWorksPage';
 import ProtectedAdminRoute from './components/admin/ProtectedAdminRoute';
 import AdminLayout from './components/admin/AdminLayout';
@@ -62,6 +63,7 @@ function App() {
               <Route path="/admin/categorias" element={<AdminCategoriesPage />} />
               <Route path="/admin/configuracoes" element={<AdminSettingsPage />} />
               <Route path="/admin/chegou-na-allegro" element={<AdminHomeVideosPage />} />
+              <Route path="/admin/videos" element={<AdminVideosPage />} />
               <Route path="/admin/trabalhos-realizados" element={<AdminServiceWorksPage />} />
               <Route path="/admin/interesses" element={<AdminInteressesPage />} />
               <Route path="/admin/pedidos" element={<AdminOrdersPage />} />
