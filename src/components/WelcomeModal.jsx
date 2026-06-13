@@ -58,6 +58,12 @@ function WelcomeModal() {
       <div className="welcome-modal">
         <button type="button" className="welcome-close" onClick={closeModal} aria-label="Fechar mensagem de boas-vindas">×</button>
 
+        <div className="welcome-field-decoration" aria-hidden="true">
+          <span className="welcome-field-circle" />
+          <span className="welcome-field-goal" />
+          <span className="welcome-ball" />
+        </div>
+
         <div className="welcome-confetti" aria-hidden="true">
           {confettiPieces.map((piece) => (
             <span
@@ -73,18 +79,12 @@ function WelcomeModal() {
           ))}
         </div>
 
-        <p className="welcome-kicker">Inauguração online</p>
-        <h2 id="welcome-modal-title">🎉 Seja bem-vindo à Allegro Music Store!</h2>
+        <p className="welcome-kicker">Esquenta da Copa na Allegro</p>
+        <h2 id="welcome-modal-title">Bem-vindo à Allegro no clima da Copa!</h2>
         <p>
-          Nossa loja online foi criada para oferecer a você uma experiência mais prática, segura e próxima.
+          A Allegro Music Store preparou uma experiência especial para quem vive a música. Entre no clima da Copa com produtos musicais, áudio, acessórios, serviços e atendimento pelo WhatsApp.
         </p>
-        <p>
-          Aqui você encontra produtos musicais, acessórios, serviços de luteria, partituras, arranjos e aulas, tudo pensado para atender melhor músicos, estudantes, igrejas, bandas e apaixonados por música.
-        </p>
-        <p>
-          Compre online, fale conosco pelo WhatsApp e acompanhe seu pedido com facilidade.
-        </p>
-        <p className="welcome-highlight">A Allegro Music Store agora está ainda mais perto de você.</p>
+        <p className="welcome-highlight">Música, torcida e atendimento Allegro para deixar sua comemoração ainda mais completa.</p>
 
         <div className="welcome-actions">
           <button type="button" className="btn" onClick={handleKnowStore}>Conhecer a loja</button>

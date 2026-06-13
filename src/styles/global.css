@@ -1865,3 +1865,582 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   .world-cup-campaign-panel { grid-template-columns: 1fr; gap: .58rem; }
   .world-cup-campaign-card { min-height: auto; padding: .82rem; border-radius: 14px; }
 }
+
+/* Esquenta da Copa: main campaign hero and themed welcome modal refinements */
+.world-cup-campaign {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2.1rem, 4vw, 4rem) 0;
+  min-height: clamp(560px, 66vh, 720px);
+  display: grid;
+  align-items: center;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(255, 220, 54, .42) 0 4px, transparent 5px 100%),
+    radial-gradient(circle at 82% 16%, rgba(255, 255, 255, .28) 0 3px, transparent 4px 100%),
+    radial-gradient(circle at 70% 88%, rgba(255, 220, 54, .24) 0 5px, transparent 6px 100%),
+    linear-gradient(128deg, #024426 0%, #05733b 45%, #073f83 100%);
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,.14);
+  isolation: isolate;
+}
+.world-cup-campaign::before,
+.world-cup-campaign::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+.world-cup-campaign::before {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px) 0 0 / 74px 74px,
+    linear-gradient(0deg, rgba(255,255,255,.1) 1px, transparent 1px) 0 0 / 74px 74px,
+    radial-gradient(circle at 50% 50%, transparent 0 118px, rgba(255,255,255,.2) 119px 121px, transparent 122px 100%);
+  mask-image: linear-gradient(90deg, rgba(0,0,0,.88), rgba(0,0,0,.35));
+}
+.world-cup-campaign::after {
+  background:
+    linear-gradient(115deg, transparent 0 10%, rgba(255, 220, 54, .32) 10.3% 11.3%, transparent 11.8% 100%),
+    linear-gradient(145deg, transparent 0 78%, rgba(255,255,255,.18) 78.2% 78.8%, transparent 79.2% 100%),
+    radial-gradient(circle at 4% 80%, rgba(255,220,54,.22), transparent 22%),
+    radial-gradient(circle at 94% 12%, rgba(8,85,182,.34), transparent 20%);
+}
+.world-cup-field-lines {
+  position: absolute;
+  inset: clamp(.8rem, 2vw, 1.4rem);
+  pointer-events: none;
+  border: 2px solid rgba(255,255,255,.13);
+  border-radius: 32px;
+  z-index: 0;
+}
+.world-cup-field-lines::before,
+.world-cup-field-lines::after {
+  content: '';
+  position: absolute;
+  background: rgba(255,255,255,.16);
+}
+.world-cup-field-lines::before {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+}
+.world-cup-field-lines::after {
+  right: 4%;
+  top: 32%;
+  width: 12%;
+  height: 36%;
+  border: 2px solid rgba(255,255,255,.18);
+  border-right: 0;
+  background: transparent;
+  border-radius: 18px 0 0 18px;
+}
+.world-cup-field-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(21vw, 240px);
+  aspect-ratio: 1;
+  border: 2px solid rgba(255,255,255,.18);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.world-cup-field-goal {
+  position: absolute;
+  left: 3%;
+  top: 35%;
+  width: min(12vw, 152px);
+  height: 30%;
+  border: 2px solid rgba(255,255,255,.18);
+  border-left: 0;
+  border-radius: 0 18px 18px 0;
+}
+.world-cup-ball {
+  position: absolute;
+  right: min(7vw, 5.5rem);
+  top: min(11vw, 5rem);
+  width: clamp(58px, 7vw, 104px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #102132 0 10%, transparent 11% 100%),
+    linear-gradient(36deg, transparent 0 45%, #102132 46% 53%, transparent 54% 100%),
+    linear-gradient(144deg, transparent 0 45%, #102132 46% 53%, transparent 54% 100%),
+    #fff;
+  box-shadow: 0 18px 34px rgba(0,0,0,.28), 0 0 0 8px rgba(255,255,255,.09);
+  opacity: .72;
+}
+.world-cup-star {
+  position: absolute;
+  color: #ffdc36;
+  text-shadow: 0 0 18px rgba(255, 220, 54, .6);
+  font-size: clamp(1.5rem, 3vw, 2.6rem);
+}
+.world-cup-star-one { left: 8%; top: 16%; }
+.world-cup-star-two { right: 16%; bottom: 12%; color: #fff; }
+.world-cup-confetti {
+  position: absolute;
+  width: 14px;
+  height: 38px;
+  border-radius: 999px;
+  background: #ffdc36;
+  box-shadow: 28px 22px 0 #fff, -18px 42px 0 #0c63ba;
+  opacity: .78;
+  transform: rotate(28deg);
+}
+.world-cup-confetti-one { left: 12%; bottom: 14%; }
+.world-cup-confetti-two { right: 28%; top: 12%; transform: rotate(-22deg); }
+.world-cup-confetti-three { right: 8%; bottom: 28%; transform: rotate(58deg); }
+.world-cup-campaign-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, .92fr) minmax(520px, 1.08fr);
+  gap: clamp(1.2rem, 3vw, 2.5rem);
+  align-items: center;
+}
+.world-cup-campaign-copy {
+  max-width: 720px;
+}
+.world-cup-campaign-kicker {
+  display: inline-flex;
+  margin: 0 0 1rem;
+  padding: .48rem .84rem;
+  border: 1px solid rgba(255,255,255,.68);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffdc36 0%, #f3ae14 100%);
+  color: #12301c;
+  box-shadow: 0 14px 30px rgba(0,0,0,.24), 0 0 0 7px rgba(255,220,54,.12);
+  font-size: clamp(.68rem, .95vw, .8rem);
+  font-weight: 950;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.world-cup-campaign h2 {
+  max-width: 11ch;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(3rem, 7.2vw, 6.4rem);
+  line-height: .9;
+  letter-spacing: -.06em;
+  text-wrap: balance;
+  text-shadow: 0 18px 34px rgba(0,0,0,.34);
+}
+.world-cup-campaign-subtitle {
+  max-width: 54ch;
+  margin: 1.15rem 0 0;
+  color: #fffef4;
+  font-size: clamp(1.14rem, 2vw, 1.52rem);
+  font-weight: 850;
+  line-height: 1.28;
+}
+.world-cup-campaign-text {
+  max-width: 62ch;
+  margin: .78rem 0 0;
+  color: rgba(255,255,255,.9);
+  font-size: 1.04rem;
+}
+.world-cup-campaign-category-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: 1.35rem;
+}
+.world-cup-campaign-category-row span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: .3rem .72rem;
+  border: 1px solid rgba(255,220,54,.74);
+  border-radius: 999px;
+  background: rgba(255,220,54,.14);
+  color: #fff8c7;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 0 18px rgba(255,220,54,.1);
+  font-size: .78rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+}
+.world-cup-campaign-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .8rem;
+  margin-top: 1.35rem;
+}
+.world-cup-campaign-products {
+  background: linear-gradient(170deg, #ffdc36 0%, #eda90d 100%);
+  border-color: rgba(255,255,255,.58);
+  color: #12301c;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.42), 0 18px 30px rgba(0,0,0,.28), 0 0 22px rgba(255,220,54,.24);
+}
+.world-cup-campaign-products:hover {
+  background: linear-gradient(170deg, #ffe766 0%, #f5b925 100%);
+}
+.world-cup-campaign-whatsapp {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 16px 28px rgba(0,0,0,.24);
+}
+.world-cup-campaign-showcase {
+  min-width: 0;
+  padding: clamp(.86rem, 1.6vw, 1.2rem);
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 30px;
+  background:
+    linear-gradient(145deg, rgba(4, 45, 36, .48), rgba(6, 57, 115, .5)),
+    rgba(255,255,255,.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 30px 70px rgba(0,0,0,.34), 0 0 0 10px rgba(255,255,255,.04);
+  backdrop-filter: blur(12px);
+}
+.world-cup-campaign-showcase-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-bottom: .8rem;
+  color: #fff;
+}
+.world-cup-campaign-showcase-header span {
+  font-weight: 950;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.world-cup-campaign-showcase-header small {
+  color: #ffef9c;
+  font-weight: 800;
+}
+.world-cup-campaign-carousel-shell { position: relative; }
+.world-cup-campaign-carousel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(236px, 42%);
+  gap: .95rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  padding: .15rem .15rem .8rem;
+}
+.world-cup-campaign-carousel:focus-visible {
+  outline: 3px solid rgba(255, 220, 54, .72);
+  outline-offset: 4px;
+  border-radius: 22px;
+}
+.world-cup-campaign-product-card {
+  position: relative;
+  display: grid;
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.26);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255,255,255,.98) 0%, rgba(248,252,255,.96) 100%);
+  color: #162413;
+  box-shadow: 0 20px 42px rgba(0,0,0,.32);
+  scroll-snap-align: start;
+}
+.world-cup-campaign-product-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 8px;
+  background: linear-gradient(90deg, #049a4b 0 33%, #ffdc36 33% 66%, #0b63bd 66% 100%);
+  z-index: 1;
+}
+.world-cup-campaign-product-image {
+  display: block;
+  height: 185px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffdc36 0%, #0b63bd 100%);
+}
+.world-cup-campaign-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.01);
+}
+.world-cup-campaign-product-content {
+  display: grid;
+  align-content: start;
+  gap: .5rem;
+  padding: .95rem;
+}
+.world-cup-campaign-product-category {
+  width: fit-content;
+  padding: .2rem .54rem;
+  border-radius: 999px;
+  background: #e9f8ef;
+  color: #08703a;
+  font-size: .72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.world-cup-campaign-product-content h3 {
+  min-height: 2.45em;
+  margin: 0;
+  color: #131922;
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+.world-cup-campaign-product-content strong {
+  color: #b71222;
+  font-size: 1.28rem;
+  font-weight: 950;
+}
+.world-cup-campaign-product-button {
+  width: 100%;
+  margin-top: .12rem;
+  background: linear-gradient(170deg, #087941 0%, #055c30 100%);
+}
+.world-cup-campaign-product-card-placeholder {
+  place-items: center;
+  min-height: 280px;
+  padding: 1.2rem;
+  text-align: center;
+  font-weight: 850;
+}
+.world-cup-campaign-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  width: 46px;
+  height: 46px;
+  border: 2px solid rgba(255,255,255,.75);
+  border-radius: 999px;
+  background: linear-gradient(160deg, #ffdc36 0%, #f1aa0d 100%);
+  color: #074385;
+  box-shadow: 0 16px 30px rgba(0,0,0,.34), 0 0 0 7px rgba(255,220,54,.12);
+  cursor: pointer;
+  font-size: 2.25rem;
+  font-weight: 900;
+  line-height: .85;
+  transform: translateY(-50%);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.world-cup-campaign-arrow:hover,
+.world-cup-campaign-arrow:focus-visible {
+  transform: translateY(-50%) scale(1.06);
+  box-shadow: 0 18px 32px rgba(0,0,0,.38), 0 0 0 8px rgba(255,220,54,.18);
+}
+.world-cup-campaign-arrow-left { left: -.8rem; }
+.world-cup-campaign-arrow-right { right: -.8rem; }
+
+.welcome-modal {
+  color: #fff;
+  border-radius: 24px;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba(255,255,255,.28);
+  background:
+    radial-gradient(circle at 10% 16%, rgba(255,220,54,.36) 0 4px, transparent 5px 100%),
+    radial-gradient(circle at 88% 12%, rgba(255,255,255,.24) 0 3px, transparent 4px 100%),
+    linear-gradient(145deg, #034626 0%, #066f3c 48%, #073f83 100%);
+  box-shadow: 0 28px 70px rgba(0,0,0,.42), 0 0 0 1px rgba(255,255,255,.12);
+  isolation: isolate;
+}
+.welcome-modal::before {
+  content: '';
+  position: absolute;
+  inset: 1rem;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 20px;
+  pointer-events: none;
+  z-index: -1;
+}
+.welcome-field-decoration {
+  position: absolute;
+  inset: 1rem;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 20px;
+  z-index: -1;
+}
+.welcome-field-decoration::before {
+  content: '';
+  position: absolute;
+  top: -15%;
+  bottom: -15%;
+  left: 50%;
+  width: 2px;
+  background: rgba(255,255,255,.14);
+}
+.welcome-field-circle {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 190px;
+  aspect-ratio: 1;
+  border: 2px solid rgba(255,255,255,.14);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.welcome-field-goal {
+  position: absolute;
+  right: -1px;
+  top: 32%;
+  width: 108px;
+  height: 34%;
+  border: 2px solid rgba(255,255,255,.14);
+  border-right: 0;
+  border-radius: 16px 0 0 16px;
+}
+.welcome-ball {
+  position: absolute;
+  right: 2rem;
+  bottom: 1.6rem;
+  width: 56px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #122337 0 12%, transparent 13% 100%),
+    linear-gradient(36deg, transparent 0 45%, #122337 46% 53%, transparent 54% 100%),
+    linear-gradient(144deg, transparent 0 45%, #122337 46% 53%, transparent 54% 100%),
+    #fff;
+  opacity: .2;
+}
+.welcome-kicker {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  margin: 0 0 .75rem;
+  padding: .34rem .7rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffdc36 0%, #f2ac13 100%);
+  color: #12301c;
+  box-shadow: 0 10px 22px rgba(0,0,0,.2), 0 0 0 6px rgba(255,220,54,.12);
+  font-weight: 950;
+  text-transform: uppercase;
+  font-size: .75rem;
+  letter-spacing: .08em;
+}
+.welcome-modal h2 {
+  position: relative;
+  z-index: 1;
+  margin: .35rem 0 .75rem;
+  max-width: 15ch;
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: .96;
+  letter-spacing: -.04em;
+  color: #fff;
+  text-shadow: 0 14px 30px rgba(0,0,0,.34);
+}
+.welcome-modal p {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 .7rem;
+  max-width: 62ch;
+  color: rgba(255,255,255,.92);
+  line-height: 1.52;
+}
+.welcome-highlight {
+  width: fit-content;
+  padding: .64rem .78rem;
+  border: 1px solid rgba(255,220,54,.44);
+  border-radius: 14px;
+  background: rgba(255,220,54,.12);
+  color: #fff8c7;
+  font-weight: 850;
+}
+.welcome-close {
+  z-index: 2;
+  border-color: rgba(255,255,255,.45);
+  background: rgba(255,255,255,.95);
+  color: #074326;
+  box-shadow: 0 10px 24px rgba(0,0,0,.2);
+}
+.welcome-close:hover { background: #fff; }
+.welcome-close:focus-visible { outline: 3px solid #ffdc36; outline-offset: 2px; }
+.welcome-actions {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: .65rem;
+  margin-top: 1.05rem;
+}
+.welcome-actions .btn { min-height: 46px; }
+.welcome-actions .btn:not(.btn-secondary):not(.btn-whatsapp) {
+  background: linear-gradient(170deg, #ffdc36 0%, #eda90d 100%);
+  color: #12301c;
+}
+.welcome-confetti-piece { background: #ffdc36; }
+.welcome-confetti-piece:nth-child(3n) { background: #0b63bd; }
+.welcome-confetti-piece:nth-child(3n+1) { background: #ffffff; border: 1px solid rgba(255,255,255,.5); }
+
+@media (max-width: 1100px) {
+  .world-cup-campaign-grid {
+    grid-template-columns: 1fr;
+  }
+  .world-cup-campaign {
+    min-height: auto;
+  }
+  .world-cup-campaign h2 {
+    max-width: 14ch;
+  }
+  .world-cup-campaign-carousel {
+    grid-auto-columns: minmax(240px, 32vw);
+  }
+}
+
+@media (max-width: 680px) {
+  .world-cup-campaign {
+    padding: 1.35rem 0 1.55rem;
+  }
+  .world-cup-field-lines {
+    inset: .55rem;
+    border-radius: 20px;
+  }
+  .world-cup-field-center,
+  .world-cup-field-goal,
+  .world-cup-ball {
+    opacity: .45;
+  }
+  .world-cup-campaign-grid {
+    gap: 1rem;
+  }
+  .world-cup-campaign-kicker {
+    font-size: .64rem;
+    line-height: 1.25;
+  }
+  .world-cup-campaign h2 {
+    font-size: clamp(2.6rem, 16vw, 4rem);
+  }
+  .world-cup-campaign-subtitle {
+    font-size: 1.07rem;
+  }
+  .world-cup-campaign-actions .btn {
+    width: 100%;
+  }
+  .world-cup-campaign-showcase {
+    padding: .72rem;
+    border-radius: 20px;
+  }
+  .world-cup-campaign-showcase-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: .1rem;
+  }
+  .world-cup-campaign-carousel {
+    grid-auto-columns: minmax(238px, 82vw);
+    gap: .75rem;
+    padding-inline: .05rem;
+  }
+  .world-cup-campaign-product-card {
+    min-height: 330px;
+  }
+  .world-cup-campaign-product-image {
+    height: 154px;
+  }
+  .world-cup-campaign-arrow {
+    display: none;
+  }
+  .welcome-modal {
+    width: min(94vw, 760px);
+    padding: 1.1rem;
+    border-radius: 20px;
+  }
+  .welcome-modal h2 {
+    max-width: 13ch;
+  }
+  .welcome-actions {
+    grid-template-columns: 1fr;
+  }
+  .welcome-ball { opacity: .12; }
+}
