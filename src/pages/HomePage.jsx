@@ -104,7 +104,7 @@ function HomePage() {
   const [loadingArrivalVideos, setLoadingArrivalVideos] = useState(true);
   const [siteVideos, setSiteVideos] = useState([]);
   const [loadingSiteVideos, setLoadingSiteVideos] = useState(true);
-  const [selectedSiteVideo, setSelectedSiteVideo] = useState(null);
+  const [activeSiteVideoId, setActiveSiteVideoId] = useState(null);
   const whatsappNumber = useStoreWhatsappNumber();
   const location = useLocation();
   const campaignCarouselRef = useRef(null);
@@ -229,7 +229,10 @@ function HomePage() {
     };
   }, []);
 
-  const activeSiteVideoEmbedUrl = selectedSiteVideo ? getYouTubeEmbedUrl(selectedSiteVideo.video_url) : '';
+  function getActiveSiteVideoEmbedUrl(video) {
+    const embedUrl = getYouTubeEmbedUrl(video.video_url);
+    return embedUrl ? `${embedUrl}?autoplay=1&playsinline=1&rel=0` : '';
+  }
 
   function openSiteVideo(video) {
     const embedUrl = getYouTubeEmbedUrl(video.video_url);
@@ -237,11 +240,11 @@ function HomePage() {
       window.open(video.video_url, '_blank', 'noopener,noreferrer');
       return;
     }
-    setSelectedSiteVideo(video);
+    setActiveSiteVideoId(video.id);
   }
 
   function closeSiteVideo() {
-    setSelectedSiteVideo(null);
+    setActiveSiteVideoId(null);
   }
 
   function handleCampaignCarouselScroll(direction) {
@@ -462,53 +465,48 @@ function HomePage() {
             {siteVideos.map((video) => {
               const thumbnailUrl = video.thumbnail_url || getYouTubeThumbnailUrl(video.video_url);
               const canEmbed = Boolean(getYouTubeEmbedUrl(video.video_url));
+              const isActive = activeSiteVideoId === video.id;
+              const activeEmbedUrl = isActive ? getActiveSiteVideoEmbedUrl(video) : '';
+
               return (
                 <article key={video.id} className="site-video-card">
-                  <button
-                    className="site-video-cover"
-                    type="button"
-                    onClick={() => openSiteVideo(video)}
-                    aria-label={`${canEmbed ? 'Assistir' : 'Abrir'} vídeo: ${video.titulo}`}
-                  >
-                    {thumbnailUrl ? <img src={thumbnailUrl} alt="" loading="lazy" /> : null}
-                    <span className="site-video-gradient" aria-hidden="true" />
-                    <span className="site-video-tag">{video.categoria || 'Allegro'}</span>
-                    <span className="site-video-play" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" focusable="false"><path d="M8 6v12l10-6z" fill="currentColor" /></svg>
-                    </span>
-                  </button>
+                  <div className="site-video-cover">
+                    {activeEmbedUrl ? (
+                      <>
+                        <iframe
+                          src={activeEmbedUrl}
+                          title={`Vídeo: ${video.titulo}`}
+                          loading="lazy"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
+                        />
+                        <button className="site-video-stop" type="button" onClick={closeSiteVideo} aria-label={`Parar vídeo: ${video.titulo}`}>×</button>
+                      </>
+                    ) : (
+                      <button
+                        className="site-video-cover-button"
+                        type="button"
+                        onClick={() => openSiteVideo(video)}
+                        aria-label={`${canEmbed ? 'Assistir' : 'Abrir'} vídeo: ${video.titulo}`}
+                      >
+                        {thumbnailUrl ? <img src={thumbnailUrl} alt="" loading="lazy" /> : null}
+                        <span className="site-video-gradient" aria-hidden="true" />
+                        <span className="site-video-tag">{video.categoria || 'Allegro'}</span>
+                        <span className="site-video-play" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" focusable="false"><path d="M8 6v12l10-6z" fill="currentColor" /></svg>
+                        </span>
+                      </button>
+                    )}
+                  </div>
                   <div className="site-video-content">
                     <h3>{video.titulo}</h3>
                     {video.descricao ? <p>{video.descricao}</p> : null}
-                    <button className="btn btn-secondary" type="button" onClick={() => openSiteVideo(video)}>Assistir vídeo</button>
+                    <button className="btn btn-secondary" type="button" onClick={() => openSiteVideo(video)}>{canEmbed ? 'Assistir vídeo' : 'Abrir vídeo'}</button>
                   </div>
                 </article>
               );
             })}
-          </div>
-        </div>
-      ) : null}
-
-      {selectedSiteVideo ? (
-        <div className="site-video-modal-backdrop" role="presentation" onClick={closeSiteVideo}>
-          <div className="site-video-modal" role="dialog" aria-modal="true" aria-labelledby="site-video-modal-title" onClick={(event) => event.stopPropagation()}>
-            <button className="site-video-modal-close" type="button" onClick={closeSiteVideo} aria-label="Fechar vídeo">×</button>
-            <div className="site-video-modal-header">
-              <p>{selectedSiteVideo.categoria || 'Vídeos da Allegro'}</p>
-              <h2 id="site-video-modal-title">{selectedSiteVideo.titulo}</h2>
-            </div>
-            <div className="site-video-iframe-wrap">
-              {activeSiteVideoEmbedUrl ? (
-                <iframe
-                  src={activeSiteVideoEmbedUrl}
-                  title={`Vídeo: ${selectedSiteVideo.titulo}`}
-                  loading="lazy"
-                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
-                />
-              ) : null}
-            </div>
           </div>
         </div>
       ) : null}
