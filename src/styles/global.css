@@ -2581,3 +2581,90 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   }
   .site-video-card { min-width: 72vw; max-width: 72vw; scroll-snap-align: start; }
 }
+
+/* Product cards: keep catalog clean on desktop and reveal actions on interaction. */
+.product-card {
+  position: relative;
+  transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+}
+.product-card:hover,
+.product-card:focus-within {
+  border-color: rgba(193, 18, 31, .32);
+  box-shadow: 0 16px 34px rgba(18,18,18,.12), 0 0 0 1px rgba(193,18,31,.12);
+  transform: translateY(-2px);
+}
+.product-card .product-image-link {
+  display: block;
+  background: linear-gradient(180deg, #fbfbfc 0%, #f5f6f8 100%);
+}
+.product-card:hover img,
+.product-card:focus-within img {
+  transform: scale(1.025);
+}
+
+@media (min-width: 681px) {
+  .product-content {
+    position: relative;
+  }
+  .product-actions {
+    position: absolute;
+    left: .68rem;
+    right: .68rem;
+    bottom: .68rem;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .45rem;
+    margin-top: 0;
+    padding: .62rem;
+    border: 1px solid rgba(255,255,255,.58);
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(255,255,255,.96) 0%, rgba(255,255,255,.9) 100%);
+    box-shadow: 0 18px 34px rgba(15, 17, 22, .18), 0 0 0 1px rgba(193,18,31,.08);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(14px);
+    transition: opacity .22s ease, transform .24s ease, box-shadow .24s ease;
+    backdrop-filter: blur(10px);
+  }
+  .product-card:hover .product-actions,
+  .product-card:focus-within .product-actions {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .product-actions .btn {
+    flex: initial;
+    min-height: 36px;
+    width: 100%;
+    padding: .48rem .55rem;
+    font-size: .8rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 680px) {
+  .product-card {
+    border-radius: 14px;
+  }
+  .product-card:hover,
+  .product-card:focus-within {
+    transform: none;
+  }
+  .product-actions {
+    display: grid;
+    grid-template-columns: .85fr 1fr;
+    gap: .42rem;
+    margin-top: .45rem;
+  }
+  .product-actions .btn {
+    width: 100%;
+    min-height: 38px;
+    padding: .48rem .55rem;
+    font-size: .78rem;
+  }
+  .product-actions .btn-cart,
+  .product-actions .btn-whatsapp {
+    font-size: .76rem;
+  }
+}
