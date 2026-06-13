@@ -2,6 +2,7 @@ import { products as mockProducts } from '../data/products';
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 import { createAuditLog } from './auditService';
 import { HOME_VIDEOS_TABLE, defaultHomeVideos, normalizeHomeVideo } from './homeVideosService';
+import { SITE_VIDEOS_TABLE, defaultSiteVideos, normalizeSiteVideo } from './siteVideosService';
 
 const PRODUCTS_TABLE = 'music_produtos';
 const PRODUCT_IMAGES_TABLE = 'music_produto_imagens';
@@ -106,6 +107,7 @@ let localCategories = Array.from(new Set(localProducts.map((p) => p.categoria)))
 }));
 let localSettings = { ...mockSettings };
 let localHomeVideos = defaultHomeVideos.map(normalizeHomeVideo);
+let localSiteVideos = defaultSiteVideos.map(normalizeSiteVideo);
 
 function isValidUuid(value) {
   return typeof value === 'string' && UUID_V4_REGEX.test(value);
@@ -699,6 +701,89 @@ export async function updateAdminStoreSettings(payload) {
   return updated;
 }
 
+
+
+function sanitizeSiteVideoPayload(payload = {}) {
+  return {
+    titulo: String(payload?.titulo ?? '').trim(),
+    descricao: String(payload?.descricao ?? '').trim(),
+    categoria: String(payload?.categoria ?? '').trim(),
+    video_url: String(payload?.video_url ?? '').trim(),
+    thumbnail_url: String(payload?.thumbnail_url ?? '').trim(),
+    ordem: Number.isFinite(Number(payload?.ordem)) ? Number(payload.ordem) : 0,
+    ativo: payload?.ativo ?? true,
+  };
+}
+
+function sortSiteVideosByOrder(a, b) {
+  const orderDifference = Number(a.ordem ?? 0) - Number(b.ordem ?? 0);
+  if (orderDifference !== 0) return orderDifference;
+  return String(a.titulo || '').localeCompare(String(b.titulo || ''), 'pt-BR', { sensitivity: 'base' });
+}
+
+export async function getAdminSiteVideos() {
+  if (!isSupabaseConfigured || !supabase) {
+    return localSiteVideos.map(normalizeSiteVideo).sort(sortSiteVideosByOrder);
+  }
+
+  const { data, error } = await supabase
+    .from(SITE_VIDEOS_TABLE)
+    .select('*')
+    .order('ordem', { ascending: true })
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.warn('[adminService] fallback vídeos da Allegro:', error.message);
+    return localSiteVideos.map(normalizeSiteVideo).sort(sortSiteVideosByOrder);
+  }
+
+  return (data ?? []).map(normalizeSiteVideo).sort(sortSiteVideosByOrder);
+}
+
+export async function createAdminSiteVideo(payload) {
+  const sanitizedPayload = sanitizeSiteVideoPayload(payload);
+  if (!sanitizedPayload.titulo) throw new Error('Informe o título do vídeo.');
+  if (!sanitizedPayload.video_url) throw new Error('Informe o link do vídeo.');
+
+  if (!isSupabaseConfigured || !supabase) {
+    const item = normalizeSiteVideo({ ...sanitizedPayload, id: `mock-site-video-${Date.now()}`, created_at: new Date().toISOString() });
+    localSiteVideos = [item, ...localSiteVideos].sort(sortSiteVideosByOrder);
+    return item;
+  }
+
+  const { data, error } = await supabase.from(SITE_VIDEOS_TABLE).insert(sanitizedPayload).select().single();
+  if (error) throw new Error(error.message);
+  return normalizeSiteVideo(data);
+}
+
+export async function updateAdminSiteVideo(id, payload) {
+  if (!id) throw new Error('Vídeo inválido para edição.');
+  const sanitizedPayload = { ...sanitizeSiteVideoPayload(payload), updated_at: new Date().toISOString() };
+  if (!sanitizedPayload.titulo) throw new Error('Informe o título do vídeo.');
+  if (!sanitizedPayload.video_url) throw new Error('Informe o link do vídeo.');
+
+  if (!isSupabaseConfigured || !supabase) {
+    localSiteVideos = localSiteVideos.map((item) => (String(item.id) === String(id) ? normalizeSiteVideo({ ...item, ...sanitizedPayload }) : item));
+    return localSiteVideos.find((item) => String(item.id) === String(id));
+  }
+
+  const { data, error } = await supabase.from(SITE_VIDEOS_TABLE).update(sanitizedPayload).eq('id', id).select().single();
+  if (error) throw new Error(error.message);
+  return normalizeSiteVideo(data);
+}
+
+export async function deleteAdminSiteVideo(id) {
+  if (!id) throw new Error('Vídeo inválido para exclusão.');
+
+  if (!isSupabaseConfigured || !supabase) {
+    localSiteVideos = localSiteVideos.filter((item) => String(item.id) !== String(id));
+    return true;
+  }
+
+  const { error } = await supabase.from(SITE_VIDEOS_TABLE).delete().eq('id', id);
+  if (error) throw new Error(error.message);
+  return true;
+}
 
 function sanitizeHomeVideoPayload(payload = {}) {
   return {

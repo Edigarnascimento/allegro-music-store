@@ -9,6 +9,7 @@ import { getCategories } from '../services/categoriesService';
 import { useStoreWhatsappNumber } from '../hooks/useStoreWhatsappNumber';
 import { buildWhatsAppLink, formatPriceBRL } from '../lib/whatsapp';
 import { DEFAULT_HOME_VIDEO_WHATSAPP_MESSAGE, getHomeVideos } from '../services/homeVideosService';
+import { getSiteVideos, getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '../services/siteVideosService';
 import { trackEvent } from '../services/analyticsService';
 
 const fallbackFeaturedCategories = [
@@ -101,6 +102,9 @@ function HomePage() {
   const [campaignProducts, setCampaignProducts] = useState([]);
   const [arrivalVideos, setArrivalVideos] = useState([]);
   const [loadingArrivalVideos, setLoadingArrivalVideos] = useState(true);
+  const [siteVideos, setSiteVideos] = useState([]);
+  const [loadingSiteVideos, setLoadingSiteVideos] = useState(true);
+  const [selectedSiteVideo, setSelectedSiteVideo] = useState(null);
   const whatsappNumber = useStoreWhatsappNumber();
   const location = useLocation();
   const campaignCarouselRef = useRef(null);
@@ -205,6 +209,40 @@ function HomePage() {
     };
   }, []);
 
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadSiteVideos() {
+      try {
+        const data = await getSiteVideos({ limit: 5 });
+        if (isMounted) setSiteVideos(data);
+      } finally {
+        if (isMounted) setLoadingSiteVideos(false);
+      }
+    }
+
+    loadSiteVideos();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const activeSiteVideoEmbedUrl = selectedSiteVideo ? getYouTubeEmbedUrl(selectedSiteVideo.video_url) : '';
+
+  function openSiteVideo(video) {
+    const embedUrl = getYouTubeEmbedUrl(video.video_url);
+    if (!embedUrl) {
+      window.open(video.video_url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    setSelectedSiteVideo(video);
+  }
+
+  function closeSiteVideo() {
+    setSelectedSiteVideo(null);
+  }
 
   function handleCampaignCarouselScroll(direction) {
     const carousel = campaignCarouselRef.current;
@@ -412,6 +450,68 @@ function HomePage() {
           </a>
         </div>
       </div>
+
+
+      {!loadingSiteVideos && siteVideos.length ? (
+        <div className="container section site-videos-section" id="videos-da-allegro">
+          <div className="section-heading">
+            <h2>Vídeos da Allegro</h2>
+            <p className="subtitle">Acompanhe novidades, produtos, serviços e bastidores da nossa loja física e online.</p>
+          </div>
+          <div className="site-videos-row" aria-label="Vídeos curtos da Allegro Music Store">
+            {siteVideos.map((video) => {
+              const thumbnailUrl = video.thumbnail_url || getYouTubeThumbnailUrl(video.video_url);
+              const canEmbed = Boolean(getYouTubeEmbedUrl(video.video_url));
+              return (
+                <article key={video.id} className="site-video-card">
+                  <button
+                    className="site-video-cover"
+                    type="button"
+                    onClick={() => openSiteVideo(video)}
+                    aria-label={`${canEmbed ? 'Assistir' : 'Abrir'} vídeo: ${video.titulo}`}
+                  >
+                    {thumbnailUrl ? <img src={thumbnailUrl} alt="" loading="lazy" /> : null}
+                    <span className="site-video-gradient" aria-hidden="true" />
+                    <span className="site-video-tag">{video.categoria || 'Allegro'}</span>
+                    <span className="site-video-play" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" focusable="false"><path d="M8 6v12l10-6z" fill="currentColor" /></svg>
+                    </span>
+                  </button>
+                  <div className="site-video-content">
+                    <h3>{video.titulo}</h3>
+                    {video.descricao ? <p>{video.descricao}</p> : null}
+                    <button className="btn btn-secondary" type="button" onClick={() => openSiteVideo(video)}>Assistir vídeo</button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
+      {selectedSiteVideo ? (
+        <div className="site-video-modal-backdrop" role="presentation" onClick={closeSiteVideo}>
+          <div className="site-video-modal" role="dialog" aria-modal="true" aria-labelledby="site-video-modal-title" onClick={(event) => event.stopPropagation()}>
+            <button className="site-video-modal-close" type="button" onClick={closeSiteVideo} aria-label="Fechar vídeo">×</button>
+            <div className="site-video-modal-header">
+              <p>{selectedSiteVideo.categoria || 'Vídeos da Allegro'}</p>
+              <h2 id="site-video-modal-title">{selectedSiteVideo.titulo}</h2>
+            </div>
+            <div className="site-video-iframe-wrap">
+              {activeSiteVideoEmbedUrl ? (
+                <iframe
+                  src={activeSiteVideoEmbedUrl}
+                  title={`Vídeo: ${selectedSiteVideo.titulo}`}
+                  loading="lazy"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
+                />
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <div className="container section arrived-section" id="chegou-na-allegro">
         <div className="section-heading">

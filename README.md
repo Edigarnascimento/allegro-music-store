@@ -905,3 +905,39 @@ grant execute on function public.return_order_stock(uuid) to authenticated;
 
 
 alter table public.music_pagamentos add column if not exists payment_url text;
+
+### SQL sugerido para seção “Vídeos da Allegro”
+
+A Home busca até 5 vídeos ativos da tabela `music_videos_site`, ordenando por `ordem`. O painel administrativo em `/admin/videos` permite criar, editar, excluir, ativar/desativar, alterar a ordem e pré-visualizar o card. Nesta etapa, os vídeos não são armazenados no Supabase: cadastre links externos do YouTube, YouTube Shorts ou `youtu.be` e informe uma URL de thumbnail quando quiser controlar a capa.
+
+```sql
+create table if not exists public.music_videos_site (
+  id uuid primary key default gen_random_uuid(),
+  titulo text not null,
+  descricao text,
+  categoria text,
+  video_url text not null,
+  thumbnail_url text,
+  ordem integer default 0,
+  ativo boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists idx_music_videos_site_ativo_ordem
+on public.music_videos_site(ativo, ordem);
+
+alter table public.music_videos_site enable row level security;
+
+create policy "Public can view active site videos"
+on public.music_videos_site
+for select
+using (ativo = true);
+
+create policy "Authenticated users can manage site videos"
+on public.music_videos_site
+for all
+to authenticated
+using (true)
+with check (true);
+```
