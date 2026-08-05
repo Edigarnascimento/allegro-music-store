@@ -66,7 +66,7 @@ const HOME_SPECIALIST_WHATSAPP_MESSAGE = 'Olá, acessei o site da Allegro Music 
 
 const institutionalHighlightCategories = ['Instrumentos', 'Acessórios', 'Áudio profissional', 'Luteria', 'Aulas'];
 
-const campaignCategoryPriority = [
+const featuredShowcaseCategoryPriority = [
   ['audio', 'som', 'microfone', 'caixa'],
   ['acessorios', 'acessorio', 'cabos', 'palhetas'],
   ['cordas'],
@@ -88,9 +88,9 @@ function normalizeProduct(product) {
   };
 }
 
-function productCampaignScore(product) {
+function productShowcaseScore(product) {
   const normalizedCategory = normalizeCategoryName(product.categoria ?? product.category);
-  const categoryIndex = campaignCategoryPriority.findIndex((categoryGroup) => categoryGroup.some((category) => normalizedCategory.includes(category)));
+  const categoryIndex = featuredShowcaseCategoryPriority.findIndex((categoryGroup) => categoryGroup.some((category) => normalizedCategory.includes(category)));
   const featuredScore = product.destaque === true ? 0 : 10;
   return featuredScore + (categoryIndex >= 0 ? categoryIndex : 8);
 }
@@ -99,7 +99,7 @@ function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [featuredCategories, setFeaturedCategories] = useState(fallbackFeaturedCategories);
-  const [campaignProducts, setCampaignProducts] = useState([]);
+  const [showcaseProducts, setShowcaseProducts] = useState([]);
   const [arrivalVideos, setArrivalVideos] = useState([]);
   const [loadingArrivalVideos, setLoadingArrivalVideos] = useState(true);
   const [siteVideos, setSiteVideos] = useState([]);
@@ -107,7 +107,7 @@ function HomePage() {
   const [activeSiteVideoId, setActiveSiteVideoId] = useState(null);
   const whatsappNumber = useStoreWhatsappNumber();
   const location = useLocation();
-  const campaignCarouselRef = useRef(null);
+  const showcaseCarouselRef = useRef(null);
 
   useEffect(() => {
     trackEvent('page_view_home');
@@ -133,9 +133,9 @@ function HomePage() {
 
         const activeProducts = data.filter((product) => product.ativo === true || typeof product.ativo === 'undefined');
         const featured = activeProducts.filter((product) => product.destaque === true);
-        const prioritizedProducts = [...activeProducts].sort((firstProduct, secondProduct) => productCampaignScore(firstProduct) - productCampaignScore(secondProduct));
+        const prioritizedProducts = [...activeProducts].sort((firstProduct, secondProduct) => productShowcaseScore(firstProduct) - productShowcaseScore(secondProduct));
         setFeaturedProducts(featured.length ? featured.slice(0, 6) : activeProducts.slice(0, 6));
-        setCampaignProducts(prioritizedProducts.slice(0, 10));
+        setShowcaseProducts(prioritizedProducts.slice(0, 10));
       } finally {
         if (isMounted) {
           setLoadingFeatured(false);
@@ -247,8 +247,8 @@ function HomePage() {
     setActiveSiteVideoId(null);
   }
 
-  function handleCampaignCarouselScroll(direction) {
-    const carousel = campaignCarouselRef.current;
+  function handleShowcaseCarouselScroll(direction) {
+    const carousel = showcaseCarouselRef.current;
     if (!carousel) return;
 
     carousel.scrollBy({
@@ -260,11 +260,10 @@ function HomePage() {
   return (
     <section>
       <div className="allegro-institutional" aria-labelledby="allegro-institutional-title">
-        <div className="allegro-sound-lines" aria-hidden="true">
-          <span className="allegro-sound-wave" />
-          <span className="allegro-sound-bar" />
+        <div className="allegro-musical-glow" aria-hidden="true">
           <span className="allegro-music-note allegro-music-note-one">♪</span>
           <span className="allegro-music-note allegro-music-note-two">♬</span>
+          <span className="allegro-music-note allegro-music-note-three">𝄞</span>
         </div>
         <div className="container allegro-institutional-grid">
           <div className="allegro-institutional-copy">
@@ -305,17 +304,17 @@ function HomePage() {
                 type="button"
                 className="allegro-institutional-arrow allegro-institutional-arrow-left"
                 aria-label="Ver produtos anteriores"
-                onClick={() => handleCampaignCarouselScroll(-1)}
+                onClick={() => handleShowcaseCarouselScroll(-1)}
               >
                 ‹
               </button>
-              <div className="allegro-institutional-carousel" ref={campaignCarouselRef} tabIndex="0">
+              <div className="allegro-institutional-carousel" ref={showcaseCarouselRef} tabIndex="0">
                 {loadingFeatured ? (
                   <article className="allegro-institutional-product-card allegro-institutional-product-card-placeholder">
                     <span>Carregando produtos em destaque...</span>
                   </article>
                 ) : null}
-                {!loadingFeatured && campaignProducts.length ? campaignProducts.map((product) => {
+                {!loadingFeatured && showcaseProducts.length ? showcaseProducts.map((product) => {
                   const normalizedProduct = normalizeProduct(product);
                   const detailsPath = normalizedProduct.id ? `/produto/${normalizedProduct.id}` : '/catalogo';
 
@@ -341,7 +340,7 @@ function HomePage() {
                     </article>
                   );
                 }) : null}
-                {!loadingFeatured && !campaignProducts.length ? (
+                {!loadingFeatured && !showcaseProducts.length ? (
                   <article className="allegro-institutional-product-card allegro-institutional-product-card-placeholder">
                     <span>Produtos musicais, áudio, acessórios e serviços selecionados pela Allegro.</span>
                     <Link className="btn btn-main btn-compact allegro-institutional-product-button" to="/catalogo">Ver catálogo</Link>
@@ -352,7 +351,7 @@ function HomePage() {
                 type="button"
                 className="allegro-institutional-arrow allegro-institutional-arrow-right"
                 aria-label="Ver próximos produtos"
-                onClick={() => handleCampaignCarouselScroll(1)}
+                onClick={() => handleShowcaseCarouselScroll(1)}
               >
                 ›
               </button>

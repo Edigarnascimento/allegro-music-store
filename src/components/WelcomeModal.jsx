@@ -45,9 +45,7 @@ function WelcomeModal() {
       <div className="welcome-modal">
         <button type="button" className="welcome-close" onClick={closeModal} aria-label="Fechar mensagem de boas-vindas">×</button>
 
-        <div className="welcome-sound-decoration" aria-hidden="true">
-          <span className="welcome-sound-wave" />
-          <span className="welcome-sound-bar" />
+        <div className="welcome-musical-decoration" aria-hidden="true">
           <span className="welcome-music-note welcome-music-note-one">♪</span>
           <span className="welcome-music-note welcome-music-note-two">♬</span>
         </div>
