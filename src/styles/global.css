@@ -225,11 +225,11 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   overflow: hidden;
   padding: clamp(2.3rem, 5vw, 4.4rem) 0;
   background:
-    radial-gradient(circle at 12% 18%, rgba(255,255,255,.12), transparent 28%),
-    radial-gradient(circle at 82% 12%, rgba(193,18,31,.36), transparent 26%),
-    linear-gradient(135deg, #111216 0%, #17191f 46%, #520711 100%);
+    radial-gradient(circle at top right, rgba(141, 29, 40, .28), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(90, 36, 28, .22), transparent 32%),
+    linear-gradient(135deg, #14090b 0%, #211012 38%, #4a151b 72%, #5a241c 100%);
   color: #fff;
-  border-bottom: 1px solid rgba(193,18,31,.28);
+  border-bottom: 1px solid rgba(199, 154, 43, .18);
 }
 .home-hero::before {
   content: '';
@@ -237,8 +237,8 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(115deg, transparent 0 56%, rgba(255,255,255,.06) 56.2% 56.9%, transparent 57.2% 100%),
-    radial-gradient(circle at 76% 76%, rgba(255, 54, 72, .2), transparent 24%);
+    linear-gradient(115deg, transparent 0 56%, rgba(245,245,245,.045) 56.2% 56.9%, transparent 57.2% 100%),
+    radial-gradient(circle at 76% 76%, rgba(122, 24, 34, .2), transparent 24%);
 }
 .home-hero-grid {
   position: relative;
@@ -259,9 +259,9 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   margin: 0 0 .78rem;
   padding: .36rem .72rem;
   border-radius: 999px;
-  color: #ffdce0;
-  background: rgba(193,18,31,.24);
-  border: 1px solid rgba(255, 92, 108, .38);
+  color: #f7e5df;
+  background: rgba(74, 21, 27, .46);
+  border: 1px solid rgba(199, 154, 43, .32);
 }
 .home-hero-lead {
   max-width: 62ch;
@@ -301,10 +301,10 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   padding: clamp(1.1rem, 2.4vw, 1.7rem);
   color: #fff;
   background:
-    radial-gradient(circle at 86% 14%, rgba(255, 69, 86, .28), transparent 27%),
-    linear-gradient(155deg, rgba(255,255,255,.12), rgba(255,255,255,.055));
-  border-color: rgba(255,255,255,.18);
-  box-shadow: 0 24px 52px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.12);
+    radial-gradient(circle at 86% 14%, rgba(141, 29, 40, .24), transparent 27%),
+    linear-gradient(180deg, rgba(28, 13, 15, .96) 0%, rgba(50, 19, 22, .96) 100%);
+  border-color: rgba(199, 154, 43, .22);
+  box-shadow: 0 24px 52px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.1);
   backdrop-filter: blur(10px);
 }
 .home-hero-panel-tag {
@@ -312,9 +312,9 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   margin-bottom: .8rem;
   padding: .28rem .62rem;
   border-radius: 999px;
-  color: #ffeff1;
-  background: rgba(193,18,31,.42);
-  border: 1px solid rgba(255, 103, 118, .42);
+  color: #f8ebe5;
+  background: rgba(122, 24, 34, .5);
+  border: 1px solid rgba(199, 154, 43, .34);
   font-size: .72rem;
   font-weight: 850;
   text-transform: uppercase;
@@ -351,9 +351,23 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   align-items: center;
   justify-content: center;
   color: #fff;
-  background: linear-gradient(145deg, #db1d2d, #8d0b15);
+  background: linear-gradient(145deg, #8d1d28, #5a241c);
   font-size: .76rem;
-  box-shadow: 0 0 18px rgba(193,18,31,.36);
+  box-shadow: 0 0 18px rgba(141,29,40,.34);
+}
+
+
+.allegro-institutional .btn-main,
+.home-hero .btn-main,
+.home-products-section .btn-main {
+  background: linear-gradient(180deg, #a11f2e 0%, #7a1822 100%);
+  border-color: rgba(199,154,43,.28);
+}
+.allegro-institutional .btn-main:hover,
+.home-hero .btn-main:hover,
+.home-products-section .btn-main:hover {
+  background: linear-gradient(180deg, #8d1d28 0%, #5a241c 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 14px 24px rgba(0,0,0,.25), 0 0 0 1px rgba(199,154,43,.18), 0 0 16px rgba(90,36,28,.26);
 }
 
 .trust-section {
@@ -408,11 +422,11 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   width: min(1360px, 94%);
   margin: 2rem auto 0;
   padding: 1.35rem;
-  border: 1px solid #ece0e2;
+  border: 1px solid #eadfda;
   border-radius: 24px;
   background:
-    linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,247,248,.72)),
-    radial-gradient(circle at 90% 0%, rgba(193,18,31,.13), transparent 30%);
+    linear-gradient(180deg, rgba(255,255,255,.97), rgba(248,241,238,.78)),
+    radial-gradient(circle at 90% 0%, rgba(122,24,34,.12), transparent 30%);
   box-shadow: 0 18px 40px rgba(18,18,18,.06);
 }
 .home-products-section .products-grid {
@@ -427,8 +441,8 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 }
 .home-products-section .product-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(193,18,31,.36);
-  box-shadow: 0 24px 44px rgba(18,18,18,.12), 0 0 0 1px rgba(193,18,31,.08);
+  border-color: rgba(122,24,34,.32);
+  box-shadow: 0 24px 44px rgba(18,18,18,.12), 0 0 0 1px rgba(122,24,34,.08);
 }
 .home-products-section .product-image-link {
   padding: .65rem .7rem 0;
@@ -442,11 +456,11 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 }
 .home-products-section .badge {
   color: #fff;
-  background: linear-gradient(145deg, #c1121f, #8f0e18);
-  border-color: rgba(193,18,31,.22);
+  background: linear-gradient(145deg, #8d1d28, #5a241c);
+  border-color: rgba(122,24,34,.22);
 }
 .home-products-section .product-price {
-  color: #b10f1b;
+  color: #7a1822;
   font-size: 1.22rem;
 }
 
@@ -1453,8 +1467,8 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   padding: 1.15rem;
   border-radius: 20px;
   background:
-    linear-gradient(145deg, rgba(34, 36, 46, .96) 0%, rgba(16, 17, 23, .98) 52%, rgba(44, 8, 14, .96) 100%);
-  border: 1px solid rgba(255, 76, 91, .28);
+    linear-gradient(180deg, rgba(28, 13, 15, .96) 0%, rgba(50, 19, 22, .96) 100%);
+  border: 1px solid rgba(199, 154, 43, .18);
   box-shadow: 0 18px 34px rgba(0, 0, 0, .34), inset 0 1px 0 rgba(255, 255, 255, .06);
   transform: translateZ(0);
 }
@@ -1464,7 +1478,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 82% 16%, rgba(255, 64, 82, .22), transparent 27%),
+    radial-gradient(circle at 82% 16%, rgba(141, 29, 40, .24), transparent 27%),
     linear-gradient(135deg, rgba(255,255,255,.08), transparent 36%);
   opacity: .78;
 }
@@ -1486,18 +1500,18 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   width: 4.15rem;
   height: 4.15rem;
   border-radius: 18px;
-  color: #ff4353;
+  color: #c79a2b;
   background:
     radial-gradient(circle at 38% 22%, rgba(255,255,255,.18), transparent 34%),
-    linear-gradient(145deg, rgba(193, 18, 31, .42) 0%, rgba(16, 17, 23, .92) 72%);
-  border: 1px solid rgba(255, 92, 106, .5);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 0 0 1px rgba(193,18,31,.18), 0 14px 26px rgba(193,18,31,.2);
+    linear-gradient(145deg, rgba(122, 24, 34, .46) 0%, rgba(20, 9, 11, .94) 72%);
+  border: 1px solid rgba(199, 154, 43, .38);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 0 0 1px rgba(199,154,43,.16), 0 14px 26px rgba(74,21,27,.24);
 }
 #categorias .category-card-icon .category-icon {
   width: 2.3rem;
   height: 2.3rem;
   flex-basis: 2.3rem;
-  filter: drop-shadow(0 0 10px rgba(255, 67, 83, .48));
+  filter: drop-shadow(0 0 10px rgba(199, 154, 43, .34));
 }
 #categorias .category-card-icon .category-icon svg {
   stroke-width: 2.05;
@@ -1507,7 +1521,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   color: #fff;
   font-size: 1.08rem;
   letter-spacing: .01em;
-  text-shadow: 0 0 16px rgba(255, 67, 83, .14);
+  text-shadow: 0 0 16px rgba(199, 154, 43, .12);
 }
 #categorias .category-card-description {
   color: #c9ced8;
@@ -1516,15 +1530,15 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 #categorias .category-card:hover,
 #categorias .category-card:focus-visible {
   transform: translateY(-5px);
-  border-color: rgba(255, 78, 94, .86);
-  box-shadow: 0 26px 46px rgba(0, 0, 0, .46), 0 0 0 1px rgba(255, 78, 94, .18), 0 0 26px rgba(193, 18, 31, .34);
+  border-color: rgba(199, 154, 43, .46);
+  box-shadow: 0 26px 46px rgba(0, 0, 0, .46), 0 0 0 1px rgba(199, 154, 43, .14), 0 0 26px rgba(90, 36, 28, .38);
 }
 #categorias .category-card:hover .category-card-icon,
 #categorias .category-card:focus-visible .category-card-icon {
   color: #fff;
-  border-color: rgba(255, 118, 130, .8);
-  background: linear-gradient(145deg, rgba(215, 24, 42, .78) 0%, rgba(99, 12, 22, .92) 100%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 0 26px rgba(255, 63, 80, .36);
+  border-color: rgba(199, 154, 43, .64);
+  background: linear-gradient(145deg, rgba(141, 29, 40, .78) 0%, rgba(90, 36, 28, .92) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 0 26px rgba(199, 154, 43, .28);
 }
 
 @media (max-width: 980px) {
@@ -1799,9 +1813,12 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   min-height: clamp(560px, 66vh, 720px);
   display: grid;
   align-items: center;
-  background: #0a0a0d;
+  background:
+    radial-gradient(circle at top right, rgba(141, 29, 40, .28), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(90, 36, 28, .22), transparent 32%),
+    linear-gradient(135deg, #14090b 0%, #211012 38%, #4a151b 72%, #5a241c 100%);
   color: #fff;
-  border-bottom: 1px solid rgba(255,255,255,.14);
+  border-bottom: 1px solid rgba(199,154,43,.18);
   isolation: isolate;
 }
 .allegro-institutional-grid {
@@ -1824,8 +1841,8 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 }
 .allegro-musical-glow .allegro-music-note {
   position: absolute;
-  color: rgba(255, 220, 54, .24);
-  text-shadow: 0 0 38px rgba(193, 18, 31, .38);
+  color: rgba(199, 154, 43, .18);
+  text-shadow: 0 0 38px rgba(90, 36, 28, .44);
   font-weight: 900;
   line-height: 1;
 }
@@ -1845,7 +1862,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 .allegro-musical-glow .allegro-music-note-three {
   right: clamp(2rem, 28vw, 18rem);
   top: clamp(1.8rem, 9vw, 6rem);
-  color: rgba(193, 18, 31, .25);
+  color: rgba(141, 29, 40, .24);
   font-size: clamp(4rem, 10vw, 8.5rem);
   transform: rotate(6deg);
 }
@@ -1856,7 +1873,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   border: 1px solid rgba(255,255,255,.28);
   border-radius: 999px;
   background: rgba(255,255,255,.08);
-  color: #f6d47a;
+  color: #c79a2b;
   box-shadow: 0 14px 30px rgba(0,0,0,.24);
   font-size: clamp(.68rem, .95vw, .8rem);
   font-weight: 950;
@@ -1898,10 +1915,10 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   align-items: center;
   min-height: 32px;
   padding: .3rem .72rem;
-  border: 1px solid rgba(246,212,122,.5);
+  border: 1px solid rgba(199,154,43,.42);
   border-radius: 999px;
   background: rgba(255,255,255,.07);
-  color: #fff7df;
+  color: #f3e4c0;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
   font-size: .78rem;
   font-weight: 900;
@@ -1914,13 +1931,13 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   margin-top: 1.35rem;
 }
 .allegro-institutional-products {
-  background: #c1121f;
-  border-color: rgba(255,255,255,.38);
+  background: linear-gradient(180deg, #a11f2e 0%, #7a1822 100%);
+  border-color: rgba(199,154,43,.34);
   color: #fff;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 18px 30px rgba(0,0,0,.28);
 }
 .allegro-institutional-products:hover {
-  background: #a70f1b;
+  background: linear-gradient(180deg, #8d1d28 0%, #5a241c 100%);
 }
 .allegro-institutional-whatsapp {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 16px 28px rgba(0,0,0,.24);
@@ -1936,8 +1953,8 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   padding: clamp(.86rem, 1.6vw, 1.2rem);
   border: 1px solid rgba(255,255,255,.18);
   border-radius: 30px;
-  background: rgba(255,255,255,.08);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 30px 70px rgba(0,0,0,.34);
+  background: linear-gradient(180deg, rgba(28, 13, 15, .88) 0%, rgba(50, 19, 22, .82) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 30px 70px rgba(0,0,0,.38);
   backdrop-filter: blur(12px);
 }
 .allegro-institutional-showcase-header {
@@ -1954,7 +1971,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   text-transform: uppercase;
 }
 .allegro-institutional-showcase-header small {
-  color: #f6d47a;
+  color: #c79a2b;
   font-weight: 800;
 }
 .allegro-institutional-carousel-shell { position: relative; }
@@ -1970,7 +1987,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   padding: .15rem .15rem .8rem;
 }
 .allegro-institutional-carousel:focus-visible {
-  outline: 3px solid rgba(246, 212, 122, .72);
+  outline: 3px solid rgba(199, 154, 43, .72);
   outline-offset: 4px;
   border-radius: 22px;
 }
@@ -1979,7 +1996,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   min-height: 360px;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,.22);
-  border-top: 6px solid #c1121f;
+  border-top: 6px solid #7a1822;
   border-radius: 24px;
   background: #fff;
   color: #1a1012;
@@ -2009,8 +2026,8 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   width: fit-content;
   padding: .2rem .54rem;
   border-radius: 999px;
-  background: #fff3f1;
-  color: #9f1a26;
+  background: #f6ebe4;
+  color: #7a1822;
   font-size: .72rem;
   font-weight: 950;
   text-transform: uppercase;
@@ -2024,14 +2041,14 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   line-height: 1.2;
 }
 .allegro-institutional-product-content strong {
-  color: #b71222;
+  color: #7a1822;
   font-size: 1.28rem;
   font-weight: 950;
 }
 .allegro-institutional-product-button {
   width: 100%;
   margin-top: .12rem;
-  background: #c1121f;
+  background: linear-gradient(180deg, #a11f2e 0%, #7a1822 100%);
 }
 .allegro-institutional-product-card-placeholder {
   place-items: center;
@@ -2048,7 +2065,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   height: 46px;
   border: 2px solid rgba(255,255,255,.75);
   border-radius: 999px;
-  background: #f6d47a;
+  background: #c79a2b;
   color: #1a1012;
   box-shadow: 0 16px 30px rgba(0,0,0,.34);
   cursor: pointer;
