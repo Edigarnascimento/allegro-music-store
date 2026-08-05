@@ -1020,8 +1020,8 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   padding: 1.2rem;
   border: 1px solid rgba(255,255,255,.2);
   background:
-    radial-gradient(circle at top right, rgba(193,18,31,.18), transparent 45%),
-    linear-gradient(160deg, #fff 0%, #fdf8f8 100%);
+    radial-gradient(circle at top right, rgba(139, 16, 24, .35), transparent 35%),
+    linear-gradient(135deg, #2a0f12 0%, #3a1216 45%, #5a241c 100%);
   box-shadow: 0 24px 45px rgba(0,0,0,.35);
 }
 
@@ -2071,8 +2071,10 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   border-radius: 24px;
   padding: clamp(1.25rem, 3vw, 2rem);
   border: 1px solid rgba(255,255,255,.18);
-  background: #0a0a0d;
-  box-shadow: 0 28px 70px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.1);
+  background:
+    radial-gradient(circle at top right, rgba(139, 16, 24, .35), transparent 35%),
+    linear-gradient(135deg, #2a0f12 0%, #3a1216 45%, #5a241c 100%);
+  box-shadow: 0 28px 70px rgba(42,15,18,.48), inset 0 1px 0 rgba(255,255,255,.12);
   isolation: isolate;
 }
 .welcome-musical-decoration {
@@ -2085,7 +2087,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 }
 .welcome-music-note {
   position: absolute;
-  color: rgba(246, 212, 122, .32);
+  color: rgba(212, 167, 44, .34);
   font-size: clamp(2rem, 8vw, 4rem);
   font-weight: 900;
   line-height: 1;
@@ -2101,7 +2103,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   padding: .34rem .7rem;
   border-radius: 999px;
   background: rgba(255,255,255,.08);
-  color: #f6d47a;
+  color: #d4a72c;
   box-shadow: 0 10px 22px rgba(0,0,0,.2);
   font-weight: 950;
   text-transform: uppercase;
@@ -2130,7 +2132,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
 .welcome-highlight {
   width: fit-content;
   padding: .64rem .78rem;
-  border: 1px solid rgba(246,212,122,.35);
+  border: 1px solid rgba(212,167,44,.38);
   border-radius: 14px;
   background: rgba(255,255,255,.08);
   color: #fff7df;
@@ -2144,7 +2146,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   box-shadow: 0 10px 24px rgba(0,0,0,.2);
 }
 .welcome-close:hover { background: #fff; }
-.welcome-close:focus-visible { outline: 3px solid #f6d47a; outline-offset: 2px; }
+.welcome-close:focus-visible { outline: 3px solid #d4a72c; outline-offset: 2px; }
 .welcome-actions {
   position: relative;
   z-index: 1;
