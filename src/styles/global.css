@@ -1046,15 +1046,21 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   padding-right: 7rem;
 }
 
-.digital-card .digital-card-brand img {
-  width: clamp(78px, 13vw, 112px);
-  height: clamp(78px, 13vw, 112px);
-  padding: .6rem;
+.digital-card .digital-card-brand .digital-card-logo {
+  display: block;
+  flex: 0 0 auto;
+  width: clamp(96px, 15vw, 140px);
+  height: clamp(72px, 11vw, 104px);
+  max-width: 100%;
   object-fit: contain;
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 20px;
-  background: rgba(255,255,255,.97);
-  box-shadow: 0 14px 32px rgba(0,0,0,.32);
+  object-position: center;
+  opacity: 1;
+  filter: none;
+  mix-blend-mode: normal;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .digital-card-kicker {
@@ -1117,7 +1123,7 @@ h1 { margin: .2rem 0 .7rem; font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 
   .digital-card-page.section { padding: 1rem 0 1.5rem; }
   .digital-card { border-radius: 22px; }
   .digital-card .digital-card-brand { align-items: flex-start; padding-right: 3rem; }
-  .digital-card .digital-card-brand img { width: 70px; height: 70px; border-radius: 15px; }
+  .digital-card .digital-card-brand .digital-card-logo { width: 96px; height: 72px; }
   .digital-card-kicker { font-size: .67rem; letter-spacing: .12em; }
   .digital-card-intro, .digital-card-info, .digital-card-qr-wrap { padding: .85rem; }
   .digital-card-actions { grid-template-columns: 1fr; }

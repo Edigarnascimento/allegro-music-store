@@ -40,7 +40,7 @@ function DigitalCardPage() {
           </div>
 
           <div className="digital-card-brand">
-            {logoUrl ? <img src={logoUrl} alt={`Logo ${storeName}`} /> : null}
+            {logoUrl ? <img className="digital-card-logo" src={logoUrl} alt={`Logo ${storeName}`} /> : null}
             <div>
               <p className="digital-card-kicker">Cartão digital</p>
               <h1>{storeName}</h1>
