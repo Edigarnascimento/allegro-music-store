@@ -64,7 +64,7 @@ const homeTrustCards = [
 
 const HOME_SPECIALIST_WHATSAPP_MESSAGE = 'Olá, acessei o site da Allegro Music Store e gostaria de ajuda para escolher um produto.';
 
-const worldCupCampaignCategories = ['Áudio', 'Acessórios', 'Cordas', 'Instrumentos', 'Serviços'];
+const institutionalHighlightCategories = ['Instrumentos', 'Acessórios', 'Áudio profissional', 'Luteria', 'Aulas'];
 
 const campaignCategoryPriority = [
   ['audio', 'som', 'microfone', 'caixa'],
@@ -76,7 +76,7 @@ const campaignCategoryPriority = [
 
 const PRODUCT_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80';
 
-const WORLD_CUP_CAMPAIGN_WHATSAPP_MESSAGE = 'Olá, vi a campanha Esquenta da Copa no site da Allegro Music Store e gostaria de atendimento.';
+const INSTITUTIONAL_WHATSAPP_MESSAGE = 'Olá, acessei o site da Allegro Music Store e gostaria de atendimento.';
 
 function normalizeProduct(product) {
   return {
@@ -259,61 +259,60 @@ function HomePage() {
 
   return (
     <section>
-      <div className="world-cup-campaign" aria-labelledby="world-cup-campaign-title">
-        <div className="world-cup-field-lines" aria-hidden="true">
-          <span className="world-cup-field-center" />
-          <span className="world-cup-field-goal" />
-          <span className="world-cup-ball" />
-          <span className="world-cup-star world-cup-star-one">✦</span>
-          <span className="world-cup-star world-cup-star-two">✧</span>
-          <span className="world-cup-confetti world-cup-confetti-one" />
-          <span className="world-cup-confetti world-cup-confetti-two" />
-          <span className="world-cup-confetti world-cup-confetti-three" />
+      <div className="allegro-institutional" aria-labelledby="allegro-institutional-title">
+        <div className="allegro-sound-lines" aria-hidden="true">
+          <span className="allegro-sound-wave" />
+          <span className="allegro-sound-bar" />
+          <span className="allegro-music-note allegro-music-note-one">♪</span>
+          <span className="allegro-music-note allegro-music-note-two">♬</span>
         </div>
-        <div className="container world-cup-campaign-grid">
-          <div className="world-cup-campaign-copy">
-            <p className="world-cup-campaign-kicker">OFERTA DA SEMANA • COPA, BRASIL, MÚSICA E COMEMORAÇÃO</p>
-            <h2 id="world-cup-campaign-title">Esquenta da Copa na Allegro</h2>
-            <p className="world-cup-campaign-subtitle">Entre no clima da Copa com música, som e acessórios para animar sua torcida.</p>
-            <p className="world-cup-campaign-text">Produtos musicais, áudio, acessórios e atendimento especial na loja física e online.</p>
-            <div className="world-cup-campaign-category-row" aria-label="Categorias priorizadas">
-              {worldCupCampaignCategories.map((category) => <span key={category}>{category}</span>)}
+        <div className="container allegro-institutional-grid">
+          <div className="allegro-institutional-copy">
+            <p className="allegro-institutional-kicker">Loja física e online para quem vive a música</p>
+            <h2 id="allegro-institutional-title">Allegro Music Store</h2>
+            <p className="allegro-institutional-subtitle">Loja física e online para quem vive a música</p>
+            <p className="allegro-institutional-text">Instrumentos musicais, acessórios, áudio profissional, luteria, partituras, arranjos e aulas em um só lugar.</p>
+            <div className="allegro-institutional-category-row" aria-label="Categorias priorizadas">
+              {institutionalHighlightCategories.map((category) => <span key={category}>{category}</span>)}
             </div>
-            <div className="world-cup-campaign-actions">
-              <Link className="btn btn-main world-cup-campaign-products" to="/catalogo" onClick={() => trackEvent('click_campaign_products', { campanha: 'esquenta_copa' })}>
-                <span>Ver produtos</span>
+            <div className="allegro-institutional-actions">
+              <Link className="btn btn-main allegro-institutional-products" to="/catalogo" onClick={() => trackEvent('click_campaign_products', { origem: 'home_institucional' })}>
+                <span>Ver catálogo</span>
                 <ArrowIcon />
               </Link>
               <a
-                className="btn btn-whatsapp world-cup-campaign-whatsapp"
-                href={buildWhatsAppLink(whatsappNumber, WORLD_CUP_CAMPAIGN_WHATSAPP_MESSAGE)}
+                className="btn btn-whatsapp allegro-institutional-whatsapp"
+                href={buildWhatsAppLink(whatsappNumber, INSTITUTIONAL_WHATSAPP_MESSAGE)}
                 target="_blank"
                 rel="noreferrer"
-                onClick={() => trackEvent('click_whatsapp', { origem: 'home_esquenta_copa' })}
+                onClick={() => trackEvent('click_whatsapp', { origem: 'home_institucional' })}
               >
                 <WhatsAppIcon />
                 <span>Falar no WhatsApp</span>
               </a>
+              <Link className="btn btn-secondary allegro-institutional-services" to="/servicos" onClick={() => trackEvent('click_services', { origem: 'home_institucional' })}>
+                <span>Ver serviços</span>
+              </Link>
             </div>
           </div>
-          <div className="world-cup-campaign-showcase" aria-label="Produtos em destaque da campanha Esquenta da Copa na Allegro">
-            <div className="world-cup-campaign-showcase-header">
+          <div className="allegro-institutional-showcase" aria-label="Produtos em destaque da Allegro Music Store">
+            <div className="allegro-institutional-showcase-header">
               <span>Produtos em destaque</span>
               <small>Arraste ou use as setas</small>
             </div>
-            <div className="world-cup-campaign-carousel-shell">
+            <div className="allegro-institutional-carousel-shell">
               <button
                 type="button"
-                className="world-cup-campaign-arrow world-cup-campaign-arrow-left"
-                aria-label="Ver produtos anteriores da campanha"
+                className="allegro-institutional-arrow allegro-institutional-arrow-left"
+                aria-label="Ver produtos anteriores"
                 onClick={() => handleCampaignCarouselScroll(-1)}
               >
                 ‹
               </button>
-              <div className="world-cup-campaign-carousel" ref={campaignCarouselRef} tabIndex="0">
+              <div className="allegro-institutional-carousel" ref={campaignCarouselRef} tabIndex="0">
                 {loadingFeatured ? (
-                  <article className="world-cup-campaign-product-card world-cup-campaign-product-card-placeholder">
-                    <span>Carregando produtos da campanha...</span>
+                  <article className="allegro-institutional-product-card allegro-institutional-product-card-placeholder">
+                    <span>Carregando produtos em destaque...</span>
                   </article>
                 ) : null}
                 {!loadingFeatured && campaignProducts.length ? campaignProducts.map((product) => {
@@ -321,8 +320,8 @@ function HomePage() {
                   const detailsPath = normalizedProduct.id ? `/produto/${normalizedProduct.id}` : '/catalogo';
 
                   return (
-                    <article key={normalizedProduct.id ?? normalizedProduct.nome} className="world-cup-campaign-product-card">
-                      <Link to={detailsPath} className="world-cup-campaign-product-image" aria-label={`Ver ${normalizedProduct.nome}`}>
+                    <article key={normalizedProduct.id ?? normalizedProduct.nome} className="allegro-institutional-product-card">
+                      <Link to={detailsPath} className="allegro-institutional-product-image" aria-label={`Ver ${normalizedProduct.nome}`}>
                         <img
                           src={normalizedProduct.imagem_url || PRODUCT_IMAGE_FALLBACK}
                           alt={normalizedProduct.nome}
@@ -333,26 +332,26 @@ function HomePage() {
                           }}
                         />
                       </Link>
-                      <div className="world-cup-campaign-product-content">
-                        <span className="world-cup-campaign-product-category">{normalizedProduct.categoria}</span>
+                      <div className="allegro-institutional-product-content">
+                        <span className="allegro-institutional-product-category">{normalizedProduct.categoria}</span>
                         <h3>{normalizedProduct.nome}</h3>
                         <strong>{formatPriceBRL(normalizedProduct.preco)}</strong>
-                        <Link className="btn btn-main btn-compact world-cup-campaign-product-button" to={detailsPath} onClick={() => trackEvent('click_campaign_product', { campanha: 'esquenta_copa', produto_id: normalizedProduct.id })}>Comprar</Link>
+                        <Link className="btn btn-main btn-compact allegro-institutional-product-button" to={detailsPath} onClick={() => trackEvent('click_campaign_product', { origem: 'home_institucional', produto_id: normalizedProduct.id })}>Comprar</Link>
                       </div>
                     </article>
                   );
                 }) : null}
                 {!loadingFeatured && !campaignProducts.length ? (
-                  <article className="world-cup-campaign-product-card world-cup-campaign-product-card-placeholder">
-                    <span>Produtos musicais, áudio, acessórios e serviços para animar sua torcida.</span>
-                    <Link className="btn btn-main btn-compact world-cup-campaign-product-button" to="/catalogo">Ver catálogo</Link>
+                  <article className="allegro-institutional-product-card allegro-institutional-product-card-placeholder">
+                    <span>Produtos musicais, áudio, acessórios e serviços selecionados pela Allegro.</span>
+                    <Link className="btn btn-main btn-compact allegro-institutional-product-button" to="/catalogo">Ver catálogo</Link>
                   </article>
                 ) : null}
               </div>
               <button
                 type="button"
-                className="world-cup-campaign-arrow world-cup-campaign-arrow-right"
-                aria-label="Ver próximos produtos da campanha"
+                className="allegro-institutional-arrow allegro-institutional-arrow-right"
+                aria-label="Ver próximos produtos"
                 onClick={() => handleCampaignCarouselScroll(1)}
               >
                 ›
