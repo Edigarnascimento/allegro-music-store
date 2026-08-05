@@ -7,7 +7,7 @@ import { trackEvent } from '../services/analyticsService';
 
 const storeSite = 'https://www.allegromusicstore.com.br';
 const services = 'instrumentos musicais, acessórios, áudio profissional, luteria, partituras, arranjos e aulas';
-const whatsappMessage = 'Olá, acessei o cartão digital da Allegro Music Store no clima da Copa e gostaria de atendimento.';
+const whatsappMessage = 'Olá, acessei o cartão digital da Allegro Music Store e gostaria de atendimento.';
 
 function DigitalCardPage() {
   const storeSettings = useStoreSettings();
@@ -29,26 +29,28 @@ function DigitalCardPage() {
 
   return (
     <section className="digital-card-page section">
-      <div className="digital-card-confetti" aria-hidden="true" />
       <div className="container">
-        <div className="digital-card" role="region" aria-label="Cartão digital Allegro Music Store no clima da Copa">
-          <div className="digital-card-field-lines" aria-hidden="true" />
-          <div className="digital-card-ball" aria-hidden="true">
-            <span />
+        <div className="digital-card" role="region" aria-label="Cartão digital da Allegro Music Store">
+          <div className="digital-card-music-art" aria-hidden="true">
+            <span className="digital-card-note">♪</span>
+            <span className="digital-card-note">♫</span>
+            <span className="digital-card-soundwave">
+              <i /><i /><i /><i /><i /><i /><i />
+            </span>
           </div>
 
           <div className="digital-card-brand">
-            {logoUrl ? <img src={logoUrl} alt={`Logo ${storeName}`} /> : null}
+            {logoUrl ? <img className="digital-card-logo" src={logoUrl} alt={`Logo ${storeName}`} /> : null}
             <div>
-              <p className="digital-card-kicker">Cartão digital • Brasil em campo</p>
-              <h1>Allegro Music Store</h1>
+              <p className="digital-card-kicker">Cartão digital</p>
+              <h1>{storeName}</h1>
               <p className="digital-card-subtitle">Loja física e online para quem vive a música</p>
             </div>
           </div>
 
-          <div className="digital-card-campaign-callout">
-            <strong>Entre no clima da Copa</strong>
-            <p>Entre no clima da Copa com produtos musicais, acessórios, áudio, serviços e atendimento especial.</p>
+          <div className="digital-card-intro">
+            <span aria-hidden="true">♫</span>
+            <p>Instrumentos musicais, acessórios, áudio profissional, luteria, partituras, arranjos e aulas em um só lugar.</p>
           </div>
 
           <div className="digital-card-info-grid">
